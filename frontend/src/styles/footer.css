@@ -1,0 +1,20 @@
+.site-footer {
+  padding: 30px var(--page-padding);
+  color: var(--color-surface);
+  text-align: center;
+  background: var(--color-footer);
+}
+
+.site-footer p {
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+  .site-footer p {
+    font-size: 9px;
+  }
+}
