@@ -12,6 +12,17 @@ class UserRepository {
     }
   }
 
+  // Cari user berdasarkan full name
+  async findByFullName(fullName) {
+    try {
+      const sql = 'SELECT * FROM users WHERE lower(full_name) = lower($1)';
+      const { rows } = await query(sql, [fullName.trim()]);
+      return rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Insert user baru saat Register
   async createUser(userData) {
     try {
