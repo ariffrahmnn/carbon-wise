@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import '../styles/login.css'; // Memakai stylesheet yang sama agar desain konsisten
 
 // URL gambar latar sisi kanan
@@ -32,23 +31,30 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Menggunakan Axios & penyesuaian endpoint API backend Carbon Wise
-      const response = await axios.post('http://localhost:3000/api/v1/auth/register', {
-        namaLengkap: formData.namaLengkap,
-        email: formData.email,
-        password: formData.password,
-        namaSekolah: formData.namaSekolah,
-        kelas: formData.kelas
+      const response = await fetch('http://localhost:3000/api/v1/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          namaLengkap: formData.namaLengkap,
+          email: formData.email,
+          password: formData.password,
+          namaSekolah: formData.namaSekolah,
+          kelas: formData.kelas
+        })
       });
 
-      if (response.status === 201 || response.status === 200) {
+      const data = await response.json();
+
+      if (response.ok) {
         alert('Registrasi Berhasil! Silakan Login.');
-        navigate('/login'); // Redirect langsung ke halaman login
+        navigate('/login');
+      } else {
+        throw new Error(data.message || 'Gagal mendaftar, periksa data Anda.');
       }
     } catch (err) {
-      // Menangkap response error dari backend jika ada
-      const message = err.response?.data?.message || 'Gagal mendaftar, periksa data Anda.';
-      setErrorMsg(message);
+      setErrorMsg(err.message);
     } finally {
       setLoading(false);
     }
