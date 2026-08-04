@@ -92,7 +92,7 @@ export default function Login() {
         
         {/* SISI KIRI: FORM LOGIN */}
         <div className="login-form-section">
-          <h1 className="login-title">Sign In</h1>
+          <h1 className="login-title">Log in</h1>
 
           {errorMsg && <div className="login-error-box">{errorMsg}</div>}
 
@@ -121,7 +121,7 @@ export default function Login() {
               alt="Google Logo" 
               style={{ width: '18px', height: '18px' }}
             />
-            Sign in with Google
+            Log in with Google
           </button>
 
           <div style={{ textAlign: 'center', margin: '10px 0', color: '#888' }}>
@@ -177,7 +177,7 @@ export default function Login() {
             </div>
 
             <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '10px' }}>
-              {loading ? 'LOGGING IN...' : 'SIGN IN'}
+              {loading ? 'LOGGING IN...' : 'LOG IN'}
             </button>
           </form>
         </div>
@@ -196,8 +196,8 @@ export default function Login() {
               type="button" 
               className="login-signup-outline-btn"
               onClick={() => navigate('/register')}
-            >
-              Sign Up
+             >
+              Belum punya akun? Daftar Sekarang
             </button>
           </div>
         </div>
