@@ -1,0 +1,225 @@
+/* ==========================================
+   CSS KHUSUS LAYOUT & HALAMAN LOGIN
+   ========================================== */
+
+.login-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background, #f3f4f6);
+  font-family: var(--font-sans, sans-serif);
+}
+
+.login-main-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.login-card-container {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  background-color: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(36, 0, 0, 0.12);
+}
+
+/* SISI KIRI: FORM */
+.login-form-section {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary, #4e0000);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-social-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.login-google-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 30px;
+  background-color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-google-btn:hover {
+  background-color: #f9fafb;
+}
+
+/* DIVIDER */
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.login-divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: #e5e7eb;
+}
+
+.login-divider-text {
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 0 12px;
+}
+
+/* FORM INPUTS */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-input-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.login-input-group input {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-input-group input:focus {
+  border-color: var(--color-primary, #4e0000);
+}
+
+.login-forgot-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.login-forgot-link {
+  font-size: 13px;
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.login-submit-btn {
+  margin-top: 12px;
+  padding: 14px;
+  background-color: rgba(78, 0, 0, 0.97);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s;
+}
+
+.login-submit-btn:hover {
+  opacity: 0.9;
+}
+
+.login-error-box {
+  padding: 10px 14px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* SISI KANAN: GAMBAR & OVERLAY */
+.login-image-section {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 130px;
+  border-bottom-left-radius: 130px;
+  overflow: hidden;
+}
+
+.login-image-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(78, 0, 0, 0.78);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.login-overlay-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.login-overlay-text {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.9;
+  margin-bottom: 24px;
+}
+
+.login-signup-outline-btn {
+  padding: 10px 32px;
+  border: 2px solid #ffffff;
+  border-radius: 30px;
+  background-color: transparent;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+/* MEDIA QUERY UNTUK TAMPILAN MOBILE */
+@media (max-width: 768px) {
+  .login-card-container {
+    flex-direction: column;
+  }
+  .login-image-section {
+    display: none; /* Sembunyikan gambar di layar HP agar hemat ruang */
+  }
+}
