@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import SuccessModalCard from './SuccessModalCard.jsx';
 import '../styles/login.css'; // Memakai stylesheet yang sama agar desain konsisten
 
 // URL gambar latar sisi kanan
 const fotoHutan = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop";
 
 export default function Register() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    nama: '',
+    namaLengkap: '',
     email: '',
     password: '',
-    sekolah: '',
+    namaSekolah: '',
     kelas: ''
   });
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -28,18 +33,27 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch('http://localhost:3000/api/v1/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          namaLengkap: formData.namaLengkap,
+          email: formData.email,
+          password: formData.password,
+          namaSekolah: formData.namaSekolah,
+          kelas: formData.kelas
+        })
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Gagal mendaftar, periksa data Anda.');
 
-      alert('Registrasi Berhasil! Silakan Login.');
-      // Navigasi/redirect bisa ditambahkan di sini jika menggunakan react-router
-
+      if (response.ok) {
+        setShowSuccessModal(true);
+      } else {
+        throw new Error(data.message || 'Gagal mendaftar, periksa data Anda.');
+      }
     } catch (err) {
       setErrorMsg(err.message);
     } finally {
@@ -47,8 +61,22 @@ export default function Register() {
     }
   };
 
+  const handleModalConfirm = () => {
+    setShowSuccessModal(false);
+    navigate('/login');
+  };
+
   return (
     <div className="login-main-container">
+      {/* SUCCESS MODAL CARD */}
+      <SuccessModalCard
+        isOpen={showSuccessModal}
+        title="Registrasi Berhasil!"
+        message="Selamat datang di CarbonWise! Akun Anda telah berhasil dibuat. Silakan login."
+        buttonText="Lanjutkan ke Login"
+        onConfirm={handleModalConfirm}
+      />
+
       <div className="login-card-container">
         
         {/* SISI KIRI: FORM REGISTER */}
@@ -58,20 +86,20 @@ export default function Register() {
           {errorMsg && <div className="login-error-box">{errorMsg}</div>}
 
           <form onSubmit={handleSubmit} className="login-form">
-            {/* INPUT NAMA */}
+            {/* INPUT NAMA LENGKAP */}
             <div className="login-input-group">
               <label>Nama Lengkap</label>
               <input
                 type="text"
-                name="nama"
+                name="namaLengkap"
                 required
                 placeholder="Contoh: Budi Santoso"
-                value={formData.nama}
+                value={formData.namaLengkap}
                 onChange={handleChange}
               />
             </div>
 
-            {/* INPUT EMAIL / GMAIL */}
+            {/* INPUT EMAIL */}
             <div className="login-input-group">
               <label>Email / Gmail</label>
               <input
@@ -102,10 +130,10 @@ export default function Register() {
               <label>Nama Sekolah</label>
               <input
                 type="text"
-                name="sekolah"
+                name="namaSekolah"
                 required
                 placeholder="Contoh: SMAN 1 Pekanbaru"
-                value={formData.sekolah}
+                value={formData.namaSekolah}
                 onChange={handleChange}
               />
             </div>
@@ -139,7 +167,13 @@ export default function Register() {
             <p className="login-overlay-text">
               To keep connected with us please login with your personal info
             </p>
-            <button className="login-signup-outline-btn">Log in</button>
+            <button 
+              type="button" 
+              className="login-signup-outline-btn"
+              onClick={() => navigate('/login')}
+            >
+              Log in
+            </button>
           </div>
         </div>
 

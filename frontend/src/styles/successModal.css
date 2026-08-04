@@ -1,0 +1,96 @@
+/* ===================================================
+   CUSTOM SUCCESS MODAL CARD STYLES
+   =================================================== */
+
+.success-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(18, 12, 14, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.success-modal-card {
+  position: relative;
+  width: min(100%, 420px);
+  padding: 36px 32px 32px;
+  background: #ffffff;
+  border: 1px solid rgba(78, 0, 0, 0.12);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(36, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.success-modal-icon-wrap {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  place-items: center;
+  color: #10b981; /* Emerald Green */
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+}
+
+.success-modal-icon-wrap .material-symbols-outlined {
+  font-size: 44px;
+  font-variation-settings: 'FILL' 1, 'wght' 600;
+}
+
+.success-modal-title {
+  color: #4e0000;
+  font-family: var(--font-display, 'Outfit', 'Inter', sans-serif);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.success-modal-message {
+  margin-top: 10px;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.success-modal-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 28px;
+  padding: 14px 24px;
+  color: #ffffff;
+  background: #4e0000;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(78, 0, 0, 0.25);
+  transition: background 200ms ease, transform 180ms ease, box-shadow 200ms ease;
+}
+
+.success-modal-confirm-btn:hover {
+  background: #380000;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(78, 0, 0, 0.35);
+}
+
+.success-modal-confirm-btn .material-symbols-outlined {
+  font-size: 18px;
+  transition: transform 200ms ease;
+}
+
+.success-modal-confirm-btn:hover .material-symbols-outlined {
+  transform: translateX(4px);
+}

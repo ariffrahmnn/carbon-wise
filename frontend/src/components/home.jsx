@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom' // 1. Import useNavigate
 import landingPageVideo from '../assets/LandingPage.mp4'
 import { animateHeroEntrance } from '../animations/heroAnimation.js'
 
 function Home() {
+  const navigate = useNavigate() // 2. Inisialisasi hook navigate
+
   const eyebrowRef = useRef(null)
   const line1Ref = useRef(null)
   const line2Ref = useRef(null)
@@ -18,6 +21,11 @@ function Home() {
       buttonRef: buttonRef.current,
     })
   }, [])
+
+  // 3. Handler untuk navigasi ke Login
+  const handleStart = () => {
+    navigate('/login')
+  }
 
   return (
     <section className="hero page-container" id="home">
@@ -38,11 +46,19 @@ function Home() {
         <p ref={subtitleRef}>
           Setiap langkah kecil berarti. Pantau dan kurangi emisi karbon harian Anda dengan cara yang lebih menyenangkan.
         </p>
-        <a className="primary-button" href="#edukasi" ref={buttonRef}>
+
+        {/* 4. Mengubah <a> menjadi <button> dengan onClick */}
+        <button 
+          className="primary-button" 
+          onClick={handleStart} 
+          ref={buttonRef}
+          type="button"
+        >
           Mulai sekarang
           <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
-        </a>
+        </button>
       </div>
+
       <div className="hero__visual" aria-hidden="true">
         <div className="hero__video-wrap">
           <video
