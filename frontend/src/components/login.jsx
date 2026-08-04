@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SuccessModalCard from './SuccessModalCard.jsx';
+import ForgotPasswordModal from './ForgotPasswordModal.jsx';
 import '../styles/login.css';
 
 const fotoHutan = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop";
@@ -15,6 +16,7 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -78,6 +80,12 @@ export default function Login() {
         message="Selamat datang kembali di CarbonWise! Akses akun Anda telah aktif."
         buttonText="Masuk ke Dashboard"
         onConfirm={handleModalConfirm}
+      />
+
+      {/* FORGOT PASSWORD MODAL */}
+      <ForgotPasswordModal
+        isOpen={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
       />
 
       <div className="login-card-container">
@@ -147,7 +155,26 @@ export default function Login() {
               />
             </div>
 
-            <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '15px' }}>
+            {/* LINK LUPA KATA SANDI */}
+            <div style={{ textAlign: 'right', marginTop: '6px', marginBottom: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setShowForgotPasswordModal(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#4e0000',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Lupa Kata Sandi?
+              </button>
+            </div>
+
+            <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '10px' }}>
               {loading ? 'LOGGING IN...' : 'SIGN IN'}
             </button>
           </form>
