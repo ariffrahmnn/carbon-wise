@@ -3,7 +3,7 @@ import Edukasi from './edukasi.jsx'
 import News from './news.jsx'
 import '../styles/main.css'
 
-function Main() {
+Main() {
   return (
     <main>
       <Home />
