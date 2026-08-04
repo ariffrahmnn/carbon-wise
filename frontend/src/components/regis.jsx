@@ -172,13 +172,6 @@ export default function Register() {
             <p className="login-overlay-text">
               To keep connected with us please login with your personal info
             </p>
-            <button 
-              type="button" 
-              className="login-signup-outline-btn"
-              onClick={() => navigate('/login')}
-            >
-              Log in
-            </button>
           </div>
         </div>
 
