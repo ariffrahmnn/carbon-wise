@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SuccessModalCard from './SuccessModalCard.jsx';
 import '../styles/login.css';
 
 const fotoHutan = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop";
@@ -13,6 +14,7 @@ export default function Login() {
   });
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -43,11 +45,10 @@ export default function Login() {
 
       if (response.ok) {
         const { token, user } = data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        if (token) localStorage.setItem('token', token);
+        if (user) localStorage.setItem('user', JSON.stringify(user));
 
-        alert('Login Berhasil!');
-        navigate('/dashboard');
+        setShowSuccessModal(true);
       } else {
         throw new Error(data.message || 'Login gagal, periksa nama dan password Anda.');
       }
@@ -58,14 +59,27 @@ export default function Login() {
     }
   };
 
+  const handleModalConfirm = () => {
+    setShowSuccessModal(false);
+    navigate('/dashboard');
+  };
+
   // Handle Login Google Placeholder
   const handleGoogleLogin = () => {
-    // Nanti dihubungkan dengan OAuth Google (misal redirect ke backend endpoint atau pakai library @react-oauth/google)
     window.location.href = 'http://localhost:3000/api/v1/auth/google';
   };
 
   return (
     <div className="login-main-container">
+      {/* SUCCESS MODAL CARD */}
+      <SuccessModalCard
+        isOpen={showSuccessModal}
+        title="Login Berhasil!"
+        message="Selamat datang kembali di CarbonWise! Akses akun Anda telah aktif."
+        buttonText="Masuk ke Dashboard"
+        onConfirm={handleModalConfirm}
+      />
+
       <div className="login-card-container">
         
         {/* SISI KIRI: FORM LOGIN */}

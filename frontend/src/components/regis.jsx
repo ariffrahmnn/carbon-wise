@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SuccessModalCard from './SuccessModalCard.jsx';
 import '../styles/login.css'; // Memakai stylesheet yang sama agar desain konsisten
 
 // URL gambar latar sisi kanan
@@ -17,6 +18,7 @@ export default function Register() {
   });
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -48,8 +50,7 @@ export default function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Registrasi Berhasil! Silakan Login.');
-        navigate('/login');
+        setShowSuccessModal(true);
       } else {
         throw new Error(data.message || 'Gagal mendaftar, periksa data Anda.');
       }
@@ -60,8 +61,22 @@ export default function Register() {
     }
   };
 
+  const handleModalConfirm = () => {
+    setShowSuccessModal(false);
+    navigate('/login');
+  };
+
   return (
     <div className="login-main-container">
+      {/* SUCCESS MODAL CARD */}
+      <SuccessModalCard
+        isOpen={showSuccessModal}
+        title="Registrasi Berhasil!"
+        message="Selamat datang di CarbonWise! Akun Anda telah berhasil dibuat. Silakan login."
+        buttonText="Lanjutkan ke Login"
+        onConfirm={handleModalConfirm}
+      />
+
       <div className="login-card-container">
         
         {/* SISI KIRI: FORM REGISTER */}
