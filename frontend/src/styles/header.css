@@ -12,13 +12,22 @@
   backdrop-filter: blur(16px);
 }
 
-.site-header--scrolled .brand,
-.site-header--scrolled .menu-toggle {
-  color: var(--color-surface, #ffffff);
+/* Scrolled Brand & Logo (Pure White & Sharp Maroon Contrast) */
+.site-header--scrolled .brand {
+  color: #ffffff;
+}
+
+.site-header--scrolled .brand__name {
+  color: #ffffff !important;
 }
 
 .site-header--scrolled .brand__icon {
-  color: var(--color-primary, #4e0000);
+  background: #ffffff !important;
+  color: #4e0000 !important;
+}
+
+.site-header--scrolled .menu-toggle {
+  color: #ffffff;
 }
 
 .site-header__inner {
@@ -32,7 +41,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--color-primary, #4e0000);
+  color: #4e0000;
   text-decoration: none;
 }
 
@@ -41,9 +50,10 @@
   width: 34px;
   height: 34px;
   place-items: center;
-  color: var(--color-surface, #ffffff);
-  background: var(--color-primary, #4e0000);
+  color: #ffffff;
+  background: #4e0000;
   border-radius: 10px;
+  transition: background 200ms ease, color 200ms ease;
 }
 
 .brand__icon .material-symbols-outlined {
@@ -55,10 +65,12 @@
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.04em;
+  color: #4e0000;
+  transition: color 200ms ease;
 }
 
 /* ===================================================
-   SEGMENTED SNAP RAIL NAVBAR (4 COLUMNS: Home, Edukasi, News, About)
+   SEGMENTED SNAP RAIL NAVBAR (4 COLUMNS)
    =================================================== */
 .site-navigation {
   --rail-padding: 4px;
@@ -69,14 +81,13 @@
   width: 440px;
   max-width: 100%;
   padding: var(--rail-padding);
-  background: rgba(78, 0, 0, 0.92); /* Background Kapsul Dark Maroon Glass */
+  background: rgba(78, 0, 0, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   backdrop-filter: blur(16px);
   box-shadow: 0 8px 24px rgba(36, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
-/* 4 Equal flex: 1 columns */
 .site-navigation a {
   flex: 1;
   position: relative;
@@ -91,7 +102,6 @@
   white-space: nowrap;
 }
 
-/* Single pill pseudo-element (1/4 of container width) */
 .site-navigation::before {
   content: "";
   position: absolute;
@@ -107,26 +117,17 @@
   z-index: 1;
 }
 
-/* Set --i via CSS :has() for hover and active states (4 items) */
-.site-navigation:has(a:nth-child(1):hover),
-.site-navigation:has(a:nth-child(1).active) {
-  --i: 0;
-}
+/* 1. Base Active Route Positions */
+.site-navigation:has(a:nth-child(1).active) { --i: 0; }
+.site-navigation:has(a:nth-child(2).active) { --i: 1; }
+.site-navigation:has(a:nth-child(3).active) { --i: 2; }
+.site-navigation:has(a:nth-child(4).active) { --i: 3; }
 
-.site-navigation:has(a:nth-child(2):hover),
-.site-navigation:has(a:nth-child(2).active) {
-  --i: 1;
-}
-
-.site-navigation:has(a:nth-child(3):hover),
-.site-navigation:has(a:nth-child(3).active) {
-  --i: 2;
-}
-
-.site-navigation:has(a:nth-child(4):hover),
-.site-navigation:has(a:nth-child(4).active) {
-  --i: 3;
-}
+/* 2. Hover Rules (MUST come AFTER active rules to ALWAYS override on hover!) */
+.site-navigation:has(a:nth-child(1):hover) { --i: 0; }
+.site-navigation:has(a:nth-child(2):hover) { --i: 1; }
+.site-navigation:has(a:nth-child(3):hover) { --i: 2; }
+.site-navigation:has(a:nth-child(4):hover) { --i: 3; }
 
 /* Active / Hover text contrast adjustment */
 .site-navigation:has(a:nth-child(1):hover) a:nth-child(1),
