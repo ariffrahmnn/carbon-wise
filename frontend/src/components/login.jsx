@@ -38,7 +38,7 @@ export default function Login() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          namaLengkap: formData.namaLengkap,
+          fullName: formData.namaLengkap,
           password: formData.password
         })
       });
@@ -139,6 +139,7 @@ export default function Login() {
                 placeholder="Masukkan Nama Lengkap"
                 value={formData.namaLengkap}
                 onChange={handleChange}
+                autoComplete="one-time-code"
               />
             </div>
 
@@ -152,6 +153,7 @@ export default function Login() {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="one-time-code"
               />
             </div>
 

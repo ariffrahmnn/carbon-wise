@@ -39,11 +39,11 @@ export default function Register() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          namaLengkap: formData.namaLengkap,
+          fullName: formData.namaLengkap,
           email: formData.email,
           password: formData.password,
-          namaSekolah: formData.namaSekolah,
-          kelas: formData.kelas
+          schoolName: formData.namaSekolah,
+          classGrade: formData.kelas
         })
       });
 
@@ -96,6 +96,7 @@ export default function Register() {
                 placeholder="Contoh: Budi Santoso"
                 value={formData.namaLengkap}
                 onChange={handleChange}
+                autoComplete="one-time-code"
               />
             </div>
 
@@ -109,6 +110,7 @@ export default function Register() {
                 placeholder="Contoh: budi@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
+                 autoComplete="one-time-code"
               />
             </div>
 
@@ -122,6 +124,7 @@ export default function Register() {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
+                 autoComplete="one-time-code"
               />
             </div>
 
@@ -135,6 +138,7 @@ export default function Register() {
                 placeholder="Contoh: SMAN 1 Pekanbaru"
                 value={formData.namaSekolah}
                 onChange={handleChange}
+                 autoComplete="one-time-code"
               />
             </div>
 
@@ -148,6 +152,7 @@ export default function Register() {
                 placeholder="Contoh: 12.1"
                 value={formData.kelas}
                 onChange={handleChange}
+                 autoComplete="one-time-code"
               />
             </div>
 

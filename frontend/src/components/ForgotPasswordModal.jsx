@@ -53,12 +53,19 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     setLoading(true);
 
     try {
-      // Panggilan API backend placeholder (bebas disesuaikan oleh teman Anda)
-      await fetch('http://localhost:3000/api/v1/auth/forgot-password', {
+      // Panggilan API backend
+      const response = await fetch('http://localhost:3000/api/v1/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
-      }).catch(() => {});
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setErrorMsg(data.message || 'Gagal mengirim link reset. Periksa kembali email Anda.');
+        return;
+      }
 
       setIsSent(true);
 
