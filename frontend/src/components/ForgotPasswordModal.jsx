@@ -117,9 +117,11 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
             <div className="forgot-modal-icon-wrap success" ref={iconRef}>
               <span className="material-symbols-outlined">mark_email_read</span>
             </div>
-            <h2 className="forgot-modal-title">Periksa Inbox Gmail Anda!</h2>
+            <h2 className="forgot-modal-title">Link Terkirim ke Gmail!</h2>
             <p className="forgot-modal-subtitle">
-              Instruksi reset kata sandi telah dikirim ke <strong className="email-highlight">{email}</strong>. Silakan cek kotak masuk (inbox) atau folder spam Gmail Anda.
+              Link reset kata sandi telah dikirim ke <strong className="email-highlight">{email}</strong>. 
+              <br /><br />
+              💡 <em>Silakan periksa <strong>Kotak Masuk (Inbox)</strong> atau folder <strong>Spam / Promosi</strong> di Gmail Anda.</em>
             </p>
             <button type="button" className="forgot-modal-submit-btn" onClick={onClose}>
               <span>Kembali ke Login</span>

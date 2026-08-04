@@ -13,6 +13,7 @@ import Header from './components/header.jsx'
 import Footer from './components/footer.jsx'
 import Login from './components/login.jsx'
 import Regis from './components/regis.jsx'
+import ResetPassword from './components/ResetPassword.jsx'
 
 // News Components
 import News1 from './components/news1.jsx'
@@ -35,12 +36,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* Landing Page Utamama */}
+        {/* Landing Page Utama */}
         <Route path="/" element={<LandingPage />} />
 
-        {/* Halaman Auth (Login & Register) */}
+        {/* Halaman Auth (Login, Register & Reset Password) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Regis />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Halaman Standar */}
         <Route path="/about" element={<About />} />
