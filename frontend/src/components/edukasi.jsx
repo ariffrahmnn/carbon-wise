@@ -1,4 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import {
+  animateAccordionExpand,
+  animateAccordionCollapse,
+  animateCardClick,
+} from '../animations/accordionAnimation.js'
 
 const facts = [
   {
@@ -35,9 +40,39 @@ const facts = [
 
 function Edukasi() {
   const [openFact, setOpenFact] = useState(null)
+  const cardRefs = useRef({})
+  const leftIconRefs = useRef({})
+  const answerRefs = useRef({})
+  const toggleIconRefs = useRef({})
 
   const toggleFact = (index) => {
-    setOpenFact((currentIndex) => (currentIndex === index ? null : index))
+    const currentOpen = openFact
+    const nextIndex = currentOpen === index ? null : index
+
+    // Trigger tactile card press & left icon spin animation
+    animateCardClick(cardRefs.current[index], leftIconRefs.current[index])
+
+    if (currentOpen !== null && answerRefs.current[currentOpen]) {
+      animateAccordionCollapse(
+        answerRefs.current[currentOpen],
+        toggleIconRefs.current[currentOpen],
+        () => {
+          if (nextIndex === null) setOpenFact(null)
+        }
+      )
+    }
+
+    if (nextIndex !== null) {
+      setOpenFact(nextIndex)
+      setTimeout(() => {
+        if (answerRefs.current[nextIndex]) {
+          animateAccordionExpand(
+            answerRefs.current[nextIndex],
+            toggleIconRefs.current[nextIndex]
+          )
+        }
+      }, 10)
+    }
   }
 
   return (
@@ -52,7 +87,11 @@ function Edukasi() {
           const answerId = `fact-answer-${index}`
 
           return (
-            <article className={`fact${isOpen ? ' fact--open' : ''}`} key={fact.question}>
+            <article
+              className={`fact${isOpen ? ' fact--open' : ''}`}
+              key={fact.question}
+              ref={(el) => (cardRefs.current[index] = el)}
+            >
               <button
                 className="fact__trigger"
                 type="button"
@@ -61,14 +100,29 @@ function Edukasi() {
                 onClick={() => toggleFact(index)}
               >
                 <span className="fact__label">
-                  <span className="fact__icon material-symbols-outlined" aria-hidden="true">{fact.icon}</span>
+                  <span
+                    className="fact__icon material-symbols-outlined"
+                    aria-hidden="true"
+                    ref={(el) => (leftIconRefs.current[index] = el)}
+                  >
+                    {fact.icon}
+                  </span>
                   <span>{fact.question}</span>
                 </span>
-                <span className="fact__toggle material-symbols-outlined" aria-hidden="true">
+                <span
+                  className="fact__toggle material-symbols-outlined"
+                  aria-hidden="true"
+                  ref={(el) => (toggleIconRefs.current[index] = el)}
+                >
                   {isOpen ? 'remove' : 'add'}
                 </span>
               </button>
-              <div className="fact__answer" id={answerId} hidden={!isOpen}>
+              <div
+                className="fact__answer"
+                id={answerId}
+                hidden={!isOpen}
+                ref={(el) => (answerRefs.current[index] = el)}
+              >
                 <p>{fact.answer}</p>
               </div>
             </article>

@@ -7,22 +7,18 @@
 }
 
 .site-header--scrolled {
-  background: rgba(78, 0, 0, 0.97);
+  background: rgba(78, 0, 0, 0.95);
   box-shadow: 0 8px 24px rgba(36, 0, 0, 0.18);
+  backdrop-filter: blur(16px);
 }
 
 .site-header--scrolled .brand,
-.site-header--scrolled .site-navigation a,
 .site-header--scrolled .menu-toggle {
-  color: var(--color-surface);
+  color: var(--color-surface, #ffffff);
 }
 
 .site-header--scrolled .brand__icon {
-  color: var(--color-primary);
-}
-
-.site-header--scrolled .site-navigation a:hover {
-  color: var(--color-accent);
+  color: var(--color-primary, #4e0000);
 }
 
 .site-header__inner {
@@ -36,7 +32,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--color-primary);
+  color: var(--color-primary, #4e0000);
   text-decoration: none;
 }
 
@@ -45,8 +41,8 @@
   width: 34px;
   height: 34px;
   place-items: center;
-  color: var(--color-primary);
-  background: var(--color-surface);
+  color: var(--color-surface, #ffffff);
+  background: var(--color-primary, #4e0000);
   border-radius: 10px;
 }
 
@@ -61,36 +57,110 @@
   letter-spacing: -0.04em;
 }
 
+/* ===================================================
+   SEGMENTED SNAP RAIL NAVBAR (4 COLUMNS: Home, Edukasi, News, About)
+   =================================================== */
 .site-navigation {
+  --rail-padding: 4px;
+  --i: 0;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 32px;
+  width: 440px;
+  max-width: 100%;
+  padding: var(--rail-padding);
+  background: rgba(78, 0, 0, 0.92); /* Background Kapsul Dark Maroon Glass */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(36, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
+/* 4 Equal flex: 1 columns */
 .site-navigation a {
-  color: var(--color-primary);
-  font-size: 15px;
-  font-weight: 700;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  padding: 8px 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  font-weight: 600;
   text-decoration: none;
-  transition: color 180ms ease;
+  text-align: center;
+  transition: color 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
 }
 
-.site-navigation a:hover {
-  color: var(--color-muted);
+/* Single pill pseudo-element (1/4 of container width) */
+.site-navigation::before {
+  content: "";
+  position: absolute;
+  top: var(--rail-padding);
+  bottom: var(--rail-padding);
+  left: var(--rail-padding);
+  width: calc((100% - (var(--rail-padding) * 2)) / 4);
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transform: translateX(calc(var(--i) * 100%));
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
 }
 
+/* Set --i via CSS :has() for hover and active states (4 items) */
+.site-navigation:has(a:nth-child(1):hover),
+.site-navigation:has(a:nth-child(1).active) {
+  --i: 0;
+}
+
+.site-navigation:has(a:nth-child(2):hover),
+.site-navigation:has(a:nth-child(2).active) {
+  --i: 1;
+}
+
+.site-navigation:has(a:nth-child(3):hover),
+.site-navigation:has(a:nth-child(3).active) {
+  --i: 2;
+}
+
+.site-navigation:has(a:nth-child(4):hover),
+.site-navigation:has(a:nth-child(4).active) {
+  --i: 3;
+}
+
+/* Active / Hover text contrast adjustment */
+.site-navigation:has(a:nth-child(1):hover) a:nth-child(1),
+.site-navigation:has(a:nth-child(1).active) a:nth-child(1),
+.site-navigation:has(a:nth-child(2):hover) a:nth-child(2),
+.site-navigation:has(a:nth-child(2).active) a:nth-child(2),
+.site-navigation:has(a:nth-child(3):hover) a:nth-child(3),
+.site-navigation:has(a:nth-child(3).active) a:nth-child(3),
+.site-navigation:has(a:nth-child(4):hover) a:nth-child(4),
+.site-navigation:has(a:nth-child(4).active) a:nth-child(4) {
+  color: #4e0000;
+  font-weight: 700;
+}
+
+/* Scrolled Header adjustment */
+.site-header--scrolled .site-navigation {
+  background: rgba(36, 0, 0, 0.95);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Mobile Toggle Button */
 .menu-toggle {
   display: none;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  color: var(--color-primary);
+  color: var(--color-primary, #4e0000);
   background: transparent;
+  border: none;
   cursor: pointer;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   .site-header__inner {
     position: relative;
     min-height: 68px;
@@ -102,45 +172,36 @@
 
   .site-navigation {
     position: absolute;
-    top: calc(100% - 1px);
-    right: var(--page-padding);
-    left: var(--page-padding);
+    top: calc(100% + 8px);
+    right: var(--page-padding, 16px);
+    left: var(--page-padding, 16px);
+    width: auto;
     display: none;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0;
     padding: 8px;
-    background: var(--color-surface);
-    border: 1px solid rgba(138, 113, 110, 0.2);
+    background: rgba(78, 0, 0, 0.98);
     border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(36, 0, 0, 0.12);
+    backdrop-filter: blur(20px);
+  }
+
+  .site-navigation::before {
+    display: none;
   }
 
   .site-navigation--open {
     display: flex;
   }
 
-  .site-header--scrolled .site-navigation {
-    background: var(--color-primary);
-    border-color: rgba(255, 255, 255, 0.18);
-  }
-
-  .site-header--scrolled .site-navigation a {
-    color: var(--color-surface);
-  }
-
   .site-navigation a {
-    padding: 14px 16px;
-    border-radius: 10px;
+    padding: 12px 16px;
+    width: 100%;
+    text-align: left;
+    color: #ffffff;
   }
 
-  .site-navigation a:hover {
-    background: var(--color-accent-soft);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-navigation a {
-    transition: none;
+  .site-navigation a:hover,
+  .site-navigation a.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
   }
 }

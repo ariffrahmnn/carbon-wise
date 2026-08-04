@@ -1,10 +1,14 @@
-import News2 from './news2.jsx' // Import komponen News2 dari news2.jsx
+import Home from './home.jsx'
+import Edukasi from './edukasi.jsx'
+import News from './news.jsx'
 import '../styles/main.css'
 
 function Main() {
   return (
     <main>
-      <News2 /> {/* Menampilkan komponen News2 */}
+      <Home />
+      <Edukasi />
+      <News />
     </main>
   )
 }
