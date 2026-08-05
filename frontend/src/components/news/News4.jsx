@@ -1,8 +1,8 @@
 import React from 'react';
-import '../styles/news.css';
+import '../../styles/news/article.css';
 
 // Import gambar dari folder assets
-import sampahImg from '../assets/sampah.jpg';
+import sampahImg from '../../assets/sampah.jpg';
 
 export default function News4() {
   return (

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SuccessModalCard from './SuccessModalCard.jsx';
-import '../styles/login.css'; // Memakai stylesheet yang sama agar desain konsisten
+import gsap from 'gsap';
+import SuccessModalCard from '../shared/SuccessModalCard.jsx';
+import '../../../styles/auth/shared/auth-form.css'; // Memakai stylesheet yang sama agar desain konsisten
 
 // URL gambar latar sisi kanan
 const fotoHutan = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop";
@@ -19,6 +20,20 @@ export default function Register() {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+    // Animasi Entrance GSAP untuk tombol navigasi
+    gsap.fromTo(
+      ".auth-back-home-btn",
+      { opacity: 0, x: -15 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }
+    );
+    gsap.fromTo(
+      ".login-signup-outline-btn",
+      { opacity: 0, scale: 0.9, y: 15 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.55, delay: 0.2, ease: "back.out(1.5)" }
+    );
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -81,6 +96,14 @@ export default function Register() {
         
         {/* SISI KIRI: FORM REGISTER */}
         <div className="login-form-section">
+          <button
+            type="button"
+            className="auth-back-home-btn"
+            onClick={() => navigate('/')}
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+            Kembali ke Beranda
+          </button>
           <h1 className="login-title">Create Account</h1>
 
           {errorMsg && <div className="login-error-box">{errorMsg}</div>}
@@ -159,6 +182,24 @@ export default function Register() {
             <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '15px' }}>
               {loading ? 'PROCESSING...' : 'SIGN UP'}
             </button>
+
+            <div className="auth-mobile-link">
+              <button 
+                type="button" 
+                onClick={() => navigate('/login')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#4e0000',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Sudah punya akun? Log in
+              </button>
+            </div>
           </form>
         </div>
 
@@ -172,6 +213,13 @@ export default function Register() {
             <p className="login-overlay-text">
               To keep connected with us please login with your personal info
             </p>
+            <button 
+              type="button" 
+              className="login-signup-outline-btn"
+              onClick={() => navigate('/login')}
+            >
+              Sudah punya akun? Log in
+            </button>
           </div>
         </div>
 

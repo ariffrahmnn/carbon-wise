@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import '../styles/header.css'
+import '../styles/shared/header.css'
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -58,8 +58,11 @@ function Header() {
     closeMenu()
   }
 
+  const isNotHome = typeof window !== 'undefined' && window.location.pathname !== '/';
+  const isSolidHeader = isScrolled || isNotHome || currentPath.includes('/about');
+
   return (
-    <header className={`site-header${isScrolled ? ' site-header--scrolled' : ''}`}>
+    <header className={`site-header${isSolidHeader ? ' site-header--scrolled' : ''}`}>
       <div className="site-header__inner page-container">
         <a className="brand" href="/" onClick={() => handleNavClick('/')}>
           <span className="brand__icon" aria-hidden="true">
@@ -102,7 +105,7 @@ function Header() {
           </a>
           <a
             href="/#news"
-            className={currentPath.includes('#news') ? 'active' : ''}
+            className={currentPath.includes('news') ? 'active' : ''}
             onClick={() => handleNavClick('/#news')}
           >
             News

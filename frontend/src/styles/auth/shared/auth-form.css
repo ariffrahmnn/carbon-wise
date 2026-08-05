@@ -212,10 +212,75 @@
   font-size: 13px;
   cursor: pointer;
   letter-spacing: 1px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.login-signup-outline-btn:hover {
+  background-color: #ffffff;
+  color: var(--color-primary, #4e0000);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+/* TOMBOL BACK TO HOME ("<- Kembali ke Beranda") */
+.auth-back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 15px;
+  padding: 0;
+  transition: color 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-back-home-btn:hover {
+  color: var(--color-primary, #4e0000);
+  transform: translateX(-4px);
+}
+
+.auth-back-home-btn .material-symbols-outlined {
+  font-size: 18px;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-back-home-btn:hover .material-symbols-outlined {
+  transform: translateX(-3px);
+}
+
+.auth-mobile-link {
+  display: none;
+}
+
+.auth-mobile-link button {
+  background: none;
+  border: none;
+  color: var(--color-primary, #4e0000);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-mobile-link button:hover {
+  color: #380000;
+  transform: translateY(-1px) scale(1.02);
 }
 
 /* MEDIA QUERY UNTUK TAMPILAN MOBILE */
 @media (max-width: 768px) {
+  .auth-mobile-link {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+  }
+
   .login-main-container {
     align-items: flex-start;
     min-height: 100vh;
@@ -230,7 +295,7 @@
 
   .login-form-section {
     width: 100%;
-    padding: 28px 22px 10px;
+    padding: 28px 22px 20px;
   }
 
   .login-submit-btn {
@@ -242,38 +307,6 @@
   }
 
   .login-image-section {
-    display: flex;
-    width: 100%;
-    min-height: 48px;
-    background-image: none !important;
-    background-color: transparent;
-    border-radius: 0;
-  }
-
-  .login-image-overlay {
-    position: static;
-    width: 100%;
-    padding: 0 22px 22px;
-    background-color: transparent;
-  }
-
-  .login-overlay-title,
-  .login-overlay-text {
-    display: none;
-  }
-
-  .login-signup-outline-btn {
-    display: block;
-    min-width: 0;
-    min-height: 36px;
-    margin: 0 auto;
-    padding: 4px 14px;
-    color: var(--color-primary, #4e0000);
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    letter-spacing: 0;
-    text-decoration: underline;
+    display: none !important;
   }
 }

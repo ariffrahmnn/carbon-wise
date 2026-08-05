@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import '../styles/forgotPasswordModal.css';
+import '../../../styles/auth/login/forgot-password-modal.css';
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {
   const [email, setEmail] = useState('');

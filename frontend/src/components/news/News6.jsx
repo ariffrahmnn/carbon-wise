@@ -1,8 +1,8 @@
 import React from 'react';
-import '../styles/news.css';
+import '../../styles/news/article.css';
 
 // Import gambar dari folder assets
-import asalKarbonImg from '../assets/asalkarbon.jpg';
+import asalKarbonImg from '../../assets/asalkarbon.jpg';
 
 export default function News6() {
   return (
