@@ -1,47 +1,42 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Car, 
-  Bike, 
-  Bus, 
-  Footprints, 
-  Trash2, 
-  Plus, 
-  Home, 
-  PenTool, 
-  Navigation, 
-  BarChart3, 
-  LogOut, 
-  Leaf,
-  CheckCircle,
-  AlertCircle,
-  X
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Car, Bike, Bus, Footprints, Trash2, Plus, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 import '../styles/headerkalkulator.css';
-import '../styles/footer.css';
+import '../styles/shared/footer.css';
 import '../styles/travel.css';
 
 const Travel = () => {
-  const vehicleFactors = {
-    'Mobil': 0.12,
-    'Motor': 0.05,
-    'Bus': 0.08,
-    'Jalan Kaki': 0.00
-  };
-
+  const navigate = useNavigate();
+  const [masterItems, setMasterItems] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [distance, setDistance] = useState('');
-  const [travelLogs, setTravelLogs] = useState([
-    { id: 1, name: 'Mobil', km: 2, factor: 0.12 },
-    { id: 2, name: 'Motor', km: 2, factor: 0.05 },
-  ]);
+  const [travelLogs, setTravelLogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // State Toast Alert Responsif
+  // State Toast Alert
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [user, setUser] = useState(null);
 
-  const userName = "Fikri Azhar";
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (err) {
+        console.error('Gagal membaca data user dari localStorage:', err);
+      }
+    }
+  }, []);
+
+  const userName = user?.fullName || user?.name || user?.username || 'User';
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
 
   const showNotification = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -50,24 +45,45 @@ const Travel = () => {
     }, 3500);
   };
 
-  const renderVehicleIcon = (vehicleName) => {
-    switch (vehicleName) {
-      case 'Mobil':
-        return <Car size={26} className="vehicle-icon" />;
-      case 'Motor':
-        return <Bike size={26} className="vehicle-icon" />;
-      case 'Bus':
-        return <Bus size={26} className="vehicle-icon" />;
-      case 'Jalan Kaki':
-        return <Footprints size={26} className="vehicle-icon" />;
-      default:
-        return <Car size={26} className="vehicle-icon" />;
-    }
-  };
+  useEffect(() => {
+    const fetchMasterItems = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
-  const handleRemoveLog = (id, name) => {
-    setTravelLogs(travelLogs.filter((item) => item.id !== id));
-    showNotification(`Perjalanan ${name} berhasil dihapus`, 'error');
+        const response = await fetch('http://localhost:3000/api/v1/emissions/master-items', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {  
+          const travelItems = result.data.filter(
+            (item) => item.category_type && item.category_type.toUpperCase() === 'TRAVEL'
+          );
+          setMasterItems(travelItems);
+        } else {
+          showNotification(result.message || 'Gagal mengambil data master', 'error');
+        }
+      } catch (error) {
+        console.error('Gagal mengambil master data travel:', error);
+        showNotification('Gagal terhubung ke server backend!', 'error');
+      }
+    };
+
+    fetchMasterItems();
+  }, []);
+
+  const renderVehicleIcon = (itemName) => {
+    const name = itemName.toLowerCase();
+    if (name.includes('mobil')) return <Car size={26} className="vehicle-icon" />;
+    if (name.includes('motor')) return <Bike size={26} className="vehicle-icon" />;
+    if (name.includes('bus')) return <Bus size={26} className="vehicle-icon" />;
+    if (name.includes('jalan')) return <Footprints size={26} className="vehicle-icon" />;
+    return <Car size={26} className="vehicle-icon" />;
   };
 
   const handleAddLog = () => {
@@ -79,37 +95,83 @@ const Travel = () => {
       showNotification('Masukkan jarak perjalanan yang valid!', 'error');
       return;
     }
+
+    const newLog = {
+      temp_id: Date.now(),
+      item_id: selectedVehicle.id,
+      item_name: selectedVehicle.item_name,
+      quantity_value: parseFloat(distance),
+      emission_factor: parseFloat(selectedVehicle.emission_factor),
+      unit: selectedVehicle.unit
+    };
+
+    setTravelLogs([...travelLogs, newLog]);
+    showNotification(`${selectedVehicle.item_name} (${distance} ${selectedVehicle.unit}) ditambahkan!`, 'success');
     
-    setTravelLogs([
-      ...travelLogs,
-      { 
-        id: Date.now(), 
-        name: selectedVehicle, 
-        km: parseFloat(distance),
-        factor: vehicleFactors[selectedVehicle] || 0
-      }
-    ]);
-    
-    showNotification(`${selectedVehicle} (${distance} km) berhasil ditambahkan!`, 'success');
     setSelectedVehicle(null);
     setDistance('');
   };
 
-  const handleSaveData = () => {
+  const handleRemoveLog = (tempId, name) => {
+    setTravelLogs(travelLogs.filter((item) => item.temp_id !== tempId));
+    showNotification(`Item ${name} dihapus dari daftar`, 'error');
+  };
+
+  const calculateTotalEstimate = () => {
+    return travelLogs.reduce((total, item) => total + (item.quantity_value * item.emission_factor), 0);
+  };
+
+  const handleSaveData = async () => {
     if (travelLogs.length === 0) {
       showNotification('Belum ada data perjalanan untuk disimpan!', 'error');
       return;
     }
-    showNotification('Data perjalanan berhasil disimpan!', 'success');
-  };
 
-  const calculateTotalEstimate = () => {
-    return travelLogs.reduce((total, item) => total + (item.km * item.factor), 0);
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        items: travelLogs.map((log) => ({
+          item_id: log.item_id,
+          quantity_value: log.quantity_value
+        }))
+      };
+
+      const token = localStorage.getItem('token');
+
+      const response = await fetch('http://localhost:3000/api/v1/emissions/calculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showNotification('Data emisi berhasil disimpan!', 'success');
+        
+        setTravelLogs([]);
+
+        setTimeout(() => {
+          navigate('/analytics');
+        }, 1200);
+      } else {
+        showNotification(result.message || 'Gagal menyimpan data ke server!', 'error');
+      }
+    } catch (error) {
+      console.error('Error submitting emission:', error);
+      showNotification('Terjadi kesalahan jaringan atau server mati!', 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="layout-wrapper">
-      {/* Toast Alert Floating untuk Mobile & Desktop */}
+      {/* Toast Alert */}
       {toast.show && (
         <div className={`custom-toast ${toast.type}`}>
           {toast.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
@@ -146,7 +208,13 @@ const Travel = () => {
             <span className="calc-user-name">{userName}</span>
           </div>
 
-          <button className="calc-btn-logout" title="Keluar" type="button">
+          {/* ✅ FIX 2: DIPASANG ONCLICK HANDLER LOGOUT */}
+          <button 
+            className="calc-btn-logout" 
+            title="Keluar" 
+            type="button"
+            onClick={handleLogout}
+          >
             <LogOut size={20} />
           </button>
         </div>
@@ -156,7 +224,7 @@ const Travel = () => {
         {/* SIDEBAR SECTION */}
         <aside className="sidebar">
           <nav className="sidebar-nav">
-            <Link to="/home" className="nav-item">
+            <Link to="/" className="nav-item">
               <Home size={22} />
               <span>Home</span>
             </Link>
@@ -179,35 +247,39 @@ const Travel = () => {
         <main className="content-area">
           <div className="travel-container">
             <h3 className="section-title">Pilih Jenis Kendaraan</h3>
-            
-            {/* Grid Pilihan Kendaraan */}
+
+            {/* Grid Pilihan Kendaraan dari Backend */}
             <div className="vehicle-grid">
-              {['Mobil', 'Motor', 'Bus', 'Jalan Kaki'].map((vehicle) => (
-                <button
-                  key={vehicle}
-                  type="button"
-                  className={`vehicle-card ${selectedVehicle === vehicle ? 'selected' : ''}`}
-                  onClick={() => setSelectedVehicle(vehicle)}
-                >
-                  <div className="vehicle-icon-wrapper">
-                    {renderVehicleIcon(vehicle)}
-                  </div>
-                  <span className="vehicle-label">{vehicle}</span>
-                </button>
-              ))}
+              {masterItems.length === 0 ? (
+                <p>Memuat opsi kendaraan...</p>
+              ) : (
+                masterItems.map((vehicle) => (
+                  <button
+                    key={vehicle.id}
+                    type="button"
+                    className={`vehicle-card ${selectedVehicle?.id === vehicle.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedVehicle(vehicle)}
+                  >
+                    <div className="vehicle-icon-wrapper">
+                      {renderVehicleIcon(vehicle.item_name)}
+                    </div>
+                    <span className="vehicle-label">{vehicle.item_name}</span>
+                  </button>
+                ))
+              )}
             </div>
 
             {/* Form Input Jarak */}
             {selectedVehicle && (
               <div className="distance-input-card">
                 <p className="selected-info">
-                  Kendaraan Terpilih: <strong>{selectedVehicle}</strong>
+                  Kendaraan Terpilih: <strong>{selectedVehicle.item_name}</strong>
                 </p>
                 <div className="input-inline">
                   <input
                     type="number"
                     className="distance-field"
-                    placeholder="Masukkan jarak (km)"
+                    placeholder={`Masukkan jarak (${selectedVehicle.unit})`}
                     value={distance}
                     onChange={(e) => setDistance(e.target.value)}
                     min="0.1"
@@ -232,14 +304,14 @@ const Travel = () => {
                 <p className="empty-logs">Belum ada aktivitas perjalanan yang ditambahkan.</p>
               ) : (
                 travelLogs.map((log) => (
-                  <div key={log.id} className="log-card">
+                  <div key={log.temp_id} className="log-card">
                     <span className="log-detail">
-                      <strong>{log.name}</strong> - {log.km} km
+                      <strong>{log.item_name}</strong> - {log.quantity_value} {log.unit}
                     </span>
                     <button
                       type="button"
                       className="btn-delete"
-                      onClick={() => handleRemoveLog(log.id, log.name)}
+                      onClick={() => handleRemoveLog(log.temp_id, log.item_name)}
                       title="Hapus item"
                     >
                       <Trash2 size={18} />
@@ -256,8 +328,13 @@ const Travel = () => {
             </div>
 
             {/* Tombol Simpan */}
-            <button type="button" className="btn-submit-all" onClick={handleSaveData}>
-              Simpan
+            <button 
+              type="button" 
+              className="btn-submit-all" 
+              onClick={handleSaveData}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>
         </main>

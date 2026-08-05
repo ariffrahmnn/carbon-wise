@@ -7,6 +7,7 @@ import './styles/global/index.css'
 import LandingPage from './pages/LandingPage.jsx'
 import About from './pages/about.jsx'
 import References from './pages/references.jsx'
+import Travel from './components/Travel.jsx'
 
 // Shared layout components
 import Header from './components/header.jsx'
@@ -22,6 +23,8 @@ import News3 from './components/news/News3.jsx'
 import News4 from './components/news/News4.jsx'
 import News5 from './components/news/News5.jsx'
 import News6 from './components/news/News6.jsx'
+
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
 
 // Wrapper untuk halaman yang menggunakan Header & Footer
 const LayoutWrapper = ({ children }) => (
@@ -43,6 +46,12 @@ createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Regis />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+
+        <Route path="/travel" element= {
+            <ProtectedRoute>
+              <Travel />
+            </ProtectedRoute>
+          } />
 
         {/* Halaman Standar */}
         <Route path="/about" element={<About />} />

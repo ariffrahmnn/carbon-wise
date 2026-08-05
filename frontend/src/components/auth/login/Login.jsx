@@ -59,9 +59,10 @@ export default function Login() {
       });
 
       const data = await response.json();
+      const payload = data.data || data;
 
       if (response.ok) {
-        const { token, user } = data;
+        const { token, user } = payload;
         if (token) localStorage.setItem('token', token);
         if (user) localStorage.setItem('user', JSON.stringify(user));
 
@@ -78,7 +79,7 @@ export default function Login() {
 
   const handleModalConfirm = () => {
     setShowSuccessModal(false);
-    navigate('/dashboard');
+    navigate('/travel');
   };
 
   // Handle Login Google Placeholder
