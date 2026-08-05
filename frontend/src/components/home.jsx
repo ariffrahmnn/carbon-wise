@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom' // 1. Import useNavigate
-import landingPageVideo from '../assets/LandingPage.mp4'
+import landingPageGif from '../assets/Vid.gif'
 import { animateHeroEntrance } from '../animations/heroAnimation.js'
 
 function Home() {
@@ -35,11 +35,11 @@ function Home() {
           Enjoy nature &amp; safe earth
         </div>
         <h1>
-          <span ref={line1Ref} style={{ display: 'inline-block', color: 'var(--color-primary)' }}>
+          <span ref={line1Ref} style={{ display: 'inline-block' }}>
             Cintai Alam,
           </span>
           <br />
-          <span ref={line2Ref} style={{ display: 'inline-block', color: 'var(--color-accent)' }}>
+          <span ref={line2Ref} style={{ display: 'inline-block' }}>
             Kurangi Jejak.
           </span>
         </h1>
@@ -61,13 +61,10 @@ function Home() {
 
       <div className="hero__visual" aria-hidden="true">
         <div className="hero__video-wrap">
-          <video
+          <img
             className="hero__video"
-            src={landingPageVideo}
-            autoPlay
-            loop
-            muted
-            playsInline
+            src={landingPageGif}
+            alt=""
           />
         </div>
       </div>
