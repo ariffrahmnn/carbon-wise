@@ -62,7 +62,7 @@ main {
 
 .hero h1 {
   margin-top: 24px;
-  color: #ffffff;
+  color: #e4d6c6;
   font-family: var(--font-display);
   font-size: clamp(50px, 7vw, 88px);
   font-weight: 700;
@@ -71,7 +71,7 @@ main {
 }
 
 .hero h1 span {
-  color: var(--color-accent);
+  color: #e4d6c6;
 }
 
 .hero p {

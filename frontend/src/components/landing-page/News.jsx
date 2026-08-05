@@ -61,10 +61,8 @@ function News() {
     <section className="news page-container" id="news" aria-labelledby="news-title">
       <div className="news__heading">
         <div>
-          <p className="section-heading__eyebrow">Cerita terbaru</p>
           <h2 id="news-title">News &amp; Insights</h2>
         </div>
-        <p>Ikuti kabar dan insight terbaru seputar iklim, alam, dan langkah kecil yang bisa kita mulai hari ini.</p>
       </div>
       <div className="news__list">
         {newsItems.map((item) => (
