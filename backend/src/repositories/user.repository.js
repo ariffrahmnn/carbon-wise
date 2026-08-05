@@ -1,7 +1,6 @@
 import { query } from '../configs/db.js';
 
 class UserRepository {
-  // Cari user berdasarkan email
   async findByEmail(email) {
     try {
       const sql = 'SELECT * FROM users WHERE email = $1';
@@ -12,7 +11,6 @@ class UserRepository {
     }
   }
 
-  // Cari user berdasarkan full name
   async findByFullName(fullName) {
     try {
       const sql = 'SELECT * FROM users WHERE lower(full_name) = lower($1)';
@@ -23,7 +21,6 @@ class UserRepository {
     }
   }
 
-  // Insert user baru saat Register
   async createUser(userData) {
     try {
       const {

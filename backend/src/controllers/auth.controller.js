@@ -5,7 +5,6 @@ class AuthController {
     try {
       const { fullName, email, password, schoolName, classGrade } = req.body;
 
-      // Validasi input sederhana
       if (!fullName || !email || !password || !schoolName || !classGrade) {
         return res.status(400).json({
           success: false,
