@@ -1,0 +1,137 @@
+/* ==========================================
+   HEADER KALKULATOR (SINKRON DENGAN LANDING PAGE)
+   ========================================== */
+
+.calc-header {
+  width: 100%;
+  height: 70px;
+  background: linear-gradient(135deg, #4a0e17 0%, #2d080e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Sisi Kiri Header (Brand & Badge Total Emisi) */
+.calc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 48px; /* Diperbesar agar badge lebih ke kanan */
+}
+
+.calc-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.calc-logo-icon {
+  width: 36px;
+  height: 36px;
+  background-color: #ffffff;
+  color: #4a0e17;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-brand-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+/* Oval Total Emisi Badge (Warna Teks Putih) */
+.calc-total-emissions-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  color: #ffffff;
+}
+
+.calc-total-emissions-badge strong {
+  color: #ffffff; /* Angka/satuan diubah ke putih konsisten */
+}
+
+/* Sisi Kanan Header (Profil & Logout) */
+.calc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.calc-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.calc-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #4a0e17;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.calc-user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.calc-btn-logout {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.calc-btn-logout:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+/* Optimasi Mobile */
+@media (max-width: 768px) {
+  .calc-header {
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .calc-brand-title {
+    font-size: 1.1rem;
+  }
+
+  .calc-total-emissions-badge,
+  .calc-user-name {
+    display: none;
+  }
+}
