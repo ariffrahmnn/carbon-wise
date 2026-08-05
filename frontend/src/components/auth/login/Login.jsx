@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
 import SuccessModalCard from '../shared/SuccessModalCard.jsx';
 import ForgotPasswordModal from './ForgotPasswordModal.jsx';
 import '../../../styles/auth/shared/auth-form.css';
@@ -17,6 +18,20 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+
+  useEffect(() => {
+    // Animasi Entrance GSAP untuk tombol navigasi
+    gsap.fromTo(
+      ".auth-back-home-btn",
+      { opacity: 0, x: -15 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }
+    );
+    gsap.fromTo(
+      ".login-signup-outline-btn",
+      { opacity: 0, scale: 0.9, y: 15 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.55, delay: 0.2, ease: "back.out(1.5)" }
+    );
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -92,6 +107,14 @@ export default function Login() {
         
         {/* SISI KIRI: FORM LOGIN */}
         <div className="login-form-section">
+          <button
+            type="button"
+            className="auth-back-home-btn"
+            onClick={() => navigate('/')}
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+            Kembali ke Beranda
+          </button>
           <h1 className="login-title">Log in</h1>
 
           {errorMsg && <div className="login-error-box">{errorMsg}</div>}
@@ -179,6 +202,24 @@ export default function Login() {
             <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '10px' }}>
               {loading ? 'LOGGING IN...' : 'LOG IN'}
             </button>
+
+            <div className="auth-mobile-link">
+              <button 
+                type="button" 
+                onClick={() => navigate('/register')}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#4e0000',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Belum punya akun? Daftar Sekarang
+              </button>
+            </div>
           </form>
         </div>
 
