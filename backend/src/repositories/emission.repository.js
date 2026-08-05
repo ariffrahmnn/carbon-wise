@@ -78,6 +78,90 @@ class EmissionRepository {
       client.release();
     }
   }
+
+  async getUserAnalytics(userId, targetMonth, targetYear) {
+    const now = new Date();
+    const month = targetMonth ? parseInt(targetMonth) : now.getMonth() + 1;
+    const year = targetYear ? parseInt(targetYear) : now.getFullYear();
+
+    const dailyQuery = `
+      SELECT 
+        TO_CHAR(created_at, 'HH24:MI') AS formatted_time,
+        TRIM(TO_CHAR(created_at, 'Day')) AS day_name,
+        TO_CHAR(created_at, 'DD Mon YYYY') AS formatted_date,
+        created_at AS time_exact,
+        SUM(total_batch_co2) AS total 
+      FROM calculation_batches 
+      WHERE user_id = $1 AND DATE(created_at) = CURRENT_DATE 
+      GROUP BY created_at, formatted_time, day_name, formatted_date 
+      ORDER BY created_at ASC
+    `;
+
+    const weeklyQuery = `
+      SELECT 
+        TRIM(TO_CHAR(created_at, 'Day')) AS day_name, 
+        DATE(created_at) AS date, 
+        SUM(total_batch_co2) AS total 
+      FROM calculation_batches 
+      WHERE user_id = $1 AND created_at >= CURRENT_DATE - INTERVAL '6 days' 
+      GROUP BY date, day_name 
+      ORDER BY date ASC
+    `;
+
+    const monthlyQuery = `
+      SELECT 
+        'Week ' || CEIL(EXTRACT(DAY FROM created_at) / 7.0) AS week, 
+        SUM(total_batch_co2) AS total 
+      FROM calculation_batches 
+      WHERE user_id = $1 
+        AND EXTRACT(MONTH FROM created_at) = $2 
+        AND EXTRACT(YEAR FROM created_at) = $3 
+      GROUP BY week 
+      ORDER BY week ASC
+    `;
+
+    const breakdownQuery = `
+      SELECT 
+        i.item_name, 
+        c.name AS category_name, 
+        SUM(l.calculated_co2) AS total 
+      FROM emission_logs l 
+      JOIN emission_items i ON l.item_id = i.id 
+      JOIN emission_categories c ON l.category_id = c.id 
+      WHERE l.user_id = $1 AND DATE(l.logged_at) = CURRENT_DATE 
+      GROUP BY i.item_name, c.name
+    `;
+
+    const [dailyRes, weeklyRes, monthlyRes, breakdownRes] = await Promise.all([
+      pool.query(dailyQuery, [userId]),
+      pool.query(weeklyQuery, [userId]),
+      pool.query(monthlyQuery, [userId, month, year]),
+      pool.query(breakdownQuery, [userId])
+    ]);
+
+    return {
+      daily: dailyRes.rows,
+      weekly: weeklyRes.rows,
+      monthly: monthlyRes.rows,
+      todayBreakdown: breakdownRes.rows
+    };
+  }
+
+  async resetUserEmissionData(userId) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('DELETE FROM emission_logs WHERE user_id = $1', [userId]);
+      await client.query('DELETE FROM calculation_batches WHERE user_id = $1', [userId]);
+      await client.query('COMMIT');
+      return true;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
 }
 
 export default new EmissionRepository();

@@ -20,9 +20,14 @@ function Home() {
     })
   }, [])
 
-  // 3. Handler untuk navigasi ke Login
+  // 3. Handler untuk navigasi (apabila sudah login langsung masuk ke dashboard /input)
   const handleStart = () => {
-    navigate('/login')
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/input');
+    } else {
+      navigate('/login');
+    }
   }
 
   return (

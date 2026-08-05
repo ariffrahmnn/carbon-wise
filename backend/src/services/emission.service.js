@@ -64,6 +64,13 @@ class EmissionService {
       }))
     };
   }
+  async getUserAnalytics(userId, targetMonth, targetYear) {
+    return await emissionRepository.getUserAnalytics(userId, targetMonth, targetYear);
+  }
+
+  async resetUserEmissions(userId) {
+    return await emissionRepository.resetUserEmissionData(userId);
+  }
 }
 
 export default new EmissionService();

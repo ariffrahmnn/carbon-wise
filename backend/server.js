@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
   res.send('Server CarbonWise API Berjalan Lancar! 🚀');
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);

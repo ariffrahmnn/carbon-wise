@@ -8,6 +8,8 @@ import LandingPage from './pages/LandingPage.jsx'
 import About from './pages/about.jsx'
 import References from './pages/references.jsx'
 import Travel from './components/Travel.jsx'
+import FoodInput from './components/FoodInput.jsx'
+import Analytics from './pages/Analytics.jsx'
 
 // Shared layout components
 import Header from './components/header.jsx'
@@ -47,11 +49,9 @@ createRoot(document.getElementById('root')).render(
         <Route path="/register" element={<Regis />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        <Route path="/travel" element= {
-            <ProtectedRoute>
-              <Travel />
-            </ProtectedRoute>
-          } />
+        <Route path="/travel" element={<ProtectedRoute><Travel /></ProtectedRoute>} />
+        <Route path="/input" element={<ProtectedRoute><FoodInput /></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
 
         {/* Halaman Standar */}
         <Route path="/about" element={<About />} />
