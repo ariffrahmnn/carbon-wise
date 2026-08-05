@@ -1,9 +1,17 @@
+import kemacetanImg from '../../assets/kemacetan.jpg'
+import kapalImg from '../../assets/kapal.jpg'
+import internetImg from '../../assets/internet.jpg'
+import sampahImg from '../../assets/sampah.jpg'
+import asalKarbonImg from '../../assets/asalkarbon.jpg'
+import mobilListrikImg from '../../assets/mobillistrik.jpg'
+
 const newsItems = [
   {
     id: 'news1',
     title: 'Emisi dari Sektor Transportasi: Seberapa Besar Dampak Perjalanan Harian Kita?',
     category: 'Transportasi',
     icon: 'directions_car',
+    image: kemacetanImg,
     link: '/news1',
   },
   {
@@ -11,6 +19,7 @@ const newsItems = [
     title: 'Food Miles: Seberapa Jauh Makananmu Bepergian Sebelum Sampai di Piring?',
     category: 'Jejak Karbon & Pangan',
     icon: 'restaurant',
+    image: kapalImg,
     link: '/news2',
   },
   {
@@ -18,6 +27,7 @@ const newsItems = [
     title: 'Jejak Karbon Digital: Apakah Aktivitas Internet Juga Menyumbang Emisi?',
     category: 'Digital & IT',
     icon: 'public',
+    image: internetImg,
     link: '/news3',
   },
   {
@@ -25,6 +35,7 @@ const newsItems = [
     title: 'Pengolahan Sampah dan Dampaknya Terhadap Emisi Metana',
     category: 'Pengolahan Sampah',
     icon: 'delete_sweep',
+    image: sampahImg,
     link: '/news4',
   },
   {
@@ -32,6 +43,7 @@ const newsItems = [
     title: 'Mengapa Hutan Merupakan Benteng Pertahanan Utama Melawan Perubahan Iklim?',
     category: 'Konservasi Hutan',
     icon: 'forest',
+    image: asalKarbonImg,
     link: '/news5',
   },
   {
@@ -39,6 +51,7 @@ const newsItems = [
     title: 'Dampak Industri Pakaian Terhadap Emisi Karbon Global',
     category: 'Gaya Hidup & Tekstil',
     icon: 'checkroom',
+    image: mobilListrikImg,
     link: '/news6',
   },
 ]
@@ -48,15 +61,13 @@ function News() {
     <section className="news page-container" id="news" aria-labelledby="news-title">
       <div className="news__heading">
         <div>
-          <p className="section-heading__eyebrow">Cerita terbaru</p>
           <h2 id="news-title">News &amp; Insights</h2>
         </div>
-        <p>Ikuti kabar dan insight terbaru seputar iklim, alam, dan langkah kecil yang bisa kita mulai hari ini.</p>
       </div>
       <div className="news__list">
         {newsItems.map((item) => (
           <article className="news-item" key={item.title}>
-            <div className="news-item__icon material-symbols-outlined" aria-hidden="true">{item.icon}</div>
+            <img className="news-item__image" src={item.image} alt={item.title} />
             <div className="news-item__content">
               <p className="news-item__meta">{item.category}</p>
               <h3>{item.title}</h3>

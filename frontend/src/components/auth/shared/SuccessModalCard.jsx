@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import '../styles/successModal.css';
+import '../../../styles/auth/shared/success-modal.css';
 
 export default function SuccessModalCard({ isOpen, title, message, buttonText, onConfirm }) {
   const overlayRef = useRef(null);
