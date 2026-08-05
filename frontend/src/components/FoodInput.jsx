@@ -1,30 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Car, Bike, Bus, Footprints, Trash2, Plus, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
-
-import busImg from '../assets/bus.jpg';
-import walkImg from '../assets/walk.jpg';
-import carImg from '../assets/car.jpg';
-import motorbikeImg from '../assets/motorbike.jpg';
+import { Utensils, Plus, Trash2, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X, Salad, Drumstick, Fish, Egg, Wheat, Beef } from 'lucide-react';
+import tofuImg from '../assets/tofu.jpg';
+import tempehImg from '../assets/tempeh.jpg';
+import beefImg from '../assets/beef.jpg';
+import chickenImg from '../assets/chicken.jpg';
+import fishImg from '../assets/fish.jpg';
+import eggImg from '../assets/egg.jpg';
+import riceImg from '../assets/rice.jpg';
+import vegetableImg from '../assets/vegetable.jpg';
 
 import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';
 import '../styles/travel.css';
 import '../styles/analytics.css';
 
-const DEFAULT_TRAVEL_ITEMS = [
-  { id: 21, item_name: 'Mobil', category_type: 'TRAVEL', emission_factor: 0.190000, unit: 'km' },
-  { id: 22, item_name: 'Motor', category_type: 'TRAVEL', emission_factor: 0.100000, unit: 'km' },
-  { id: 23, item_name: 'Bus', category_type: 'TRAVEL', emission_factor: 1.200000, unit: 'km' },
-  { id: 24, item_name: 'Jalan', category_type: 'TRAVEL', emission_factor: 0.000000, unit: 'km' }
+// Fallback Data Master Makanan per 1 Gram (Sesuai Skema Database PostgreSQL Foto 3 & 4)
+const DEFAULT_FOOD_ITEMS = [
+  { id: 13, item_name: 'Daging', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.027000, emission_factor: 0.027000 },
+  { id: 14, item_name: 'Ayam', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.006000, emission_factor: 0.006000 },
+  { id: 15, item_name: 'Ikan', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.005000, emission_factor: 0.005000 },
+  { id: 16, item_name: 'Telur', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.004800, emission_factor: 0.004800 },
+  { id: 17, item_name: 'Nasi', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.004000, emission_factor: 0.004000 },
+  { id: 18, item_name: 'Tahu', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.001000, emission_factor: 0.001000 },
+  { id: 19, item_name: 'Tempe', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.001000, emission_factor: 0.001000 },
+  { id: 20, item_name: 'Sayur', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.000400, emission_factor: 0.000400 }
 ];
 
-const Travel = () => {
+const FoodInput = () => {
   const navigate = useNavigate();
   const [masterItems, setMasterItems] = useState([]);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [distance, setDistance] = useState('');
-  const [travelLogs, setTravelLogs] = useState([]);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [weightGrams, setWeightGrams] = useState('');
+  const [foodLogs, setFoodLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // State Toast Alert
@@ -58,6 +66,7 @@ const Travel = () => {
     }, 3500);
   };
 
+  // Fetch Master Data Makanan Dinamis dari API Backend (Identik dengan Travel.jsx)
   useEffect(() => {
     const fetchMasterItems = async () => {
       try {
@@ -74,34 +83,39 @@ const Travel = () => {
         const result = await response.json();
 
         if (response.ok && result.success) {  
-          const travelItems = result.data.filter(
-            (item) => item.category_type && item.category_type.toUpperCase() === 'TRAVEL'
+          const foodItems = result.data.filter(
+            (item) => item.category_id === 1 || item.unit === 'gram' || (item.category_type && item.category_type.toUpperCase() === 'FOOD')
           );
-          if (travelItems.length > 0) {
-            setMasterItems(travelItems);
+
+          if (foodItems.length > 0) {
+            setMasterItems(foodItems);
           } else {
-            setMasterItems(DEFAULT_TRAVEL_ITEMS);
+            setMasterItems(DEFAULT_FOOD_ITEMS);
           }
         } else {
-          setMasterItems(DEFAULT_TRAVEL_ITEMS);
+          setMasterItems(DEFAULT_FOOD_ITEMS);
         }
       } catch (error) {
-        console.error('Gagal mengambil master data travel:', error);
-        setMasterItems(DEFAULT_TRAVEL_ITEMS);
+        console.error('Gagal mengambil master data makanan:', error);
+        setMasterItems(DEFAULT_FOOD_ITEMS);
       }
     };
 
     fetchMasterItems();
   }, []);
 
-  const renderVehicleIcon = (itemName) => {
+  const renderFoodIcon = (itemName) => {
     const name = itemName.toLowerCase();
     let imgSrc = null;
 
-    if (name.includes('bus')) imgSrc = busImg;
-    else if (name.includes('jalan')) imgSrc = walkImg;
-    else if (name.includes('mobil')) imgSrc = carImg;
-    else if (name.includes('motor')) imgSrc = motorbikeImg;
+    if (name.includes('daging')) imgSrc = beefImg;
+    else if (name.includes('ayam')) imgSrc = chickenImg;
+    else if (name.includes('ikan')) imgSrc = fishImg;
+    else if (name.includes('telur')) imgSrc = eggImg;
+    else if (name.includes('nasi')) imgSrc = riceImg;
+    else if (name.includes('tahu')) imgSrc = tofuImg;
+    else if (name.includes('tempe')) imgSrc = tempehImg;
+    else if (name.includes('sayur')) imgSrc = vegetableImg;
 
     if (imgSrc) {
       return (
@@ -119,47 +133,50 @@ const Travel = () => {
       );
     }
 
-    return <Car size={28} className="vehicle-icon" />;
+    return <Utensils size={28} className="vehicle-icon" />;
   };
 
   const handleAddLog = () => {
-    if (!selectedVehicle) {
-      showNotification('Pilih jenis kendaraan terlebih dahulu!', 'error');
+    if (!selectedFood) {
+      showNotification('Pilih jenis makanan terlebih dahulu!', 'error');
       return;
     }
-    if (!distance || parseFloat(distance) <= 0) {
-      showNotification('Masukkan jarak perjalanan yang valid!', 'error');
+    if (!weightGrams || parseFloat(weightGrams) <= 0) {
+      showNotification('Masukkan berat makanan (gram) yang valid!', 'error');
       return;
     }
+
+    const factor = selectedFood.co2_factor_per_unit || selectedFood.emission_factor;
 
     const newLog = {
       temp_id: Date.now(),
-      item_id: selectedVehicle.id,
-      item_name: selectedVehicle.item_name,
-      quantity_value: parseFloat(distance),
-      emission_factor: parseFloat(selectedVehicle.emission_factor),
-      unit: selectedVehicle.unit
+      item_id: selectedFood.id,
+      item_name: selectedFood.item_name,
+      quantity_value: parseFloat(weightGrams),
+      emission_factor: parseFloat(factor),
+      unit: selectedFood.unit || 'gram'
     };
 
-    setTravelLogs([...travelLogs, newLog]);
-    showNotification(`${selectedVehicle.item_name} (${distance} ${selectedVehicle.unit}) ditambahkan!`, 'success');
+    setFoodLogs([...foodLogs, newLog]);
+    showNotification(`${selectedFood.item_name} (${weightGrams} gram) ditambahkan!`, 'success');
     
-    setSelectedVehicle(null);
-    setDistance('');
+    setSelectedFood(null);
+    setWeightGrams('');
   };
 
   const handleRemoveLog = (tempId, name) => {
-    setTravelLogs(travelLogs.filter((item) => item.temp_id !== tempId));
+    setFoodLogs(foodLogs.filter((item) => item.temp_id !== tempId));
     showNotification(`Item ${name} dihapus dari daftar`, 'error');
   };
 
+  // Rumus Emisi Makanan: Total Emisi = Total (Berat dalam Gram * Faktor Emisi per Gram)
   const calculateTotalEstimate = () => {
-    return travelLogs.reduce((total, item) => total + (item.quantity_value * item.emission_factor), 0);
+    return foodLogs.reduce((total, item) => total + (item.quantity_value * item.emission_factor), 0);
   };
 
   const handleSaveData = async () => {
-    if (travelLogs.length === 0) {
-      showNotification('Belum ada data perjalanan untuk disimpan!', 'error');
+    if (foodLogs.length === 0) {
+      showNotification('Belum ada data konsumsi makanan untuk disimpan!', 'error');
       return;
     }
 
@@ -167,7 +184,7 @@ const Travel = () => {
 
     try {
       const payload = {
-        items: travelLogs.map((log) => ({
+        items: foodLogs.map((log) => ({
           item_id: log.item_id,
           quantity_value: log.quantity_value
         }))
@@ -187,9 +204,9 @@ const Travel = () => {
       const result = await response.json();
 
       if (response.ok) {
-        showNotification('Data emisi berhasil disimpan!', 'success');
+        showNotification('Data emisi makanan berhasil disimpan!', 'success');
         
-        setTravelLogs([]);
+        setFoodLogs([]);
 
         setTimeout(() => {
           navigate('/analytics');
@@ -198,7 +215,7 @@ const Travel = () => {
         showNotification(result.message || 'Gagal menyimpan data ke server!', 'error');
       }
     } catch (error) {
-      console.error('Error submitting emission:', error);
+      console.error('Error submitting food emission:', error);
       showNotification('Terjadi kesalahan jaringan atau server mati!', 'error');
     } finally {
       setIsLoading(false);
@@ -239,7 +256,6 @@ const Travel = () => {
             <span className="calc-user-name">{userName}</span>
           </div>
 
-          {/* ✅ FIX 2: DIPASANG ONCLICK HANDLER LOGOUT */}
           <button 
             className="calc-btn-logout" 
             title="Keluar" 
@@ -259,11 +275,11 @@ const Travel = () => {
               <Home size={22} />
               <span>Home</span>
             </Link>
-            <Link to="/input" className="nav-item">
+            <Link to="/input" className="nav-item active">
               <PenTool size={22} />
               <span>Makanan</span>
             </Link>
-            <Link to="/travel" className="nav-item active">
+            <Link to="/travel" className="nav-item">
               <Navigation size={22} />
               <span>Travel</span>
             </Link>
@@ -287,43 +303,43 @@ const Travel = () => {
           </button>
 
           <div className="travel-container">
-            <h3 className="section-title">Pilih Jenis Kendaraan</h3>
+            <h3 className="section-title">Pilih Jenis Makanan</h3>
 
-            {/* Grid Pilihan Kendaraan dari Backend */}
+            {/* Grid Pilihan Makanan Dinamis */}
             <div className="vehicle-grid">
               {masterItems.length === 0 ? (
-                <p>Memuat opsi kendaraan...</p>
+                <p>Memuat opsi makanan...</p>
               ) : (
-                masterItems.map((vehicle) => (
+                masterItems.map((food) => (
                   <button
-                    key={vehicle.id}
+                    key={food.id}
                     type="button"
-                    className={`vehicle-card ${selectedVehicle?.id === vehicle.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedVehicle(vehicle)}
+                    className={`vehicle-card ${selectedFood?.id === food.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedFood(food)}
                   >
                     <div className="vehicle-icon-wrapper">
-                      {renderVehicleIcon(vehicle.item_name)}
+                      {renderFoodIcon(food.item_name)}
                     </div>
-                    <span className="vehicle-label">{vehicle.item_name}</span>
+                    <span className="vehicle-label">{food.item_name}</span>
                   </button>
                 ))
               )}
             </div>
 
-            {/* Form Input Jarak */}
-            {selectedVehicle && (
+            {/* Form Input Berat (Gram) */}
+            {selectedFood && (
               <div className="distance-input-card">
                 <p className="selected-info">
-                  Kendaraan Terpilih: <strong>{selectedVehicle.item_name}</strong>
+                  Makanan Terpilih: <strong>{selectedFood.item_name}</strong>
                 </p>
                 <div className="input-inline">
                   <input
                     type="number"
                     className="distance-field"
-                    placeholder={`Masukkan jarak (${selectedVehicle.unit})`}
-                    value={distance}
-                    onChange={(e) => setDistance(e.target.value)}
-                    min="0.1"
+                    placeholder={`Masukkan berat (${selectedFood.unit || 'gram'})`}
+                    value={weightGrams}
+                    onChange={(e) => setWeightGrams(e.target.value)}
+                    min="1"
                     step="any"
                   />
                   <button 
@@ -338,13 +354,13 @@ const Travel = () => {
               </div>
             )}
 
-            {/* List Perjalanan */}
+            {/* List Makanan Terpilih */}
             <div className="logs-wrapper">
-              <h4 className="section-subtitle">Daftar Perjalanan Terpilih</h4>
-              {travelLogs.length === 0 ? (
-                <p className="empty-logs">Belum ada aktivitas perjalanan yang ditambahkan.</p>
+              <h4 className="section-subtitle">Daftar Makanan Terpilih</h4>
+              {foodLogs.length === 0 ? (
+                <p className="empty-logs">Belum ada aktivitas konsumsi makanan yang ditambahkan.</p>
               ) : (
-                travelLogs.map((log) => (
+                foodLogs.map((log) => (
                   <div key={log.temp_id} className="log-card">
                     <span className="log-detail">
                       <strong>{log.item_name}</strong> - {log.quantity_value} {log.unit}
@@ -362,9 +378,9 @@ const Travel = () => {
               )}
             </div>
 
-            {/* Estimasi Ringkasan Emisi */}
+            {/* Estimasi Ringkasan Emisi Makanan */}
             <div className="travel-estimate-card">
-              <span>Estimasi Emisi Perjalanan:</span>
+              <span>Estimasi Emisi Makanan:</span>
               <strong>{calculateTotalEstimate().toFixed(3)} kg CO₂</strong>
             </div>
 
@@ -389,4 +405,4 @@ const Travel = () => {
   );
 };
 
-export default Travel;
+export default FoodInput;
