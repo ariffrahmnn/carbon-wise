@@ -1,5 +1,6 @@
 /.env
 /.env.example
 /node_modules
+.DS_Store
 schema.sql
 seed.sql
