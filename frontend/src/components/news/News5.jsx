@@ -1,8 +1,8 @@
 import React from 'react';
-import '../styles/news.css';
+import '../../styles/news/article.css';
 
 // Import gambar dari folder assets
-import mobilListrikImg from '../assets/mobillistrik.jpg';
+import mobilListrikImg from '../../assets/mobillistrik.jpg';
 
 export default function News5() {
   return (

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import '../styles/header.css'
+import '../styles/shared/header.css'
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

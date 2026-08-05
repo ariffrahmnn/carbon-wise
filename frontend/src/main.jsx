@@ -1,27 +1,27 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import './index.css'
+import './styles/global/index.css'
 
 // Pages
 import LandingPage from './pages/LandingPage.jsx'
 import About from './pages/about.jsx'
 import References from './pages/references.jsx'
 
-// Components (Selevel di folder components)
+// Shared layout components
 import Header from './components/header.jsx'
 import Footer from './components/footer.jsx'
-import Login from './components/login.jsx'
-import Regis from './components/regis.jsx'
-import ResetPassword from './components/ResetPassword.jsx'
+import Login from './components/auth/login/Login.jsx'
+import Regis from './components/auth/register/Register.jsx'
+import ResetPassword from './components/auth/login/ResetPassword.jsx'
 
 // News Components
-import News1 from './components/news1.jsx'
-import News2 from './components/news2.jsx'
-import News3 from './components/news3.jsx'
-import News4 from './components/news4.jsx'
-import News5 from './components/news5.jsx'
-import News6 from './components/news6.jsx'
+import News1 from './components/news/News1.jsx'
+import News2 from './components/news/News2.jsx'
+import News3 from './components/news/News3.jsx'
+import News4 from './components/news/News4.jsx'
+import News5 from './components/news/News5.jsx'
+import News6 from './components/news/News6.jsx'
 
 // Wrapper untuk halaman yang menggunakan Header & Footer
 const LayoutWrapper = ({ children }) => (

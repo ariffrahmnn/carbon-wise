@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom' // 1. Import useNavigate
-import landingPageGif from '../assets/Vid.gif'
-import { animateHeroEntrance } from '../animations/heroAnimation.js'
+import { useNavigate } from 'react-router-dom'
+import landingPageGif from '../../assets/Vid.gif'
+import { animateHeroEntrance } from '../../animations/heroAnimation.js'
 
 function Home() {
   const navigate = useNavigate() // 2. Inisialisasi hook navigate

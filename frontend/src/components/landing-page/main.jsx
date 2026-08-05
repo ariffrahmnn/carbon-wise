@@ -1,7 +1,8 @@
 import Home from './home.jsx'
 import Edukasi from './edukasi.jsx'
-import News from './news.jsx'
-import '../styles/main.css'
+import News from './News.jsx'
+import '../../styles/landing-page/landing.css'
+import '../../styles/landing-page/news-section.css'
 
 function Main() {
   return (

@@ -3,7 +3,7 @@ import {
   animateAccordionExpand,
   animateAccordionCollapse,
   animateCardClick,
-} from '../animations/accordionAnimation.js'
+} from '../../animations/accordionAnimation.js'
 
 const facts = [
   {

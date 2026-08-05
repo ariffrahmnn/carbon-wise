@@ -1,5 +1,6 @@
 import Header from '../components/header.jsx'
 import Footer from '../components/footer.jsx'
+import '../styles/global/references.css'
 
 function References() {
   return (
