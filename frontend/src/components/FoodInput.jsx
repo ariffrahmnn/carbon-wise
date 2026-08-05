@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, Plus, Trash2, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X, Salad, Drumstick, Fish, Egg, Wheat, Beef } from 'lucide-react';
+import { Utensils, Plus, Trash2, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
 import tofuImg from '../assets/tofu.jpg';
 import tempehImg from '../assets/tempeh.jpg';
 import beefImg from '../assets/beef.jpg';
@@ -15,7 +15,7 @@ import '../styles/shared/footer.css';
 import '../styles/travel.css';
 import '../styles/analytics.css';
 
-// Fallback Data Master Makanan per 1 Gram (Sesuai Skema Database PostgreSQL Foto 3 & 4)
+// Fallback Data Master Makanan per 1 Gram
 const DEFAULT_FOOD_ITEMS = [
   { id: 13, item_name: 'Daging', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.027000, emission_factor: 0.027000 },
   { id: 14, item_name: 'Ayam', category_id: 1, unit: 'gram', co2_factor_per_unit: 0.006000, emission_factor: 0.006000 },
@@ -35,9 +35,13 @@ const FoodInput = () => {
   const [foodLogs, setFoodLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // State Toast Alert
+  // State Toast Alert & User
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [user, setUser] = useState(null);
+
+  // Refs untuk pembersihan timer agar tidak memory leak saat unmount
+  const toastTimerRef = useRef(null);
+  const redirectTimerRef = useRef(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -48,30 +52,38 @@ const FoodInput = () => {
         console.error('Gagal membaca data user dari localStorage:', err);
       }
     }
+
+    // Cleanup timer saat komponen unmount
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
   }, []);
 
   const userName = user?.fullName || user?.name || user?.username || 'User';
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
-  };
+  }, [navigate]);
 
-  const showNotification = (message, type = 'success') => {
+  const showNotification = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ show: true, message, type });
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToast({ show: false, message: '', type: 'success' });
     }, 3500);
-  };
+  }, []);
 
-  // Fetch Master Data Makanan Dinamis dari API Backend (Identik dengan Travel.jsx)
+  // Fetch Master Data Makanan Dinamis dari API Backend
   useEffect(() => {
+    let isMounted = true;
+
     const fetchMasterItems = async () => {
       try {
         const token = localStorage.getItem('token');
-
         const response = await fetch('http://localhost:3000/api/v1/emissions/master-items', {
           method: 'GET',
           headers: {
@@ -82,29 +94,35 @@ const FoodInput = () => {
 
         const result = await response.json();
 
-        if (response.ok && result.success) {  
-          const foodItems = result.data.filter(
-            (item) => item.category_id === 1 || item.unit === 'gram' || (item.category_type && item.category_type.toUpperCase() === 'FOOD')
-          );
+        if (isMounted) {
+          if (response.ok && result.success) {  
+            const foodItems = result.data.filter(
+              (item) => item.category_id === 1 || item.unit === 'gram' || (item.category_type && item.category_type.toUpperCase() === 'FOOD')
+            );
 
-          if (foodItems.length > 0) {
-            setMasterItems(foodItems);
+            if (foodItems.length > 0) {
+              setMasterItems(foodItems);
+            } else {
+              setMasterItems(DEFAULT_FOOD_ITEMS);
+            }
           } else {
             setMasterItems(DEFAULT_FOOD_ITEMS);
           }
-        } else {
-          setMasterItems(DEFAULT_FOOD_ITEMS);
         }
       } catch (error) {
         console.error('Gagal mengambil master data makanan:', error);
-        setMasterItems(DEFAULT_FOOD_ITEMS);
+        if (isMounted) setMasterItems(DEFAULT_FOOD_ITEMS);
       }
     };
 
     fetchMasterItems();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const renderFoodIcon = (itemName) => {
+  const renderFoodIcon = useCallback((itemName) => {
     const name = itemName.toLowerCase();
     let imgSrc = null;
 
@@ -134,9 +152,9 @@ const FoodInput = () => {
     }
 
     return <Utensils size={28} className="vehicle-icon" />;
-  };
+  }, []);
 
-  const handleAddLog = () => {
+  const handleAddLog = useCallback(() => {
     if (!selectedFood) {
       showNotification('Pilih jenis makanan terlebih dahulu!', 'error');
       return;
@@ -157,22 +175,22 @@ const FoodInput = () => {
       unit: selectedFood.unit || 'gram'
     };
 
-    setFoodLogs([...foodLogs, newLog]);
+    setFoodLogs((prevLogs) => [...prevLogs, newLog]);
     showNotification(`${selectedFood.item_name} (${weightGrams} gram) ditambahkan!`, 'success');
     
     setSelectedFood(null);
     setWeightGrams('');
-  };
+  }, [selectedFood, weightGrams, showNotification]);
 
-  const handleRemoveLog = (tempId, name) => {
-    setFoodLogs(foodLogs.filter((item) => item.temp_id !== tempId));
+  const handleRemoveLog = useCallback((tempId, name) => {
+    setFoodLogs((prevLogs) => prevLogs.filter((item) => item.temp_id !== tempId));
     showNotification(`Item ${name} dihapus dari daftar`, 'error');
-  };
+  }, [showNotification]);
 
-  // Rumus Emisi Makanan: Total Emisi = Total (Berat dalam Gram * Faktor Emisi per Gram)
-  const calculateTotalEstimate = () => {
+  // Rumus Emisi Makanan (Memoized)
+  const totalEstimate = useMemo(() => {
     return foodLogs.reduce((total, item) => total + (item.quantity_value * item.emission_factor), 0);
-  };
+  }, [foodLogs]);
 
   const handleSaveData = async () => {
     if (foodLogs.length === 0) {
@@ -208,7 +226,8 @@ const FoodInput = () => {
         
         setFoodLogs([]);
 
-        setTimeout(() => {
+        if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+        redirectTimerRef.current = setTimeout(() => {
           navigate('/analytics');
         }, 1200);
       } else {
@@ -381,7 +400,7 @@ const FoodInput = () => {
             {/* Estimasi Ringkasan Emisi Makanan */}
             <div className="travel-estimate-card">
               <span>Estimasi Emisi Makanan:</span>
-              <strong>{calculateTotalEstimate().toFixed(3)} kg CO₂</strong>
+              <strong>{totalEstimate.toFixed(3)} kg CO₂</strong>
             </div>
 
             {/* Tombol Simpan */}

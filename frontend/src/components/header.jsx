@@ -51,13 +51,6 @@ function Header() {
     }
   }, [])
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) setIsLoggedIn(true);
-  }, []);
-
   const closeMenu = () => setIsMenuOpen(false)
 
   const handleNavClick = (path) => {
@@ -124,21 +117,6 @@ function Header() {
           >
             About
           </a>
-          {isLoggedIn ? (
-            <a
-              href="/input"
-              style={{ fontWeight: 'bold', color: '#4a0e17' }}
-            >
-              Dashboard
-            </a>
-          ) : (
-            <a
-              href="/login"
-              style={{ fontWeight: 'bold', color: '#4a0e17' }}
-            >
-              Masuk
-            </a>
-          )}
         </nav>
       </div>
     </header>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Leaf, BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, FileText, CheckCircle2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Home, Leaf, BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
@@ -8,6 +8,7 @@ import {
 
 import DailyPieModal from '../components/analytics/DailyPieModal.jsx';
 import ResetConfirmModal from '../components/analytics/ResetConfirmModal.jsx';
+import AnalyticsPDFReport from '../components/analytics/AnalyticsPDFReport.jsx';
 import { exportAnalyticsToPDF } from '../utils/pdfGenerator.js';
 
 import '../styles/headerkalkulator.css';
@@ -20,9 +21,53 @@ const MONTH_NAMES = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
+// Sub-komponen Custom Dot (Didefinisikan di luar komponen utama agar tidak re-create pada setiap render)
+const CustomDot = React.memo(({ cx, cy, index, dailyLength, onClickDot }) => {
+  const isLast = index === dailyLength - 1;
+  
+  if (isLast) {
+    return (
+      <svg x={cx - 10} y={cy - 10} width={20} height={20} onClick={onClickDot} style={{ cursor: 'pointer' }}>
+        <circle cx="10" cy="10" r="6" fill="#ff4d4f" stroke="#fff" strokeWidth="2" />
+        <circle cx="10" cy="10" r="14" fill="transparent" stroke="#ff4d4f" strokeWidth="1" strokeDasharray="3 3">
+          <animate attributeName="r" from="6" to="16" dur="1.5s" repeatCount="indefinite" />
+          <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    );
+  }
+  return <circle cx={cx} cy={cy} r={4} fill="#4a0e17" stroke="#fff" strokeWidth={2} />;
+});
+
+// Sub-komponen Custom Tooltip (Didefinisikan di luar komponen utama)
+const CustomDailyTooltip = React.memo(({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div style={{
+        background: '#ffffff',
+        padding: '10px 14px',
+        border: '1px solid #E0E0E0',
+        borderRadius: '10px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+      }}>
+        <p style={{ margin: 0, fontWeight: 'bold', color: '#1B5E20', fontSize: '0.95rem' }}>
+          {data.day_name}, {data.formatted_date}
+        </p>
+        <p style={{ margin: '4px 0 0 0', color: '#555', fontSize: '0.9rem' }}>
+          Pukul: <strong>{data.formatted_time}</strong>
+        </p>
+        <p style={{ margin: '4px 0 0 0', color: '#4a0e17', fontWeight: '600', fontSize: '0.95rem' }}>
+          Total Emisi: {parseFloat(data.total).toFixed(3)} kg CO₂
+        </p>
+      </div>
+    );
+  }
+  return null;
+});
+
 const Analytics = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const containerRef = useRef(null);
   
   const [analyticsData, setAnalyticsData] = useState({
@@ -37,19 +82,20 @@ const Analytics = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isResettingData, setIsResettingData] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (err) {
+        console.error('Error parsing user data:', err);
+      }
+    }
   }, []);
 
-  useEffect(() => {
-    fetchAnalyticsData(selectedMonth, selectedYear);
-  }, [selectedMonth, selectedYear]);
-
-  const fetchAnalyticsData = async (m = selectedMonth, y = selectedYear) => {
+  const fetchAnalyticsData = useCallback(async (m = selectedMonth, y = selectedYear) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/v1/emissions/analytics?month=${m}&year=${y}`, {
@@ -74,7 +120,11 @@ const Analytics = () => {
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
     }
-  };
+  }, [selectedMonth, selectedYear]);
+
+  useEffect(() => {
+    fetchAnalyticsData(selectedMonth, selectedYear);
+  }, [selectedMonth, selectedYear, fetchAnalyticsData]);
 
   const userName = user?.fullName || user?.name || user?.username || 'User';
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
@@ -114,30 +164,18 @@ const Analytics = () => {
     }
   };
 
-  // Custom Dot untuk Grafik Garis Harian
-  const CustomDot = (props) => {
-    const { cx, cy, index } = props;
-    const isLast = index === dailyList.length - 1;
-    
-    if (isLast) {
-      return (
-        <svg x={cx - 10} y={cy - 10} width={20} height={20} onClick={() => setIsModalOpen(true)} style={{ cursor: 'pointer' }}>
-          <circle cx="10" cy="10" r="6" fill="#ff4d4f" stroke="#fff" strokeWidth="2" />
-          <circle cx="10" cy="10" r="14" fill="transparent" stroke="#ff4d4f" strokeWidth="1" strokeDasharray="3 3">
-            <animate attributeName="r" from="6" to="16" dur="1.5s" repeatCount="indefinite" />
-            <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
-          </circle>
-        </svg>
-      );
-    }
-    return <circle cx={cx} cy={cy} r={4} fill="#4a0e17" stroke="#fff" strokeWidth={2} />;
-  };
+  // Callback klik dot pada grafik harian
+  const handleDotClick = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
 
-  // Hitung total emisi gabungan dari data hari ini
-  const totalTodayEmissions = dailyList.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
+  // Hitung total emisi gabungan dari data hari ini dengan useMemo
+  const totalTodayEmissions = useMemo(() => {
+    return dailyList.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
+  }, [dailyList]);
 
-  // LOGIKA KOMPLIMEN MINGGUAN (Friendly & Menenangkan)
-  const getWeeklyInsight = () => {
+  // LOGIKA KOMPLIMEN MINGGUAN (Memoized)
+  const weeklyInsight = useMemo(() => {
     if (!weeklyList || weeklyList.length < 2) {
       return {
         type: 'info',
@@ -166,10 +204,10 @@ const Analytics = () => {
         message: 'Tingkat emisi kamu stabil dibanding kemarin. Konsistensi dalam menjaga pola konsumsi dan mobilitas yang ramah lingkungan sudah sangat hebat! 🍃😊'
       };
     }
-  };
+  }, [weeklyList]);
 
-  // LOGIKA KOMPLIMEN BULANAN
-  const getMonthlyInsight = () => {
+  // LOGIKA KOMPLIMEN BULANAN (Memoized)
+  const monthlyInsight = useMemo(() => {
     if (!monthlyList || monthlyList.length < 2) {
       return {
         message: `Rekap emisi bulan ${MONTH_NAMES[selectedMonth - 1]} ${selectedYear} tercatat dengan baik. Mari kita jadikan bulan ini lebih bersih dan hijau dari bulan sebelumnya! 🌟`
@@ -188,44 +226,12 @@ const Analytics = () => {
         message: `Minggu ini di bulan ${MONTH_NAMES[selectedMonth - 1]} mungkin aktivitasmu sedikit lebih padat. Jangan berkecil hati ya, mari pelan-pelan evaluasi pilihan konsumsi dan perjalanan minggu depan dengan santai dan gembira. 💖🌿`
       };
     }
-  };
-
-  const weeklyInsight = getWeeklyInsight();
-  const monthlyInsight = getMonthlyInsight();
+  }, [monthlyList, selectedMonth, selectedYear]);
 
   // Fungsi Ekspor PDF
-  const handleExportPDF = async () => {
-    setIsGeneratingPDF(true);
+  const handleExportPDF = useCallback(async () => {
     await exportAnalyticsToPDF('printable-analytics-report', `Laporan_Analisis_Karbon_${userName.replace(/\s+/g, '_')}.pdf`);
-    setIsGeneratingPDF(false);
-  };
-
-  // Custom Tooltip untuk Grafik Harian
-  const CustomDailyTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div style={{
-          background: '#ffffff',
-          padding: '10px 14px',
-          border: '1px solid #E0E0E0',
-          borderRadius: '10px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
-        }}>
-          <p style={{ margin: 0, fontWeight: 'bold', color: '#1B5E20', fontSize: '0.95rem' }}>
-            {data.day_name}, {data.formatted_date}
-          </p>
-          <p style={{ margin: '4px 0 0 0', color: '#555', fontSize: '0.9rem' }}>
-            Pukul: <strong>{data.formatted_time}</strong>
-          </p>
-          <p style={{ margin: '4px 0 0 0', color: '#4a0e17', fontWeight: '600', fontSize: '0.95rem' }}>
-            Total Emisi: {parseFloat(data.total).toFixed(3)} kg CO₂
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+  }, [userName]);
 
   return (
     <div className="layout-wrapper" ref={containerRef}>
@@ -313,7 +319,21 @@ const Analytics = () => {
                       <XAxis dataKey="formatted_time" stroke="#757575" />
                       <YAxis stroke="#757575" />
                       <RechartsTooltip content={<CustomDailyTooltip />} />
-                      <Line type="monotone" dataKey="total" stroke="#4a0e17" strokeWidth={3} dot={<CustomDot />} activeDot={{ r: 8 }} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="total" 
+                        stroke="#4a0e17" 
+                        strokeWidth={3} 
+                        dot={(props) => (
+                          <CustomDot 
+                            key={props.index} 
+                            {...props} 
+                            dailyLength={dailyList.length} 
+                            onClickDot={handleDotClick} 
+                          />
+                        )} 
+                        activeDot={{ r: 8 }} 
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
@@ -490,127 +510,20 @@ const Analytics = () => {
         isLoading={isResettingData}
       />
 
-      {/* TEMPLATE TERSEMBUNYI KHUSUS CETAK PDF LAPORAN RESMI */}
-      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-        <div id="printable-analytics-report" style={{ width: '800px', padding: '40px', background: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#333333' }}>
-          {/* Header PDF */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #4a0e17', paddingBottom: '16px', marginBottom: '24px' }}>
-            <div>
-              <h1 style={{ margin: 0, color: '#4a0e17', fontSize: '24px', fontWeight: 'bold' }}>CarbonWise - Laporan Analisis Emisi</h1>
-              <p style={{ margin: '4px 0 0 0', color: '#666', fontSize: '14px' }}>Laporan Resmi Grafik Jejak Karbon Harian, Mingguan, & Bulanan</p>
-            </div>
-            <div style={{ textAlign: 'right', fontSize: '13px', color: '#555' }}>
-              <p style={{ margin: 0 }}><strong>Pengguna:</strong> {userName}</p>
-              <p style={{ margin: '2px 0 0 0' }}><strong>Dicetak:</strong> {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-            </div>
-          </div>
-
-          {/* SECTION 1: GRAFIK & RINCIAN HARIAN */}
-          <div style={{ marginBottom: '32px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ color: '#4a0e17', borderBottom: '1.5px solid #4a0e17', paddingBottom: '6px', fontSize: '16px', marginBottom: '12px' }}>
-              1. Grafik & Rincian Emisi Harian (Hari Ini)
-            </h3>
-            <p style={{ fontSize: '13px', margin: '0 0 10px 0', color: '#555' }}>
-              Total Emisi Hari Ini: <strong style={{ color: '#4a0e17' }}>{totalTodayEmissions.toFixed(3)} kg CO₂</strong>
-            </p>
-            
-            {/* Visual Grafik Harian LineChart */}
-            {dailyList.length > 0 && (
-              <div style={{ width: '720px', height: '180px', marginBottom: '16px', background: '#fafafa', padding: '10px', borderRadius: '8px', border: '1px solid #eee' }}>
-                <LineChart width={700} height={170} data={dailyList} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
-                  <XAxis dataKey="formatted_time" stroke="#757575" style={{ fontSize: '11px' }} />
-                  <YAxis stroke="#757575" style={{ fontSize: '11px' }} />
-                  <Line type="monotone" dataKey="total" stroke="#4a0e17" strokeWidth={2.5} dot={{ r: 4, fill: '#4a0e17' }} />
-                </LineChart>
-              </div>
-            )}
-
-            {/* Tabel Item Rincian */}
-            {todayBreakdownList.length > 0 && (
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '12px' }}>
-                <thead>
-                  <tr style={{ background: '#4a0e17', color: '#ffffff', textAlign: 'left' }}>
-                    <th style={{ padding: '6px 10px', border: '1px solid #4a0e17' }}>Sumber / Item</th>
-                    <th style={{ padding: '6px 10px', border: '1px solid #4a0e17' }}>Kategori</th>
-                    <th style={{ padding: '6px 10px', border: '1px solid #4a0e17' }}>Total Emisi (kg CO₂)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {todayBreakdownList.map((item, i) => (
-                    <tr key={i} style={{ background: i % 2 === 0 ? '#ffffff' : '#fcfcfc' }}>
-                      <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{item.item_name}</td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{item.category_name}</td>
-                      <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{parseFloat(item.total).toFixed(3)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          {/* SECTION 2: GRAFIK & ANALISIS MINGGUAN DENGAN DETAIL MINGGU/BULAN */}
-          <div style={{ marginBottom: '32px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ color: '#4a0e17', borderBottom: '1.5px solid #4a0e17', paddingBottom: '6px', fontSize: '16px', marginBottom: '6px' }}>
-              2. Grafik & Analisis Emisi Mingguan (Pekan Ke-{Math.ceil(new Date().getDate() / 7)}, Bulan {MONTH_NAMES[new Date().getMonth()]} {new Date().getFullYear()})
-            </h3>
-            <p style={{ fontSize: '12px', margin: '0 0 10px 0', color: '#666' }}>
-              Pelacakan emisi 7 hari terakhir dalam rentang pekan aktif saat ini.
-            </p>
-            
-            {/* Visual Grafik Mingguan BarChart */}
-            {weeklyList.length > 0 && (
-              <div style={{ width: '720px', height: '180px', marginBottom: '12px', background: '#fafafa', padding: '10px', borderRadius: '8px', border: '1px solid #eee' }}>
-                <BarChart width={700} height={170} data={weeklyList} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
-                  <XAxis dataKey="day_name" stroke="#757575" style={{ fontSize: '11px' }} />
-                  <YAxis stroke="#757575" style={{ fontSize: '11px' }} />
-                  <Bar dataKey="total" fill="#4a0e17" maxBarSize={35} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </div>
-            )}
-
-            {/* Kotak Analisis & Komplimen Mingguan */}
-            <div style={{ background: '#e8f5e9', padding: '12px 16px', borderRadius: '8px', borderLeft: '4px solid #2e7d32', fontSize: '12.5px', color: '#1b5e20', lineHeight: '1.5' }}>
-              <strong style={{ display: 'block', marginBottom: '2px', color: '#2e7d32' }}>Analisis & Komplimen Mingguan:</strong>
-              {weeklyInsight.message}
-            </div>
-          </div>
-
-          {/* SECTION 3: GRAFIK & ANALISIS BULANAN DENGAN DETAIL BULAN/TAHUN */}
-          <div style={{ marginBottom: '24px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ color: '#4a0e17', borderBottom: '1.5px solid #4a0e17', paddingBottom: '6px', fontSize: '16px', marginBottom: '6px' }}>
-              3. Grafik & Analisis Emisi Bulanan (Bulan {MONTH_NAMES[selectedMonth - 1]} {selectedYear})
-            </h3>
-            <p style={{ fontSize: '12px', margin: '0 0 10px 0', color: '#666' }}>
-              Rekapitulasi total emisi per pekan (Week 1 s.d. Week 4) pada bulan {MONTH_NAMES[selectedMonth - 1]} {selectedYear}.
-            </p>
-            
-            {/* Visual Grafik Bulanan BarChart */}
-            {monthlyList.length > 0 && (
-              <div style={{ width: '720px', height: '180px', marginBottom: '12px', background: '#fafafa', padding: '10px', borderRadius: '8px', border: '1px solid #eee' }}>
-                <BarChart width={700} height={170} data={monthlyList} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
-                  <XAxis dataKey="week" stroke="#757575" style={{ fontSize: '11px' }} />
-                  <YAxis stroke="#757575" style={{ fontSize: '11px' }} />
-                  <Bar dataKey="total" fill="#360810" maxBarSize={35} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </div>
-            )}
-
-            {/* Kotak Analisis & Apresiasi Bulanan */}
-            <div style={{ background: '#f3e5f5', padding: '12px 16px', borderRadius: '8px', borderLeft: '4px solid #7b1fa2', fontSize: '12.5px', color: '#4a148c', lineHeight: '1.5' }}>
-              <strong style={{ display: 'block', marginBottom: '2px', color: '#7b1fa2' }}>Analisis & Apresiasi Bulanan:</strong>
-              {monthlyInsight.message}
-            </div>
-          </div>
-
-          {/* Footer Dokumen PDF */}
-          <div style={{ marginTop: '30px', paddingTop: '14px', borderTop: '1px solid #eee', textAlign: 'center', fontSize: '11px', color: '#888' }}>
-            Laporan ini secara otomatis dibuat oleh sistem CarbonWise. Mari terus lestarikan bumi bersama-sama. 🌱
-          </div>
-        </div>
-      </div>
+      {/* TEMPLATE TERSEMBUNYI KHUSUS CETAK PDF LAPORAN RESMI (Komponen Terpisah) */}
+      <AnalyticsPDFReport 
+        userName={userName}
+        totalTodayEmissions={totalTodayEmissions}
+        dailyList={dailyList}
+        todayBreakdownList={todayBreakdownList}
+        weeklyList={weeklyList}
+        weeklyInsight={weeklyInsight}
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        monthlyList={monthlyList}
+        monthlyInsight={monthlyInsight}
+        MONTH_NAMES={MONTH_NAMES}
+      />
     </div>
   );
 };

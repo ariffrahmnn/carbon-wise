@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import landingPageGif from '../../assets/Vid.gif'
+import landingPageVideo from '../../assets/Vid.mp4'
 import { animateHeroEntrance } from '../../animations/heroAnimation.js'
 
 function Home() {
@@ -60,10 +60,13 @@ function Home() {
 
       <div className="hero__visual" aria-hidden="true">
         <div className="hero__video-wrap">
-          <img
+          <video
             className="hero__video"
-            src={landingPageGif}
-            alt=""
+            src={landingPageVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
           />
         </div>
       </div>

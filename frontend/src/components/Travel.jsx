@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Car, Bike, Bus, Footprints, Trash2, Plus, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
 
@@ -27,9 +27,13 @@ const Travel = () => {
   const [travelLogs, setTravelLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // State Toast Alert
+  // State Toast Alert & User
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [user, setUser] = useState(null);
+
+  // Refs untuk pembersihan timer agar tidak memory leak saat unmount
+  const toastTimerRef = useRef(null);
+  const redirectTimerRef = useRef(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -40,25 +44,34 @@ const Travel = () => {
         console.error('Gagal membaca data user dari localStorage:', err);
       }
     }
+
+    // Cleanup timer saat unmount
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
   }, []);
 
   const userName = user?.fullName || user?.name || user?.username || 'User';
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
-  };
+  }, [navigate]);
 
-  const showNotification = (message, type = 'success') => {
+  const showNotification = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast({ show: true, message, type });
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToast({ show: false, message: '', type: 'success' });
     }, 3500);
-  };
+  }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchMasterItems = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -73,28 +86,34 @@ const Travel = () => {
 
         const result = await response.json();
 
-        if (response.ok && result.success) {  
-          const travelItems = result.data.filter(
-            (item) => item.category_type && item.category_type.toUpperCase() === 'TRAVEL'
-          );
-          if (travelItems.length > 0) {
-            setMasterItems(travelItems);
+        if (isMounted) {
+          if (response.ok && result.success) {  
+            const travelItems = result.data.filter(
+              (item) => item.category_type && item.category_type.toUpperCase() === 'TRAVEL'
+            );
+            if (travelItems.length > 0) {
+              setMasterItems(travelItems);
+            } else {
+              setMasterItems(DEFAULT_TRAVEL_ITEMS);
+            }
           } else {
             setMasterItems(DEFAULT_TRAVEL_ITEMS);
           }
-        } else {
-          setMasterItems(DEFAULT_TRAVEL_ITEMS);
         }
       } catch (error) {
         console.error('Gagal mengambil master data travel:', error);
-        setMasterItems(DEFAULT_TRAVEL_ITEMS);
+        if (isMounted) setMasterItems(DEFAULT_TRAVEL_ITEMS);
       }
     };
 
     fetchMasterItems();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const renderVehicleIcon = (itemName) => {
+  const renderVehicleIcon = useCallback((itemName) => {
     const name = itemName.toLowerCase();
     let imgSrc = null;
 
@@ -120,9 +139,9 @@ const Travel = () => {
     }
 
     return <Car size={28} className="vehicle-icon" />;
-  };
+  }, []);
 
-  const handleAddLog = () => {
+  const handleAddLog = useCallback(() => {
     if (!selectedVehicle) {
       showNotification('Pilih jenis kendaraan terlebih dahulu!', 'error');
       return;
@@ -141,21 +160,22 @@ const Travel = () => {
       unit: selectedVehicle.unit
     };
 
-    setTravelLogs([...travelLogs, newLog]);
+    setTravelLogs((prevLogs) => [...prevLogs, newLog]);
     showNotification(`${selectedVehicle.item_name} (${distance} ${selectedVehicle.unit}) ditambahkan!`, 'success');
     
     setSelectedVehicle(null);
     setDistance('');
-  };
+  }, [selectedVehicle, distance, showNotification]);
 
-  const handleRemoveLog = (tempId, name) => {
-    setTravelLogs(travelLogs.filter((item) => item.temp_id !== tempId));
+  const handleRemoveLog = useCallback((tempId, name) => {
+    setTravelLogs((prevLogs) => prevLogs.filter((item) => item.temp_id !== tempId));
     showNotification(`Item ${name} dihapus dari daftar`, 'error');
-  };
+  }, [showNotification]);
 
-  const calculateTotalEstimate = () => {
+  // Total emisi travel (Memoized)
+  const totalEstimate = useMemo(() => {
     return travelLogs.reduce((total, item) => total + (item.quantity_value * item.emission_factor), 0);
-  };
+  }, [travelLogs]);
 
   const handleSaveData = async () => {
     if (travelLogs.length === 0) {
@@ -191,7 +211,8 @@ const Travel = () => {
         
         setTravelLogs([]);
 
-        setTimeout(() => {
+        if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+        redirectTimerRef.current = setTimeout(() => {
           navigate('/analytics');
         }, 1200);
       } else {
@@ -239,7 +260,6 @@ const Travel = () => {
             <span className="calc-user-name">{userName}</span>
           </div>
 
-          {/* ✅ FIX 2: DIPASANG ONCLICK HANDLER LOGOUT */}
           <button 
             className="calc-btn-logout" 
             title="Keluar" 
@@ -365,7 +385,7 @@ const Travel = () => {
             {/* Estimasi Ringkasan Emisi */}
             <div className="travel-estimate-card">
               <span>Estimasi Emisi Perjalanan:</span>
-              <strong>{calculateTotalEstimate().toFixed(3)} kg CO₂</strong>
+              <strong>{totalEstimate.toFixed(3)} kg CO₂</strong>
             </div>
 
             {/* Tombol Simpan */}
