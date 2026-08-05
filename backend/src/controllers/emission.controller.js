@@ -14,7 +14,7 @@ export const getMasterItems = async (req, res) => {
 
 export const calculateEmission = async (req, res) => {
   try {
-    const userId = req.user.id; // Didapat dari middleware verifyToken!
+    const userId = req.user.id;
     const { items } = req.body;
 
     const result = await emissionService.calculateAndSaveEmission(userId, items);

@@ -1,66 +1,82 @@
 import pool from '../configs/db.js';
 
 class EmissionRepository {
-  // Ambil semua master data untuk dikirim ke FE
   async getAllMasterItems() {
     const query = `
-      SELECT id, category_type, item_name, emission_factor, unit 
-      FROM emission_categories 
-      ORDER BY category_type ASC, item_name ASC
+      SELECT 
+        i.id,
+        c.name AS category_type,
+        i.item_name,
+        i.co2_factor_per_unit AS emission_factor,
+        i.unit
+      FROM emission_items i
+      JOIN emission_categories c ON i.category_id = c.id
+      ORDER BY c.name ASC, i.item_name ASC
     `;
     const result = await pool.query(query);
     return result.rows;
   }
 
-  // Simpan kalkulasi ke DB (menggunakan Transaction)
-  async createEmissionLog(userId, totalCo2, itemsDetail) {
+  async getItemsByIds(itemIds) {
+    const query = `
+      SELECT 
+        i.id,
+        i.category_id,
+        i.item_name,
+        i.co2_factor_per_unit,
+        i.unit,
+        c.name AS category_type
+      FROM emission_items i
+      JOIN emission_categories c ON i.category_id = c.id
+      WHERE i.id = ANY($1::int[])
+    `;
+    const result = await pool.query(query, [itemIds]);
+    return result.rows;
+  }
+
+  async createEmissionLogsBatch(userId, totalCo2, itemsDetail) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
 
-      // 1. Insert Header Transaksi (emission_logs)
+      const batchQuery = `
+        INSERT INTO calculation_batches (user_id, total_batch_co2) 
+        VALUES ($1, $2) 
+        RETURNING id, created_at
+      `;
+      const batchResult = await client.query(batchQuery, [userId, totalCo2]);
+      const batchId = batchResult.rows[0].id;
+
       const logQuery = `
-        INSERT INTO emission_logs (user_id, total_co2_kg)
-        VALUES ($1, $2)
-        RETURNING id, user_id, logged_at, total_co2_kg
-      `;
-      const logResult = await client.query(logQuery, [userId, totalCo2]);
-      const newLog = logResult.rows[0];
-
-      // 2. Insert Detail Transaksi (emission_log_details)
-      const detailQuery = `
-        INSERT INTO emission_log_details (log_id, category_id, quantity_value, calculated_co2_kg)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO emission_logs (batch_id, user_id, category_id, item_id, quantity, calculated_co2)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id, batch_id, user_id, category_id, item_id, quantity, calculated_co2, logged_at
       `;
 
+      const insertedLogs = [];
       for (const item of itemsDetail) {
-        await client.query(detailQuery, [
-          newLog.id,
+        const logResult = await client.query(logQuery, [
+          batchId,
+          userId,
           item.category_id,
-          item.quantity_value,
-          item.calculated_co2_kg
+          item.item_id,
+          item.quantity,
+          item.calculated_co2
         ]);
+        insertedLogs.push(logResult.rows[0]);
       }
 
       await client.query('COMMIT');
-      return newLog;
+      return {
+        batch_id: batchId,
+        logs: insertedLogs
+      };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
     } finally {
       client.release();
     }
-  }
-
-  // Helper untuk mengambil faktor emisi berdasarkan list category_id
-  async getCategoriesByIds(categoryIds) {
-    const query = `
-      SELECT id, emission_factor 
-      FROM emission_categories 
-      WHERE id = ANY($1::int[])
-    `;
-    const result = await pool.query(query, [categoryIds]);
-    return result.rows;
   }
 }
 
