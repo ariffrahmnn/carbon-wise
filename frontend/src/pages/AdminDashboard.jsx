@@ -228,11 +228,16 @@ const AdminDashboard = () => {
                     className="admin-filter-select"
                   >
                     <option value="">-- Semua Sekolah --</option>
-                    {schoolsList.map((sch, i) => (
-                      <option key={i} value={sch.school_name}>
-                        {sch.school_name} ({sch.student_count} siswa)
-                      </option>
-                    ))}
+                    {schoolsList.map((sch, i) => {
+                      const schoolName = (typeof sch === 'string' ? sch : (sch?.school_name || '')).trim();
+                      const count = typeof sch === 'object' && sch?.student_count ? ` (${sch.student_count} siswa)` : '';
+                      if (!schoolName) return null;
+                      return (
+                        <option key={i} value={schoolName}>
+                          {schoolName}{count}
+                        </option>
+                      );
+                    })}
                   </select>
                   {selectedSchool && (
                     <button 

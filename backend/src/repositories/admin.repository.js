@@ -20,7 +20,7 @@ class AdminRepository {
 
     if (cleanSchool) {
       whereConditions.push(`TRIM(u.school_name) ILIKE $${paramIndex}`);
-      queryParams.push(`%${cleanSchool}%`);
+      queryParams.push(cleanSchool);
       paramIndex++;
     }
 
@@ -91,18 +91,21 @@ class AdminRepository {
     };
   }
 
-  // Mengambil daftar nama sekolah unik (Deduplikasi 1 nama per sekolah)
+  // Mengambil daftar nama sekolah unik (Deduplikasi & TRIM + Hitung Jumlah Siswa)
   async getDistinctSchools() {
     const query = `
-      SELECT DISTINCT TRIM(school_name) AS school_name 
+      SELECT 
+        TRIM(school_name) AS school_name,
+        COUNT(id) AS student_count
       FROM users 
       WHERE school_name IS NOT NULL 
         AND TRIM(school_name) != '' 
         AND role::text NOT ILIKE 'admin' 
-      ORDER BY school_name ASC
+      GROUP BY TRIM(school_name)
+      ORDER BY TRIM(school_name) ASC
     `;
     const result = await pool.query(query);
-    return result.rows.map(row => row.school_name);
+    return result.rows;
   }
 
   // Mengambil data analitik grafik harian, mingguan, dan bulanan siswa tertentu untuk modal admin
