@@ -273,9 +273,9 @@ const AdminDashboard = () => {
                     <th>SEKOLAH</th>
                     <th>KELAS</th>
                     <th>EMAIL</th>
-                    <th>HARIAN</th>
-                    <th>MINGGUAN</th>
-                    <th>BULANAN</th>
+                    <th>PER HARI</th>
+                    <th>PER MINGGU</th>
+                    <th>PER BULAN</th>
                     <th style={{ width: '70px', textAlign: 'center' }}>DETAIL</th>
                   </tr>
                 </thead>
