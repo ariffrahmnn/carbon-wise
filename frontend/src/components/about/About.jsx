@@ -240,7 +240,7 @@ function About() {
             <h3>Siap Menjadi Agen Perubahan?</h3>
             <p>Mari mulai hitung jejak karbonmu dan jadilah bagian dari generasi penerus yang peduli keberlanjutan bumi.</p>
             <button className="cta-button" onClick={() => navigate('/input')}>
-              <span>Hitung Jejak Karbon Now</span>
+              <span>Hitung Jejak Karbon</span>
               <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_forward</span>
             </button>
           </div>
