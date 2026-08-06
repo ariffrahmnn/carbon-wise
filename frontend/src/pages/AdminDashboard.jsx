@@ -148,29 +148,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-wrapper">
-      {/* HEADER ATAS (DENGAN NAMA ADMIN & LOGOUT DIBAGIAN KANAN) */}
+      {/* HEADER ATAS (PROFIL ADMIN & LOGOUT DI ATAS, SEARCH BOX DI BAWAH) */}
       <header className="admin-header">
-        <div className="admin-brand">
-          <div className="admin-brand-icon">
-            <Leaf size={20} color="#ffffff" />
-          </div>
-          <span className="admin-brand-title">CarbonWise</span>
-        </div>
-
-        {/* SEARCH INPUT DENGAN TEKNIK DEBOUNCE (400ms) & TRIM */}
-        <div className="admin-search-box">
-          <Search size={18} className="admin-search-icon" />
-          <input 
-            type="text" 
-            className="admin-search-input"
-            placeholder="Search records..." 
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-        </div>
-
-        {/* PROFILE ADMIN & LOGOUT DI HEADER */}
-        <div className="admin-header-right">
+        <div className="admin-header-top-row">
           <div className="admin-header-user">
             <div className="admin-header-avatar">{adminInitial}</div>
             <div className="admin-header-info">
@@ -183,6 +163,18 @@ const AdminDashboard = () => {
             <LogOut size={16} />
             <span>Logout</span>
           </button>
+        </div>
+
+        {/* SEARCH INPUT DIBERIKAN DI BAWAH NAMA & LOGOUT */}
+        <div className="admin-search-box">
+          <Search size={18} className="admin-search-icon" />
+          <input 
+            type="text" 
+            className="admin-search-input"
+            placeholder="Search records..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
         </div>
       </header>
 
