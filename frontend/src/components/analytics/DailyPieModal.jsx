@@ -137,16 +137,25 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
         <button 
           className="close-btn" 
           onClick={handleAnimatedClose}
+          aria-label="Tutup Modal"
           style={{
-            top: '20px',
-            right: '20px',
-            transition: 'transform 0.2s ease, color 0.2s ease',
-            cursor: 'pointer'
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'none',
+            border: 'none',
+            color: '#475569',
+            cursor: 'pointer',
+            zIndex: 10
           }}
-          onMouseEnter={(e) => gsap.to(e.currentTarget, { rotate: 90, scale: 1.1, duration: 0.2 })}
-          onMouseLeave={(e) => gsap.to(e.currentTarget, { rotate: 0, scale: 1, duration: 0.2 })}
         >
-          <X size={22} />
+          <X size={24} />
         </button>
 
         <h3 className="modal-title" ref={titleRef} style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1b4332', marginBottom: '16px' }}>

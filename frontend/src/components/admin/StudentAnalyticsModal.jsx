@@ -95,9 +95,23 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
       >
         <button 
           onClick={handleAnimatedClose}
-          style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}
-          onMouseEnter={(e) => gsap.to(e.currentTarget, { rotate: 90, scale: 1.1, duration: 0.2 })}
-          onMouseLeave={(e) => gsap.to(e.currentTarget, { rotate: 0, scale: 1, duration: 0.2 })}
+          aria-label="Tutup Modal"
+          style={{ 
+            position: 'absolute', 
+            top: '12px', 
+            right: '12px', 
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'none', 
+            border: 'none', 
+            cursor: 'pointer', 
+            color: '#475569',
+            zIndex: 10
+          }}
         >
           <X size={24} />
         </button>
