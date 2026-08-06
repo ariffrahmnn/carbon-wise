@@ -17,7 +17,7 @@ export default function News1() {
 
       {/* MAIN ARTICLE CARD */}
       <main className="news-content-card">
-        <e className="news-article">
+        <article className="news-article">
           
           {/* Judul Utama Artikel */}
           <h2 className="article-title">
