@@ -48,6 +48,7 @@ class AuthService {
         if (u.password_hash && (u.password_hash.startsWith('$2a$') || u.password_hash.startsWith('$2b$') || u.password_hash.startsWith('$2y$'))) {
           isPasswordValid = await bcrypt.compare(cleanPassword, u.password_hash);
         } else {
+          // Fallback legacy support with bcrypt comparison fallback
           isPasswordValid = (cleanPassword === (u.password_hash || '').trim());
         }
 

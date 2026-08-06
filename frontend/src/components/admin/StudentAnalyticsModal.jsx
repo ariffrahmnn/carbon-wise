@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, User, School, GraduationCap, Mail, Calendar, Clock, BarChart3 } from 'lucide-react';
+import gsap from 'gsap';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
@@ -11,6 +12,38 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
     monthly: []
   });
   const [loading, setLoading] = useState(false);
+
+  const overlayRef = useRef(null);
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const ctx = gsap.context(() => {
+        gsap.fromTo(
+          overlayRef.current,
+          { opacity: 0, backdropFilter: 'blur(0px)' },
+          { opacity: 1, backdropFilter: 'blur(8px)', duration: 0.3, ease: 'power2.out' }
+        );
+
+        gsap.fromTo(
+          contentRef.current,
+          { scale: 0.8, opacity: 0, y: 30 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: 'back.out(1.5)', delay: 0.05 }
+        );
+      });
+      return () => ctx.revert();
+    }
+  }, [isOpen]);
+
+  const handleAnimatedClose = () => {
+    if (!overlayRef.current || !contentRef.current) {
+      onClose();
+      return;
+    }
+
+    gsap.to(contentRef.current, { scale: 0.85, opacity: 0, y: 20, duration: 0.25, ease: 'power2.in' });
+    gsap.to(overlayRef.current, { opacity: 0, duration: 0.25, ease: 'power2.in', onComplete: onClose });
+  };
 
   useEffect(() => {
     if (isOpen && studentProfile?.id) {
@@ -43,24 +76,28 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
   if (!isOpen || !studentProfile) return null;
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 1100 }}>
+    <div className="modal-overlay" ref={overlayRef} style={{ zIndex: 1100 }} onClick={handleAnimatedClose}>
       <div 
         className="modal-content"
+        ref={contentRef}
+        onClick={(e) => e.stopPropagation()}
         style={{
           background: '#ffffff',
-          borderRadius: '20px',
-          padding: '30px',
+          borderRadius: '24px',
+          padding: '32px',
           maxWidth: '850px',
           width: '92%',
           maxHeight: '90vh',
           overflowY: 'auto',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+          boxShadow: '0 25px 50px -12px rgba(74, 14, 23, 0.25)',
           position: 'relative'
         }}
       >
         <button 
-          onClick={onClose}
+          onClick={handleAnimatedClose}
           style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}
+          onMouseEnter={(e) => gsap.to(e.currentTarget, { rotate: 90, scale: 1.1, duration: 0.2 })}
+          onMouseLeave={(e) => gsap.to(e.currentTarget, { rotate: 0, scale: 1, duration: 0.2 })}
         >
           <X size={24} />
         </button>
