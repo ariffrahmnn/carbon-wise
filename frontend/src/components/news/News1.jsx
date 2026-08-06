@@ -9,7 +9,6 @@ export default function News1() {
     <div className="news-page-container">
       {/* HEADER SECTION */}
       <header className="news-header-section">
-        <span className="news-tagline">CERITA TERBARU</span>
         <h1 className="news-main-title">News & Insights</h1>
         <p className="news-subtitle">
           Ikuti kabar dan insight terbaru seputar iklim, alam, dan langkah kecil yang bisa kita mulai hari ini.
@@ -25,8 +24,9 @@ export default function News1() {
             Emisi dari Sektor Transportasi: Seberapa Besar Dampak Perjalanan Harian Kita?
           </h2>
 
+          {/* DIBERIKAN CLASS KHUSUS UNTUK WARNA COKELAT */}
           <div className="article-meta">
-            <span></span>  <span>Topik: Impilkasi Penggunaan Transportasi</span>
+            <span className="meta-topic">Topik: Implikasi Penggunaan Transportasi</span>
           </div>
 
           {/* GAMBAR DARI ASSETS */}
@@ -37,6 +37,18 @@ export default function News1() {
               className="article-image"
             />
           </div>
+
+          {/* KREDIT SUMBER DI BAWAH GAMBAR */}
+          <p className="image-source-credit">
+            Sumber Gambar:
+            <a 
+              href="https://unsplash.com/photos/traffic-filled-highways-crisscross-a-city-at-golden-hour-72CrKMqbwkM" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              https://unsplash.com/photos/traffic-filled-highways-crisscross-a-city-at-golden-hour-72CrKMqbwkM
+            </a>
+          </p>
 
           {/* PARAGRAF BACAAN */}
           <div className="article-body">

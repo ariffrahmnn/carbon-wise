@@ -5,7 +5,7 @@ import '../../styles/landing-page/landing.css'
 import '../../styles/landing-page/news-section.css'
 
 function Main() {
-    return (
+  return (
     <main>
       <Home />
       <Edukasi />
