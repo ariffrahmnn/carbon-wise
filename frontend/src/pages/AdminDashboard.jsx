@@ -148,24 +148,35 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-wrapper">
-      {/* HEADER ATAS (PROFIL ADMIN & LOGOUT DI ATAS, SEARCH BOX DI BAWAH) */}
+      {/* HEADER ATAS ADMIN DASHBOARD */}
       <header className="admin-header">
         <div className="admin-header-top-row">
-          <div className="admin-header-user">
-            <div className="admin-header-avatar">{adminInitial}</div>
-            <div className="admin-header-info">
-              <span className="admin-header-name">{adminName}</span>
-              <span className="admin-header-role">Administrator</span>
+          {/* BRAND LOGO CARBONWISE (DITAMPILKAN KHUSUS TAMPILAN DESKTOP) */}
+          <div className="admin-brand">
+            <div className="admin-brand-icon">
+              <Leaf size={20} color="#ffffff" />
             </div>
+            <span className="admin-brand-title">CarbonWise</span>
           </div>
 
-          <button type="button" className="admin-header-logout" onClick={handleLogout} title="Keluar">
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
+          {/* PROFIL ADMIN & LOGOUT DIDEKATKAN DI SISI KANAN */}
+          <div className="admin-header-right">
+            <div className="admin-header-user">
+              <div className="admin-header-avatar">{adminInitial}</div>
+              <div className="admin-header-info">
+                <span className="admin-header-name">{adminName}</span>
+                <span className="admin-header-role">Administrator</span>
+              </div>
+            </div>
+
+            <button type="button" className="admin-header-logout" onClick={handleLogout} title="Keluar">
+              <LogOut size={16} />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
 
-        {/* SEARCH INPUT DIBERIKAN DI BAWAH NAMA & LOGOUT */}
+        {/* SEARCH INPUT DI BAWAH PROFIL & LOGOUT */}
         <div className="admin-search-box">
           <Search size={18} className="admin-search-icon" />
           <input 
