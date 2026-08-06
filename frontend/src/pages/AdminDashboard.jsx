@@ -373,9 +373,6 @@ const AdminDashboard = () => {
         onClose={() => setIsModalOpen(false)}
         studentProfile={selectedStudentForModal}
       />
-
-      {/* Indikator Scroll Mobile */}
-      <ScrollHint text="Gulir ke bawah untuk lihat tabel data" />
     </div>
   );
 };
