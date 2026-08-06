@@ -121,7 +121,26 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
     : [];
 
   return (
-    <div className="modal-overlay" ref={overlayRef} onClick={handleAnimatedClose}>
+    <div 
+      className="modal-overlay" 
+      ref={overlayRef} 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.65)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999,
+        padding: '20px',
+        boxSizing: 'border-box'
+      }}
+      onClick={handleAnimatedClose}
+    >
       <div 
         className="modal-content pie-modal-content" 
         ref={contentRef}
@@ -129,9 +148,11 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
         style={{
           borderRadius: '24px',
           padding: '32px 28px',
-          boxShadow: '0 25px 50px -12px rgba(74, 14, 23, 0.25)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
           background: '#ffffff',
-          border: '1px solid rgba(74, 14, 23, 0.08)'
+          border: '1px solid rgba(74, 14, 23, 0.08)',
+          position: 'relative',
+          margin: 'auto'
         }}
       >
         <button 

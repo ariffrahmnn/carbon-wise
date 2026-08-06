@@ -76,7 +76,26 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
   if (!isOpen || !studentProfile) return null;
 
   return (
-    <div className="modal-overlay" ref={overlayRef} style={{ zIndex: 1100 }} onClick={handleAnimatedClose}>
+    <div 
+      className="modal-overlay" 
+      ref={overlayRef} 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.65)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999,
+        padding: '20px',
+        boxSizing: 'border-box'
+      }} 
+      onClick={handleAnimatedClose}
+    >
       <div 
         className="modal-content"
         ref={contentRef}
@@ -84,13 +103,14 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
         style={{
           background: '#ffffff',
           borderRadius: '24px',
-          padding: '32px',
+          padding: '32px 28px',
           maxWidth: '850px',
-          width: '92%',
-          maxHeight: '90vh',
+          width: '100%',
+          maxHeight: '88vh',
           overflowY: 'auto',
-          boxShadow: '0 25px 50px -12px rgba(74, 14, 23, 0.25)',
-          position: 'relative'
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+          position: 'relative',
+          margin: 'auto'
         }}
       >
         <button 
