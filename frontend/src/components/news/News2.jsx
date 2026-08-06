@@ -9,7 +9,6 @@ export default function News2() {
     <div className="news-page-container">
       {/* HEADER SECTION */}
       <header className="news-header-section">
-        <span className="news-tagline">CERITA TERBARU</span>
         <h1 className="news-main-title">News & Insights</h1>
         <p className="news-subtitle">
           Ikuti kabar dan insight terbaru seputar iklim, alam, dan langkah kecil yang bisa kita mulai hari ini.
@@ -26,7 +25,7 @@ export default function News2() {
           </h2>
 
           <div className="article-meta">
-            <span>Topik: <strong className="topic-highlight">Jejak Karbon & Konsumsi Pangan</strong></span>
+            <span>Topik: <strong className="meta-topic">Jejak Karbon & Konsumsi Pangan</strong></span>
           </div>
 
           {/* GAMBAR DARI ASSETS */}
@@ -37,6 +36,18 @@ export default function News2() {
               className="article-image"
             />
           </div>
+
+          {/* KREDIT SUMBER DI BAWAH GAMBAR */}
+          <p className="image-source-credit">
+            Sumber Gambar:
+            <a 
+              href="https://unsplash.com/photos/aerial-view-of-blue-and-white-boat-on-body-of-water-during-daytime-FPKnAO-CF6M" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              https://unsplash.com/photos/aerial-view-of-blue-and-white-boat-on-body-of-water-during-daytime-FPKnAO-CF6M
+            </a>
+          </p>
 
           {/* PARAGRAF BACAAN */}
           <div className="article-body">

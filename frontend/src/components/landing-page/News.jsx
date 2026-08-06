@@ -40,18 +40,18 @@ const newsItems = [
   },
   {
     id: 'news5',
-    title: 'Mengapa Hutan Merupakan Benteng Pertahanan Utama Melawan Perubahan Iklim?',
+    title: 'Apakah Mobil Listrik Benar-Benar Bebas Emisi dan Ramah Lingkungan?',
     category: 'Konservasi Hutan',
     icon: 'forest',
-    image: asalKarbonImg,
+    image: mobilListrikImg,
     link: '/news5',
   },
   {
     id: 'news6',
-    title: 'Dampak Industri Pakaian Terhadap Emisi Karbon Global',
+    title: 'Karbon Dioksida (CO₂) , Kenali Bahaya dan Sumbernya',
     category: 'Gaya Hidup & Tekstil',
     icon: 'checkroom',
-    image: mobilListrikImg,
+    image: asalKarbonImg,
     link: '/news6',
   },
 ]

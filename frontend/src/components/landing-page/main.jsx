@@ -4,7 +4,7 @@ import News from './News.jsx'
 import '../../styles/landing-page/landing.css'
 import '../../styles/landing-page/news-section.css'
 
-Main() {
+function Main() {
   return (
     <main>
       <Home />

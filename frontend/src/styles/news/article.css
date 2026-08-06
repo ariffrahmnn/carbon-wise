@@ -99,11 +99,17 @@
   font-weight: 700;
 }
 
+/* WARNA COKELAT UNTUK TOPIK IMPLIKASI */
+.meta-topic {
+  color: #8b4513; /* Warna Cokelat */
+  font-weight: 600;
+}
+
 /* GAMBAR HASIL ASSETS */
 .article-image-wrapper {
   width: 100%;
   max-width: 650px;
-  margin: 0 auto 30px auto;
+  margin: 0 auto 10px auto; /* Margin bawah diperkecil agar pas dengan teks sumber */
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -119,6 +125,27 @@
 
 .article-image-wrapper:hover .article-image {
   transform: scale(1.02);
+}
+
+/* STYLING TEKS SUMBER/KREDIT DARI UNSPLASH */
+.image-source-credit {
+  max-width: 650px;       /* Disamakan dengan lebar maksimal wrapper gambar */
+  margin: 0 auto 32px auto; /* Margin bawah 32px memberi jarak lega ke paragraf */
+  text-align: center;
+  font-size: 0.72rem;     /* Ukuran font kecil agar tidak meluber dari lebar gambar */
+  color: #64748b;
+  line-height: 1.4;
+  word-break: break-all;  /* Mencegah link URL panjang memotong border card */
+}
+
+.image-source-credit a {
+  color: #64748b;
+  text-decoration: underline;
+  margin-left: 4px;
+}
+
+.image-source-credit a:hover {
+  color: #4a0e17;
 }
 
 /* TEKS BACAAN ARTIKEL */
@@ -196,5 +223,10 @@
 
   .article-subheading {
     font-size: 1.1rem;
+  }
+
+  .image-source-credit {
+    font-size: 0.68rem; /* Lebih kecil sedikit khusus layar HP */
+    margin-bottom: 24px;
   }
 }
