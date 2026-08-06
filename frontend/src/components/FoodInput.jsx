@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, Plus, Trash2, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Utensils, Plus, Trash2, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
 import tofuImg from '../assets/tofu.jpg';
 import tempehImg from '../assets/tempeh.jpg';
 import beefImg from '../assets/beef.jpg';
@@ -290,10 +290,6 @@ const FoodInput = () => {
         {/* SIDEBAR SECTION */}
         <aside className="sidebar">
           <nav className="sidebar-nav">
-            <Link to="/" className="nav-item">
-              <Home size={22} />
-              <span>Home</span>
-            </Link>
             <Link to="/input" className="nav-item active">
               <PenTool size={22} />
               <span>Makanan</span>
@@ -313,9 +309,8 @@ const FoodInput = () => {
         <main className="content-area">
           <button
             type="button"
-            className="auth-back-home-btn"
+            className="auth-back-home-btn analytics-back-home-btn"
             onClick={() => navigate('/')}
-            style={{ marginBottom: '20px', border: 'none', background: 'transparent' }}
           >
             <span className="material-symbols-outlined">arrow_back</span>
             Kembali ke Beranda

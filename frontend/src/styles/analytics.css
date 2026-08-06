@@ -126,3 +126,38 @@
 .auth-back-home-btn:hover .material-symbols-outlined {
   transform: translateX(-3px);
 }
+
+.analytics-back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  min-width: 190px;
+  margin-bottom: 24px;
+  padding: 13px 22px;
+  color: #ffffff;
+  background: #4a0e17;
+  border: 2px solid #4a0e17;
+  border-radius: 14px;
+  box-shadow: 0 7px 18px rgba(74, 14, 23, 0.28);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.analytics-back-home-btn:hover,
+.analytics-back-home-btn:hover span {
+  color: #ffffff !important;
+}
+
+.analytics-back-home-btn:hover {
+  background: #320a10;
+  box-shadow: 0 8px 18px rgba(74, 14, 23, 0.3);
+  transform: translateY(-2px);
+}
+
+.analytics-back-home-btn .material-symbols-outlined {
+  font-size: 18px;
+}
