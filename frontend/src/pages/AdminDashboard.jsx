@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, FileSpreadsheet, LogOut, Users, MoreVertical, ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
+import { Search, Filter, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 import StudentAnalyticsModal from '../components/admin/StudentAnalyticsModal.jsx';
@@ -32,6 +32,16 @@ const AdminDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
+
+  // Data profil Admin dari localStorage
+  const savedUser = localStorage.getItem('user');
+  let adminUser = null;
+  try {
+    adminUser = JSON.parse(savedUser);
+  } catch (e) {}
+
+  const adminName = adminUser?.fullName || adminUser?.full_name || adminUser?.name || 'Admin User';
+  const adminInitial = adminName.charAt(0).toUpperCase();
 
   // 1. Debounce Effect: Menunda pengubahan debouncedSearch hingga 400ms setelah user berhenti mengetik
   useEffect(() => {
@@ -138,57 +148,46 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-wrapper">
-      {/* SIDEBAR KIRI */}
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar-top">
-          <div className="admin-user-profile-card">
-            <div className="admin-avatar">A</div>
-            <div className="admin-info">
-              <span className="admin-name">Admin User</span>
-              <span className="admin-role">Administrator</span>
+      {/* HEADER ATAS (DENGAN NAMA ADMIN & LOGOUT DIBAGIAN KANAN) */}
+      <header className="admin-header">
+        <div className="admin-brand">
+          <div className="admin-brand-icon">
+            <Leaf size={20} color="#ffffff" />
+          </div>
+          <span className="admin-brand-title">CarbonWise</span>
+        </div>
+
+        {/* SEARCH INPUT DENGAN TEKNIK DEBOUNCE (400ms) & TRIM */}
+        <div className="admin-search-box">
+          <Search size={18} className="admin-search-icon" />
+          <input 
+            type="text" 
+            className="admin-search-input"
+            placeholder="Search records..." 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+
+        {/* PROFILE ADMIN & LOGOUT DI HEADER */}
+        <div className="admin-header-right">
+          <div className="admin-header-user">
+            <div className="admin-header-avatar">{adminInitial}</div>
+            <div className="admin-header-info">
+              <span className="admin-header-name">{adminName}</span>
+              <span className="admin-header-role">Administrator</span>
             </div>
           </div>
 
-          <nav className="admin-nav-menu">
-            <div className="admin-nav-item active">
-              <Users size={20} />
-              <span>User Management</span>
-            </div>
-          </nav>
-        </div>
-
-        <div className="admin-sidebar-bottom">
-          <button type="button" className="admin-logout-btn" onClick={handleLogout}>
-            <LogOut size={18} />
+          <button type="button" className="admin-header-logout" onClick={handleLogout} title="Keluar">
+            <LogOut size={16} />
             <span>Logout</span>
           </button>
         </div>
-      </aside>
+      </header>
 
       {/* AREA UTAMA DOKUMEN ADMIN */}
       <main className="admin-main-area">
-        {/* HEADER ATAS */}
-        <header className="admin-header">
-          <div className="admin-brand">
-            <div className="admin-brand-icon">
-              <Leaf size={20} color="#4A0E17" />
-            </div>
-            <span className="admin-brand-title">CarbonWise</span>
-          </div>
-
-          {/* SEARCH INPUT DENGAN TEKNIK DEBOUNCE (400ms) & TRIM */}
-          <div className="admin-search-box">
-            <Search size={18} className="admin-search-icon" />
-            <input 
-              type="text" 
-              className="admin-search-input"
-              placeholder="Search records..." 
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-          </div>
-        </header>
-
         {/* BODY DASHBOARD REKOR SISWA */}
         <div className="admin-content-body">
           <div className="admin-page-heading">
@@ -220,101 +219,115 @@ const AdminDashboard = () => {
                     value={selectedSchool}
                     onChange={(e) => {
                       setSelectedSchool(e.target.value);
-                      setShowFilterDropdown(false);
                       setCurrentPage(1);
+                      setShowFilterDropdown(false);
                     }}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '0.85rem' }}
+                    className="admin-filter-select"
                   >
-                    <option value="">Semua Sekolah</option>
+                    <option value="">-- Semua Sekolah --</option>
                     {schoolsList.map((sch, i) => (
-                      <option key={i} value={sch}>{sch}</option>
+                      <option key={i} value={sch.school_name}>
+                        {sch.school_name} ({sch.student_count} siswa)
+                      </option>
                     ))}
                   </select>
+                  {selectedSchool && (
+                    <button 
+                      type="button" 
+                      className="admin-reset-filter-btn"
+                      onClick={() => {
+                        setSelectedSchool('');
+                        setCurrentPage(1);
+                        setShowFilterDropdown(false);
+                      }}
+                    >
+                      Reset Filter
+                    </button>
+                  )}
                 </div>
               )}
 
-              {/* TOMBOL IMPORT / EXPORT EXCEL */}
+              {/* TOMBOL EXPORT KE EXCEL */}
               <button 
                 type="button" 
-                className="admin-import-btn"
+                className="admin-export-btn"
                 onClick={handleExportExcel}
               >
-                <FileSpreadsheet size={18} />
+                <FileSpreadsheet size={16} />
                 <span>Import Excel</span>
               </button>
             </div>
           </div>
 
-          {/* TABEL REKOR SISWA */}
+          {/* TABEL REKOR SISWA (DENGAN RUANG YANG MENGISI CONTAINER SECARA PROPORSIONAL) */}
           <div className="admin-table-card">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th style={{ width: '50px' }}>NO</th>
-                  <th>NAMA LENGKAP</th>
-                  <th>SEKOLAH</th>
-                  <th>KELAS</th>
-                  <th>EMAIL</th>
-                  <th>TOTAL HARIAN</th>
-                  <th>WEEKLY</th>
-                  <th>MONTHLY</th>
-                  <th style={{ width: '60px', textAlign: 'center' }}>AKSI</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
+            <div className="admin-table-container">
+              <table className="admin-table">
+                <thead>
                   <tr>
-                    <td colSpan="9" style={{ textAlign: 'center', padding: '40px 0', color: '#777' }}>
-                      Memuat data rekor siswa...
-                    </td>
+                    <th style={{ width: '60px' }}>NO</th>
+                    <th>NAMA LENGKAP</th>
+                    <th>SEKOLAH</th>
+                    <th>KELAS</th>
+                    <th>EMAIL</th>
+                    <th>TOTAL HARIAN</th>
+                    <th>WEEKLY</th>
+                    <th>MONTHLY</th>
+                    <th style={{ width: '60px', textAlign: 'center' }}>ACTION</th>
                   </tr>
-                ) : students.length === 0 ? (
-                  <tr>
-                    <td colSpan="9" style={{ textAlign: 'center', padding: '40px 0', color: '#888' }}>
-                      Tidak ada rekor siswa yang ditemukan.
-                    </td>
-                  </tr>
-                ) : (
-                  students.map((student, idx) => (
-                    <tr key={student.id}>
-                      <td style={{ fontWeight: '600', color: '#555' }}>
-                        {idx + 1 + (currentPage - 1) * pagination.limit}
-                      </td>
-                      <td className="student-name-bold">{student.full_name}</td>
-                      <td>{student.school_name || '-'}</td>
-                      <td>{student.class_grade || '-'}</td>
-                      <td style={{ color: '#555' }}>{student.email}</td>
-                      <td style={{ fontWeight: '600', color: '#2e7d32' }}>
-                        {parseFloat(student.total_daily || 0).toFixed(1)} kg
-                      </td>
-                      <td style={{ fontWeight: '600', color: '#1565c0' }}>
-                        {parseFloat(student.total_weekly || 0).toFixed(1)} kg
-                      </td>
-                      <td style={{ fontWeight: '600', color: '#6a1b9a' }}>
-                        {parseFloat(student.total_monthly || 0).toFixed(1)} kg
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        {/* TOMBOL TITIK TIGA (TRIGGER MODAL 3 GRAFIK) */}
-                        <button
-                          type="button"
-                          className="admin-action-dots-btn"
-                          title="Lihat 3 Grafik Emisi Siswa"
-                          onClick={() => handleOpenStudentModal(student)}
-                        >
-                          <MoreVertical size={18} />
-                        </button>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="9" className="admin-table-empty">
+                        Memuat data rekor siswa...
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : students.length === 0 ? (
+                    <tr>
+                      <td colSpan="9" className="admin-table-empty">
+                        Tidak ada data siswa ditemukan.
+                      </td>
+                    </tr>
+                  ) : (
+                    students.map((student, idx) => (
+                      <tr key={student.id || idx}>
+                        <td className="col-no">{startEntryIndex + idx}</td>
+                        <td className="col-name">{student.full_name}</td>
+                        <td className="col-school">{student.school_name || '-'}</td>
+                        <td className="col-class">{student.class_grade || '-'}</td>
+                        <td className="col-email">{student.email}</td>
+                        <td className="col-emission daily">
+                          {parseFloat(student.total_daily || 0).toFixed(1)} kg
+                        </td>
+                        <td className="col-emission weekly">
+                          {parseFloat(student.total_weekly || 0).toFixed(1)} kg
+                        </td>
+                        <td className="col-emission monthly">
+                          {parseFloat(student.total_monthly || 0).toFixed(1)} kg
+                        </td>
+                        <td className="col-action">
+                          <button 
+                            type="button" 
+                            className="admin-action-dots-btn"
+                            title="Lihat Detail Grafik Siswa"
+                            onClick={() => handleOpenStudentModal(student)}
+                          >
+                            <MoreVertical size={18} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-            {/* PAGINASI FOOTER */}
-            <div className="admin-pagination-footer">
-              <span>
+            {/* PAGINATION FOOTER */}
+            <div className="admin-table-footer">
+              <div className="admin-entries-info">
                 Showing {pagination.totalRecords > 0 ? startEntryIndex : 0} to {endEntryIndex} of {pagination.totalRecords} entries
-              </span>
+              </div>
 
               <div className="admin-pagination-controls">
                 <button
@@ -325,15 +338,15 @@ const AdminDashboard = () => {
                 >
                   <ChevronLeft size={16} />
                 </button>
-
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(p => (
+                
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
                   <button
-                    key={p}
+                    key={page}
                     type="button"
-                    className={`admin-page-btn ${currentPage === p ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(p)}
+                    className={`admin-page-btn ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
                   >
-                    {p}
+                    {page}
                   </button>
                 ))}
 
