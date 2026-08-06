@@ -33,6 +33,7 @@ const News6 = lazy(() => import('./components/news/News6.jsx'))
 
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
 import AdminRoute from './components/auth/AdminRoute.jsx'
+import CustomCursor from './components/common/CustomCursor.jsx'
 
 // Loading Spinner Halaman saat Lazy Chunk Diunduh
 const PageLoader = () => (
@@ -179,6 +180,7 @@ const AppRoutes = () => (
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+      <CustomCursor />
       <AppRoutes />
     </BrowserRouter>
   </StrictMode>
