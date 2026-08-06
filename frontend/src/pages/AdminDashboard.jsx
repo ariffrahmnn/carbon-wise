@@ -126,9 +126,9 @@ const AdminDashboard = () => {
       'SEKOLAH': s.school_name || '-',
       'KELAS': s.class_grade || '-',
       'EMAIL': s.email,
-      'TOTAL HARIAN (kg CO2)': parseFloat(s.total_daily || 0).toFixed(3),
-      'WEEKLY (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(3),
-      'MONTHLY (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(3)
+      'PER HARI (kg CO2)': parseFloat(s.total_daily || 0).toFixed(3),
+      'PER MINGGU (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(3),
+      'PER BULAN (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(3)
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
