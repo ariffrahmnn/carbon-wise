@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Car, Bike, Bus, Footprints, Trash2, Plus, Home, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Car, Bike, Bus, Footprints, Trash2, Plus, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 import busImg from '../assets/bus.jpg';
 import walkImg from '../assets/walk.jpg';
@@ -275,10 +275,6 @@ const Travel = () => {
         {/* SIDEBAR SECTION */}
         <aside className="sidebar">
           <nav className="sidebar-nav">
-            <Link to="/" className="nav-item">
-              <Home size={22} />
-              <span>Home</span>
-            </Link>
             <Link to="/input" className="nav-item">
               <PenTool size={22} />
               <span>Makanan</span>
@@ -298,9 +294,8 @@ const Travel = () => {
         <main className="content-area">
           <button
             type="button"
-            className="auth-back-home-btn"
+            className="auth-back-home-btn analytics-back-home-btn"
             onClick={() => navigate('/')}
-            style={{ marginBottom: '20px', border: 'none', background: 'transparent' }}
           >
             <span className="material-symbols-outlined">arrow_back</span>
             Kembali ke Beranda

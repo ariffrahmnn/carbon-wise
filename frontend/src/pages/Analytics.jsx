@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Leaf, BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
+import { Leaf, BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
 import gsap from 'gsap';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
@@ -271,11 +271,7 @@ const Analytics = () => {
       <div className="main-body">
         {/* SIDEBAR SECTION */}
         <aside className="sidebar">
-          <nav className="nav-menu">
-            <Link to="/" className="nav-item">
-              <Home size={22} />
-              <span>Home</span>
-            </Link>
+          <nav className="sidebar-nav">
             <Link to="/input" className="nav-item">
               <PenTool size={22} />
               <span>Makanan</span>
@@ -295,9 +291,8 @@ const Analytics = () => {
         <main className="content-area">
           <button
             type="button"
-            className="auth-back-home-btn"
+            className="auth-back-home-btn analytics-back-home-btn"
             onClick={() => navigate('/')}
-            style={{ marginBottom: '20px', border: 'none', background: 'transparent' }}
           >
             <span className="material-symbols-outlined">arrow_back</span>
             Kembali ke Beranda
