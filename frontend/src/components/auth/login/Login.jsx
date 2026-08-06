@@ -21,8 +21,15 @@ export default function Login() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
     if (token) {
-      navigate('/input');
+      let user = null;
+      try { user = JSON.parse(savedUser); } catch(e) {}
+      if (user?.role?.toUpperCase() === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/input');
+      }
       return;
     }
 
@@ -85,7 +92,15 @@ export default function Login() {
 
   const handleModalConfirm = () => {
     setShowSuccessModal(false);
-    navigate('/travel');
+    const savedUser = localStorage.getItem('user');
+    let user = null;
+    try { user = JSON.parse(savedUser); } catch(e) {}
+
+    if (user?.role?.toUpperCase() === 'ADMIN') {
+      navigate('/admin');
+    } else {
+      navigate('/input');
+    }
   };
 
   // Handle Login Google Placeholder

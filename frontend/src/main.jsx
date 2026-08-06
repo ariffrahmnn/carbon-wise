@@ -10,6 +10,7 @@ import References from './pages/references.jsx'
 import Travel from './components/Travel.jsx'
 import FoodInput from './components/FoodInput.jsx'
 import Analytics from './pages/Analytics.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
 
 // Shared layout components
 import Header from './components/header.jsx'
@@ -27,6 +28,7 @@ import News5 from './components/news/News5.jsx'
 import News6 from './components/news/News6.jsx'
 
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx'
+import AdminRoute from './components/auth/AdminRoute.jsx'
 
 // Wrapper untuk halaman yang menggunakan Header & Footer
 const LayoutWrapper = ({ children }) => (
@@ -48,6 +50,9 @@ createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Regis />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Halaman Admin */}
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
         <Route path="/travel" element={<ProtectedRoute><Travel /></ProtectedRoute>} />
         <Route path="/input" element={<ProtectedRoute><FoodInput /></ProtectedRoute>} />

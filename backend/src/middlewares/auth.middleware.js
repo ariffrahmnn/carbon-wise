@@ -22,3 +22,16 @@ export const verifyToken = (req, res, next) => {
     });
   }
 };
+
+export const verifyAdmin = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user && (req.user.role === 'ADMIN' || req.user.role === 'admin' || req.user.role?.toUpperCase() === 'ADMIN')) {
+      next();
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: 'Akses ditolak! Fitur ini khusus untuk Administrator.',
+      });
+    }
+  });
+};

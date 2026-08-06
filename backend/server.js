@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import AuthController from './src/routes/auth.routes.js';
 import emissionRoutes from './src/routes/emission.routes.js';
+import adminRoutes from './src/routes/admin.routes.js';
 
 dotenv.config();
 
@@ -12,9 +13,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Route Auth (Public)
+// Route Auth & Admin
 app.use('/api/v1/auth', AuthController);
 app.use('/api/v1/emissions', emissionRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // Route Test Server
 app.get('/', (req, res) => {
