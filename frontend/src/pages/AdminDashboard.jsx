@@ -4,6 +4,7 @@ import { Search, Filter, FileSpreadsheet, LogOut, Users, MoreVertical, ChevronLe
 import * as XLSX from 'xlsx';
 
 import StudentAnalyticsModal from '../components/admin/StudentAnalyticsModal.jsx';
+import ScrollHint from '../components/common/ScrollHint.jsx';
 import '../styles/admin.css';
 
 const AdminDashboard = () => {
@@ -356,6 +357,9 @@ const AdminDashboard = () => {
         onClose={() => setIsModalOpen(false)}
         studentProfile={selectedStudentForModal}
       />
+
+      {/* Indikator Scroll Mobile */}
+      <ScrollHint text="Gulir ke bawah untuk lihat tabel data" />
     </div>
   );
 };

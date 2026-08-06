@@ -14,6 +14,7 @@ import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';
 import '../styles/travel.css';
 import '../styles/analytics.css';
+import ScrollHint from './common/ScrollHint.jsx';
 
 // Fallback Data Master Makanan per 1 Gram
 const DEFAULT_FOOD_ITEMS = [
@@ -415,6 +416,9 @@ const FoodInput = () => {
       <footer className="main-footer">
         <p>&copy; 2026 CarbonWise. All rights reserved.</p>
       </footer>
+
+      {/* Indikator Scroll Mobile */}
+      <ScrollHint text="Gulir ke bawah untuk opsi & simpan" />
     </div>
   );
 };

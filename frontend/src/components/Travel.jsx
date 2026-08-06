@@ -11,6 +11,7 @@ import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';
 import '../styles/travel.css';
 import '../styles/analytics.css';
+import ScrollHint from './common/ScrollHint.jsx';
 
 const DEFAULT_TRAVEL_ITEMS = [
   { id: 21, item_name: 'Mobil', category_type: 'TRAVEL', emission_factor: 0.190000, unit: 'km' },
@@ -400,6 +401,9 @@ const Travel = () => {
       <footer className="main-footer">
         <p>&copy; 2026 CarbonWise. All rights reserved.</p>
       </footer>
+
+      {/* Indikator Scroll Mobile */}
+      <ScrollHint text="Gulir ke bawah untuk opsi & simpan" />
     </div>
   );
 };
