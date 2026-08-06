@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import landingPageGif from '../../assets/Vid.gif'
+import landingPageVideo from '../../assets/Vid.mp4'
 import { animateHeroEntrance } from '../../animations/heroAnimation.js'
 
 function Home() {
@@ -20,9 +20,14 @@ function Home() {
     })
   }, [])
 
-  // 3. Handler untuk navigasi ke Login
+  // 3. Handler untuk navigasi (apabila sudah login langsung masuk ke dashboard /input)
   const handleStart = () => {
-    navigate('/login')
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/input');
+    } else {
+      navigate('/login');
+    }
   }
 
   return (
@@ -55,10 +60,13 @@ function Home() {
 
       <div className="hero__visual" aria-hidden="true">
         <div className="hero__video-wrap">
-          <img
+          <video
             className="hero__video"
-            src={landingPageGif}
-            alt=""
+            src={landingPageVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
           />
         </div>
       </div>

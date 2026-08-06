@@ -6,7 +6,6 @@ import transporter from '../configs/mailer.js';
 class AuthService {
   async register(data) {
     try {
-      // 1. Cek apakah email sudah terdaftar
       const existingUser = await userRepository.findByEmail(data.email);
       if (existingUser) {
         const error = new Error('Email sudah terdaftar!');
@@ -14,11 +13,9 @@ class AuthService {
         throw error;
       }
 
-      // 2. Hash Password
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(data.password, saltRounds);
 
-      // 3. Simpan ke database
       const newUser = await userRepository.createUser({
         fullName: data.fullName,
         email: data.email,
@@ -35,7 +32,6 @@ class AuthService {
 
   async login(identifier, password) {
     try {
-      // 1. Cek keberadaan user (identifier bisa berupa email atau full name)
       let user;
       if (typeof identifier === 'string' && identifier.includes('@')) {
         user = await userRepository.findByEmail(identifier);
@@ -48,7 +44,6 @@ class AuthService {
         throw error;
       }
 
-      // 2. Verifikasi Password
       const isPasswordValid = await bcrypt.compare(password, user.password_hash);
       if (!isPasswordValid) {
         const error = new Error('Email atau password salah!');
@@ -56,7 +51,6 @@ class AuthService {
         throw error;
       }
 
-      // 3. Generate Token JWT
       const payload = {
         id: user.id,
         email: user.email,
@@ -64,10 +58,9 @@ class AuthService {
       };
 
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+        expiresIn: process.env.JWT_EXPIRES_IN || '1h',
       });
 
-      // 4. Return data user & token
       return {
         user: {
           id: user.id,
@@ -85,23 +78,19 @@ class AuthService {
   }
   
   async forgotPassword(email) {
-    // 1. Cek keberadaan user
     const user = await userRepository.findByEmail(email);
     if (!user) {
       throw new Error('Email tidak ditemukan!');
     }
 
-    // 2. Buat Reset Token (kadaluwarsa dalam 15 menit)
     const resetToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_RESET_SECRET,
       { expiresIn: '15m' }
     );
 
-    // 3. Susun URL Reset Password untuk Frontend
     const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
 
-    // 4. Susun Opsi Email HTML
     const mailOptions = {
       from: `"Carbon Wise Support" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -119,7 +108,6 @@ class AuthService {
       `,
     };
 
-    // 5. Kirim Email via Nodemailer
     try {
       await transporter.sendMail(mailOptions);
     } catch (err) {
