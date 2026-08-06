@@ -165,3 +165,25 @@
   color: #4A0E17;
   transition: transform 0.2s ease, color 0.2s ease;
 }
+
+/* OPTIMASI RESPONSIP MOBILE UNTUK HALAMAN GRAFIK ANALITIK */
+@media (max-width: 768px) {
+  .analytics-back-home-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 16px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .pie-modal-content {
+    width: 94% !important;
+    padding: 20px 16px !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+
+  .pie-modal-content .modal-title {
+    font-size: 1.15rem !important;
+    margin-bottom: 12px !important;
+  }
+}
