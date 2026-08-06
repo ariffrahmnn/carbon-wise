@@ -20,6 +20,12 @@ export default function Login() {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/input');
+      return;
+    }
+
     // Animasi Entrance GSAP untuk tombol navigasi
     gsap.fromTo(
       ".auth-back-home-btn",
@@ -31,7 +37,7 @@ export default function Login() {
       { opacity: 0, scale: 0.9, y: 15 },
       { opacity: 1, scale: 1, y: 0, duration: 0.55, delay: 0.2, ease: "back.out(1.5)" }
     );
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -59,9 +65,10 @@ export default function Login() {
       });
 
       const data = await response.json();
+      const payload = data.data || data;
 
       if (response.ok) {
-        const { token, user } = data;
+        const { token, user } = payload;
         if (token) localStorage.setItem('token', token);
         if (user) localStorage.setItem('user', JSON.stringify(user));
 
@@ -78,7 +85,7 @@ export default function Login() {
 
   const handleModalConfirm = () => {
     setShowSuccessModal(false);
-    navigate('/dashboard');
+    navigate('/travel');
   };
 
   // Handle Login Google Placeholder

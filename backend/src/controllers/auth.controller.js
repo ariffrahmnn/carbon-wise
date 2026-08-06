@@ -2,37 +2,55 @@ import authService from '../services/auth.service.js';
 
 class AuthController {
   async register(req, res) {
-    try {
-      const { fullName, email, password, schoolName, classGrade } = req.body;
+  try {
+    const { fullName, email, password, schoolName, classGrade } = req.body;
 
-      // Validasi input sederhana
-      if (!fullName || !email || !password || !schoolName || !classGrade) {
-        return res.status(400).json({
-          success: false,
-          message: 'Semua field wajib diisi!',
-        });
-      }
-
-      const newUser = await authService.register({
-        fullName,
-        email,
-        password,
-        schoolName,
-        classGrade,
-      });
-
-      return res.status(201).json({
-        success: true,
-        message: 'Registrasi berhasil!',
-        data: newUser,
-      });
-    } catch (error) {
-      return res.status(error.statusCode || 500).json({
+    // 1. Validasi field wajib
+    if (!fullName || !email || !password || !schoolName || !classGrade) {
+      return res.status(400).json({
         success: false,
-        message: error.message || 'Terjadi kesalahan internal server.',
+        message: 'Semua field wajib diisi!',
       });
     }
+
+    // 2. Validasi sederhana format email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Format email tidak valid!',
+      });
+    }
+
+    // 3. Panggil Service
+    const newUser = await authService.register({
+      fullName,
+      email,
+      password,
+      schoolName,
+      classGrade,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Registrasi berhasil!',
+      data: newUser,
+    });
+  } catch (error) {
+    // 4. Handling Error Duplikat dari Database Level (PostgreSQL: 23505, MySQL: ER_DUP_ENTRY)
+    if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({
+        success: false,
+        message: 'Email sudah terdaftar, silakan gunakan email lain.',
+      });
+    }
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Terjadi kesalahan internal server.',
+    });
   }
+}
 
   async login(req, res) {
     try {

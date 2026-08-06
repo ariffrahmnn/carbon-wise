@@ -78,7 +78,6 @@ function Edukasi() {
   return (
     <section className="facts page-container" id="edukasi">
       <div className="section-heading">
-        <p className="section-heading__eyebrow">Kenali dampaknya</p>
         <h2>Fakta Karbon &amp; Alam</h2>
       </div>
       <div className="facts__list">
