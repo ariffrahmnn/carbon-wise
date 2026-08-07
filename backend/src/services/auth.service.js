@@ -32,29 +32,42 @@ class AuthService {
 
   async login(identifier, password) {
     try {
-      let user;
-      if (typeof identifier === 'string' && identifier.includes('@')) {
-        user = await userRepository.findByEmail(identifier);
-      } else {
-        user = await userRepository.findByFullName(identifier);
-      }
-      if (!user) {
+      const cleanIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
+      const cleanPassword = typeof password === 'string' ? password.trim() : '';
+
+      const users = await userRepository.findAllByIdentifier(cleanIdentifier);
+      if (!users || users.length === 0) {
         const error = new Error('Email/Nama atau password salah!');
         error.statusCode = 401;
         throw error;
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-      if (!isPasswordValid) {
-        const error = new Error('Email atau password salah!');
+      let validUser = null;
+      for (const u of users) {
+        let isPasswordValid = false;
+        if (u.password_hash && (u.password_hash.startsWith('$2a$') || u.password_hash.startsWith('$2b$') || u.password_hash.startsWith('$2y$'))) {
+          isPasswordValid = await bcrypt.compare(cleanPassword, u.password_hash);
+        } else {
+          // Fallback legacy support with bcrypt comparison fallback
+          isPasswordValid = (cleanPassword === (u.password_hash || '').trim());
+        }
+
+        if (isPasswordValid) {
+          validUser = u;
+          break;
+        }
+      }
+
+      if (!validUser) {
+        const error = new Error('Email/Nama atau password salah!');
         error.statusCode = 401;
         throw error;
       }
 
       const payload = {
-        id: user.id,
-        email: user.email,
-        role: user.role,
+        id: validUser.id,
+        email: validUser.email,
+        role: validUser.role,
       };
 
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -63,12 +76,12 @@ class AuthService {
 
       return {
         user: {
-          id: user.id,
-          fullName: user.full_name,
-          email: user.email,
-          role: user.role,
-          schoolName: user.school_name,
-          classGrade: user.class_grade,
+          id: validUser.id,
+          fullName: validUser.full_name,
+          email: validUser.email,
+          role: validUser.role,
+          schoolName: validUser.school_name,
+          classGrade: validUser.class_grade,
         },
         token,
       };

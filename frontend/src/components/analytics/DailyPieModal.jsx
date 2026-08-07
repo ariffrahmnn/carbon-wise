@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { X, Printer } from 'lucide-react';
+import gsap from 'gsap';
 
 // Pemetaan warna kontras dan indah khusus setiap item
 const ITEM_COLORS = {
@@ -30,6 +31,83 @@ const getItemColor = (itemName, index) => {
 };
 
 const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
+  const overlayRef = useRef(null);
+  const contentRef = useRef(null);
+  const titleRef = useRef(null);
+  const chartRef = useRef(null);
+  const btnRef = useRef(null);
+
+  // Animasi GSAP saat Modal Terbuka
+  useEffect(() => {
+    if (isOpen) {
+      const ctx = gsap.context(() => {
+        // Overlay fade in
+        gsap.fromTo(
+          overlayRef.current,
+          { opacity: 0, backdropFilter: 'blur(0px)' },
+          { opacity: 1, backdropFilter: 'blur(8px)', duration: 0.3, ease: 'power2.out' }
+        );
+
+        // Modal Box pop-up dengan efek spring/elastic back.out
+        gsap.fromTo(
+          contentRef.current,
+          { scale: 0.75, opacity: 0, y: 40 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: 'back.out(1.5)', delay: 0.05 }
+        );
+
+        // Title staggered slide down
+        gsap.fromTo(
+          titleRef.current,
+          { y: -15, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.35, ease: 'power3.out', delay: 0.2 }
+        );
+
+        // Chart container scale up
+        if (chartRef.current) {
+          gsap.fromTo(
+            chartRef.current,
+            { scale: 0.9, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.4, ease: 'power2.out', delay: 0.25 }
+          );
+        }
+
+        // Button pop up
+        if (btnRef.current) {
+          gsap.fromTo(
+            btnRef.current,
+            { y: 15, opacity: 0, scale: 0.9 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: 'back.out(1.8)', delay: 0.35 }
+          );
+        }
+      });
+
+      return () => ctx.revert();
+    }
+  }, [isOpen]);
+
+  // Handler penutupan dengan animasi smooth out
+  const handleAnimatedClose = () => {
+    if (!overlayRef.current || !contentRef.current) {
+      onClose();
+      return;
+    }
+
+    gsap.to(contentRef.current, {
+      scale: 0.85,
+      opacity: 0,
+      y: 20,
+      duration: 0.25,
+      ease: 'power2.in'
+    });
+
+    gsap.to(overlayRef.current, {
+      opacity: 0,
+      duration: 0.25,
+      ease: 'power2.in',
+      onComplete: onClose
+    });
+  };
+
   if (!isOpen) return null;
 
   // Filter hanya item yang memiliki total emisi > 0 agar grafik bersih
@@ -43,14 +121,71 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
     : [];
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content pie-modal-content">
-        <button className="close-btn" onClick={onClose}><X size={24} /></button>
-        <h3 className="modal-title">Rincian Emisi Hari Ini</h3>
+    <div 
+      className="modal-overlay" 
+      ref={overlayRef} 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.65)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999,
+        padding: '20px',
+        boxSizing: 'border-box'
+      }}
+      onClick={handleAnimatedClose}
+    >
+      <div 
+        className="modal-content pie-modal-content" 
+        ref={contentRef}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          borderRadius: '24px',
+          padding: '32px 28px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+          background: '#ffffff',
+          border: '1px solid rgba(74, 14, 23, 0.08)',
+          position: 'relative',
+          margin: 'auto'
+        }}
+      >
+        <button 
+          className="close-btn" 
+          onClick={handleAnimatedClose}
+          aria-label="Tutup Modal"
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'none',
+            border: 'none',
+            color: '#475569',
+            cursor: 'pointer',
+            zIndex: 10
+          }}
+        >
+          <X size={24} />
+        </button>
+
+        <h3 className="modal-title" ref={titleRef} style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1b4332', marginBottom: '16px' }}>
+          Rincian Emisi Hari Ini
+        </h3>
         
         {chartData.length > 0 ? (
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: '100%', height: 300 }}>
+            <div ref={chartRef} style={{ width: '100%', height: 300 }}>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -59,9 +194,12 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
                     nameKey="item_name"
                     cx="50%"
                     cy="45%"
-                    outerRadius={90}
-                    innerRadius={30}
+                    outerRadius={92}
+                    innerRadius={32}
                     paddingAngle={4}
+                    isAnimationActive={true}
+                    animationDuration={1000}
+                    animationEasing="ease-out"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
                     {chartData.map((entry, index) => (
@@ -79,26 +217,28 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
               </ResponsiveContainer>
             </div>
 
-            {/* Tombol Cetak PDF di bawah keterangan warna */}
-            <div style={{ marginTop: '16px', textAlign: 'center', width: '100%' }}>
+            {/* Tombol Cetak PDF dengan Animasi Hover GSAP */}
+            <div ref={btnRef} style={{ marginTop: '20px', textAlign: 'center', width: '100%' }}>
               <button 
                 type="button" 
                 className="btn-cetak-pdf"
                 onClick={onExportPDF}
+                onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.05, translateY: -2, boxShadow: '0 8px 20px rgba(74, 14, 23, 0.35)', duration: 0.2 })}
+                onMouseLeave={(e) => gsap.to(e.currentTarget, { scale: 1, translateY: 0, boxShadow: '0 4px 14px rgba(74, 14, 23, 0.25)', duration: 0.2 })}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '10px',
                   backgroundColor: '#4a0e17',
                   color: '#ffffff',
-                  padding: '10px 24px',
+                  padding: '12px 28px',
                   borderRadius: '30px',
                   border: 'none',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   fontSize: '0.95rem',
                   cursor: 'pointer',
                   boxShadow: '0 4px 14px rgba(74, 14, 23, 0.25)',
-                  transition: 'all 0.2s ease'
+                  transition: 'background-color 0.2s ease'
                 }}
               >
                 <Printer size={18} />

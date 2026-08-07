@@ -10,6 +10,7 @@ import DailyPieModal from '../components/analytics/DailyPieModal.jsx';
 import ResetConfirmModal from '../components/analytics/ResetConfirmModal.jsx';
 import AnalyticsPDFReport from '../components/analytics/AnalyticsPDFReport.jsx';
 import { exportAnalyticsToPDF } from '../utils/pdfGenerator.js';
+import ScrollHint from '../components/common/ScrollHint.jsx';
 
 import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';
@@ -519,6 +520,9 @@ const Analytics = () => {
         monthlyInsight={monthlyInsight}
         MONTH_NAMES={MONTH_NAMES}
       />
+
+      {/* Indikator Scroll Mobile untuk UX Terbaik */}
+      <ScrollHint text="Gulir ke bawah untuk lihat grafik lainnya" />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import SuccessModalCard from '../shared/SuccessModalCard.jsx';
 import ForgotPasswordModal from './ForgotPasswordModal.jsx';
@@ -21,8 +22,15 @@ export default function Login() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
     if (token) {
-      navigate('/input');
+      let user = null;
+      try { user = JSON.parse(savedUser); } catch(e) {}
+      if (user?.role?.toUpperCase() === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/input');
+      }
       return;
     }
 
@@ -85,7 +93,15 @@ export default function Login() {
 
   const handleModalConfirm = () => {
     setShowSuccessModal(false);
-    navigate('/travel');
+    const savedUser = localStorage.getItem('user');
+    let user = null;
+    try { user = JSON.parse(savedUser); } catch(e) {}
+
+    if (user?.role?.toUpperCase() === 'ADMIN') {
+      navigate('/admin');
+    } else {
+      navigate('/input');
+    }
   };
 
   // Handle Login Google Placeholder
@@ -206,9 +222,22 @@ export default function Login() {
               </button>
             </div>
 
-            <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '10px' }}>
-              {loading ? 'LOGGING IN...' : 'LOG IN'}
+            <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {loading ? (
+                <>
+                  <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                  <span>MEMPROSES...</span>
+                </>
+              ) : (
+                'LOG IN'
+              )}
             </button>
+            <style>{`
+              @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
 
             <div className="auth-mobile-link">
               <button 

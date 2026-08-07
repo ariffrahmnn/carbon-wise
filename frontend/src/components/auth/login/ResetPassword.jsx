@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import SuccessModalCard from '../shared/SuccessModalCard.jsx';
 import '../../../styles/auth/shared/auth-form.css';
@@ -176,9 +177,22 @@ export default function ResetPassword() {
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '20px' }}>
-              {loading ? 'SAVING...' : 'SIMPAN KATA SANDI BARU'}
+            <button type="submit" disabled={loading} className="login-submit-btn" style={{ marginTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {loading ? (
+                <>
+                  <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                  <span>MEMPROSES...</span>
+                </>
+              ) : (
+                'SIMPAN KATA SANDI BARU'
+              )}
             </button>
+            <style>{`
+              @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
           </form>
         </div>
 

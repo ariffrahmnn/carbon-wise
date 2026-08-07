@@ -11,6 +11,8 @@ import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';
 import '../styles/travel.css';
 import '../styles/analytics.css';
+import SaveStatusOverlay from './common/SaveStatusOverlay.jsx';
+import ScrollHint from './common/ScrollHint.jsx';
 
 const DEFAULT_TRAVEL_ITEMS = [
   { id: 21, item_name: 'Mobil', category_type: 'TRAVEL', emission_factor: 0.190000, unit: 'km' },
@@ -27,9 +29,10 @@ const Travel = () => {
   const [travelLogs, setTravelLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // State Toast Alert & User
+  // State Toast Alert & User & Save Status
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [user, setUser] = useState(null);
+  const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'success'
 
   // Refs untuk pembersihan timer agar tidak memory leak saat unmount
   const toastTimerRef = useRef(null);
@@ -184,6 +187,7 @@ const Travel = () => {
     }
 
     setIsLoading(true);
+    setSaveStatus('saving');
 
     try {
       const payload = {
@@ -207,19 +211,21 @@ const Travel = () => {
       const result = await response.json();
 
       if (response.ok) {
-        showNotification('Data emisi berhasil disimpan!', 'success');
-        
+        setSaveStatus('success');
         setTravelLogs([]);
 
         if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
         redirectTimerRef.current = setTimeout(() => {
+          setSaveStatus(null);
           navigate('/analytics');
-        }, 1200);
+        }, 1400);
       } else {
+        setSaveStatus(null);
         showNotification(result.message || 'Gagal menyimpan data ke server!', 'error');
       }
     } catch (error) {
-      console.error('Error submitting emission:', error);
+      console.error('Error submitting travel emission:', error);
+      setSaveStatus(null);
       showNotification('Terjadi kesalahan jaringan atau server mati!', 'error');
     } finally {
       setIsLoading(false);
@@ -400,6 +406,9 @@ const Travel = () => {
       <footer className="main-footer">
         <p>&copy; 2026 CarbonWise. All rights reserved.</p>
       </footer>
+
+      {/* OVERLAY ANIMASI MENYIMPAN & SUKSES */}
+      <SaveStatusOverlay status={saveStatus} message={saveStatus === 'saving' ? 'Menyimpan Emisi Perjalanan...' : 'Berhasil Menyimpan Progress!'} />
     </div>
   );
 };

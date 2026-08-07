@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import '../../../styles/auth/login/forgot-password-modal.css';
 
@@ -113,9 +114,18 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                 />
               </div>
 
-              <button type="submit" disabled={loading} className="forgot-modal-submit-btn">
-                <span>{loading ? 'MENGIRIM...' : 'Kirim Link Reset ke Gmail'}</span>
-                <span className="material-symbols-outlined">send</span>
+              <button type="submit" disabled={loading} className="forgot-modal-submit-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                {loading ? (
+                  <>
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    <span>MENGIRIM LINK...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Kirim Link Reset ke Gmail</span>
+                    <span className="material-symbols-outlined">send</span>
+                  </>
+                )}
               </button>
             </form>
           </>

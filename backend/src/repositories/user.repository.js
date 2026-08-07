@@ -13,9 +13,20 @@ class UserRepository {
 
   async findByFullName(fullName) {
     try {
-      const sql = 'SELECT * FROM users WHERE lower(full_name) = lower($1)';
-      const { rows } = await query(sql, [fullName.trim()]);
+      const sql = 'SELECT * FROM users WHERE TRIM(full_name) ILIKE TRIM($1)';
+      const { rows } = await query(sql, [fullName]);
       return rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAllByIdentifier(identifier) {
+    try {
+      const clean = identifier.trim();
+      const sql = 'SELECT * FROM users WHERE email ILIKE $1 OR TRIM(full_name) ILIKE $1';
+      const { rows } = await query(sql, [clean]);
+      return rows;
     } catch (error) {
       throw error;
     }
