@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Libre+Caslon+Text:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Sora:wght@400;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 :root {
   --color-background: #f8f9f9;
@@ -11,8 +11,8 @@
   --color-accent-soft: #e8f0f3;
   --color-border: #ddc0bb;
   --color-footer: #505457;
-  --font-body: 'Hanken Grotesk', sans-serif;
-  --font-display: 'Libre Caslon Text', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-display: 'Sora', sans-serif;
   --font-label: 'JetBrains Mono', monospace;
   --container-width: 1280px;
   --page-padding: clamp(20px, 5vw, 64px);

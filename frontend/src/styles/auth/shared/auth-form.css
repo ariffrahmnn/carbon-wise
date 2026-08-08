@@ -15,7 +15,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
   padding: 40px 20px;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../../../assets/LoginRegister.jpg') center/cover no-repeat fixed;
 }
 
 .login-card-container {
