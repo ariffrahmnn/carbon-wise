@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Leaf, BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
+import { BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
+import appIcon from '../assets/Icon.png';
 import gsap from 'gsap';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
@@ -241,7 +242,7 @@ const Analytics = () => {
         <div className="calc-header-left">
           <div className="calc-brand">
             <div className="calc-logo-icon">
-              <Leaf size={20} />
+              <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
             <span className="calc-brand-title">CarbonWise</span>
           </div>

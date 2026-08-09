@@ -45,6 +45,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(74, 14, 23, 0.2);
+  overflow: hidden;
 }
 
 .admin-brand-title {

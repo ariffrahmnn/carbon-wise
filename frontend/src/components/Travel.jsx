@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Car, Bike, Bus, Footprints, Trash2, Plus, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Car, Bike, Bus, Footprints, Trash2, Plus, PenTool, Navigation, BarChart3, LogOut, CheckCircle, AlertCircle, X } from 'lucide-react';
+import appIcon from '../assets/Icon.png';
 
 import busImg from '../assets/bus.jpg';
 import walkImg from '../assets/walk.jpg';
@@ -254,7 +255,7 @@ const Travel = () => {
         <div className="calc-header-left">
           <div className="calc-brand">
             <div className="calc-logo-icon">
-              <Leaf size={20} />
+              <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
             <span className="calc-brand-title">CarbonWise</span>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
+import { Search, Filter, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import appIcon from '../assets/Icon.png';
 import * as XLSX from 'xlsx';
 
 import StudentAnalyticsModal from '../components/admin/StudentAnalyticsModal.jsx';
@@ -154,7 +155,7 @@ const AdminDashboard = () => {
           {/* BRAND LOGO CARBONWISE (DITAMPILKAN KHUSUS TAMPILAN DESKTOP) */}
           <div className="admin-brand">
             <div className="admin-brand-icon">
-              <Leaf size={20} color="#ffffff" />
+              <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
             <span className="admin-brand-title">CarbonWise</span>
           </div>

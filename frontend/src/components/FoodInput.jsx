@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Utensils, Plus, Trash2, PenTool, Navigation, BarChart3, LogOut, Leaf, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Utensils, Plus, Trash2, PenTool, Navigation, BarChart3, LogOut, CheckCircle, AlertCircle, X } from 'lucide-react';
+import appIcon from '../assets/Icon.png';
 import tofuImg from '../assets/tofu.jpg';
 import tempehImg from '../assets/tempeh.jpg';
 import beefImg from '../assets/beef.jpg';
@@ -269,7 +270,7 @@ const FoodInput = () => {
         <div className="calc-header-left">
           <div className="calc-brand">
             <div className="calc-logo-icon">
-              <Leaf size={20} />
+              <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
             <span className="calc-brand-title">CarbonWise</span>
           </div>
