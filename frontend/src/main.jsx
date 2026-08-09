@@ -9,6 +9,7 @@ import LandingPage from './pages/LandingPage.jsx'
 // Lazy Loading Halaman Berat untuk Optimasi Performa & Ukuran Bundle
 const About = lazy(() => import('./pages/about.jsx'))
 const References = lazy(() => import('./pages/references.jsx'))
+const Credits = lazy(() => import('./pages/credits.jsx'))
 const Travel = lazy(() => import('./components/Travel.jsx'))
 const FoodInput = lazy(() => import('./components/FoodInput.jsx'))
 const Analytics = lazy(() => import('./pages/Analytics.jsx'))
@@ -163,6 +164,7 @@ const AppRoutes = () => (
         {/* Halaman Standar */}
         <Route path="/about" element={<About />} />
         <Route path="/references" element={<References />} />
+        <Route path="/credits" element={<Credits />} />
 
         {/* Halaman News */}
         <Route path="/news1" element={<LayoutWrapper><News1 /></LayoutWrapper>} />
