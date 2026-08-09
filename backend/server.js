@@ -22,7 +22,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(null, true); // Fallback safe
+    return callback(new Error('Origin tidak diizinkan oleh CORS')); // Tolak origin tidak dikenal
   },
   credentials: true
 }));
