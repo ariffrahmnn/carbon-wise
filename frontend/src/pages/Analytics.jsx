@@ -528,7 +528,7 @@ const Analytics = () => {
       <DailyPieModal 
         isOpen={isModalOpen} 
         onClose={() => { setIsModalOpen(false); setSelectedBatchBreakdown(null); setSelectedBatchTime(null); }} 
-        data={selectedBatchBreakdown && selectedBatchBreakdown.length > 0 ? selectedBatchBreakdown : todayBreakdownList} 
+        data={selectedBatchTime ? (selectedBatchBreakdown || []) : todayBreakdownList} 
         batchTime={selectedBatchTime}
         onExportPDF={handleExportPDF}
       />
