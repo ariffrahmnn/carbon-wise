@@ -173,17 +173,10 @@ const Analytics = () => {
   };
 
   // Callback klik dot pada grafik harian
-  // Mengakses dailyList[index] langsung agar data breakdown selalu akurat
+  // Mengakses dailyList[index] langsung untuk menampilkan breakdown khusus batch jam tersebut
   const handleDotClick = useCallback((dotIndex) => {
-    const isLastDot = dotIndex === dailyList.length - 1;
     const clickedBatch = dailyList[dotIndex];
-
-    if (isLastDot) {
-      // Titik terakhir: rincian emisi hari ini (total gabungan)
-      setSelectedBatchBreakdown(null);
-      setSelectedBatchTime(null);
-    } else if (clickedBatch && clickedBatch.breakdown && clickedBatch.breakdown.length > 0) {
-      // Titik lainnya: rincian emisi khusus batch jam tersebut
+    if (clickedBatch && clickedBatch.breakdown && clickedBatch.breakdown.length > 0) {
       setSelectedBatchBreakdown(clickedBatch.breakdown);
       setSelectedBatchTime(clickedBatch.formatted_time || null);
     } else {
@@ -192,6 +185,13 @@ const Analytics = () => {
     }
     setIsModalOpen(true);
   }, [dailyList]);
+
+  // Callback untuk menampilkan total emisi gabungan hari ini
+  const handleShowTotalBreakdown = useCallback(() => {
+    setSelectedBatchBreakdown(todayBreakdownList);
+    setSelectedBatchTime(null);
+    setIsModalOpen(true);
+  }, [todayBreakdownList]);
 
   // Hitung total emisi gabungan dari data hari ini dengan useMemo
   const totalTodayEmissions = useMemo(() => {
@@ -377,6 +377,13 @@ const Analytics = () => {
                         <span style={{ fontWeight: 'bold', color: '#4a0e17' }}>Pukul {item.formatted_time}:</span> {parseFloat(item.total).toFixed(2)} kg CO₂
                       </div>
                     ))}
+                    <div 
+                      onClick={handleShowTotalBreakdown}
+                      style={{ background: '#4a0e17', color: '#ffffff', padding: '8px 14px', borderRadius: '8px', fontSize: '0.88rem', cursor: 'pointer', fontWeight: 'bold' }}
+                      title="Klik untuk melihat Pie Chart total gabungan emisi hari ini"
+                    >
+                      📊 Total Hari Ini: {totalTodayEmissions.toFixed(2)} kg CO₂
+                    </div>
                   </div>
                 </div>
               )}
