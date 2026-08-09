@@ -193,21 +193,34 @@ class AuthService {
         throw new Error('Gagal mengambil informasi profil dari Google.');
       }
 
-      // 3. Cari atau buat user baru di database PostgreSQL
-      let user = await userRepository.findByEmail(googleUser.email);
+      // 1. Callback Handler & Ekstraksi Data Google (Profil & Email)
+      const userEmail = googleUser.email.toLowerCase().trim();
+      const googleName = googleUser.name || userEmail.split('@')[0];
+
+      // 2. Logika Sinkronisasi Akun (Upsert User)
+      let user = await userRepository.findByEmail(userEmail);
+
       if (!user) {
+        // Kondisi A: Pengguna Baru (Register) -> Buat entitas user baru dengan auth_provider: 'google'
         const randomPasswordHash = await bcrypt.hash(`google_oauth_${googleUser.id}_${Date.now()}`, 10);
-        user = await userRepository.createUser({
-          fullName: googleUser.name || googleUser.email.split('@')[0],
-          email: googleUser.email,
+        user = await userRepository.createGoogleUser({
+          fullName: googleName,
+          email: userEmail,
           passwordHash: randomPasswordHash,
           schoolName: '-',
           classGrade: '-',
-          role: 'USER'
+          role: 'USER',
+          authProvider: 'google'
         });
+      } else {
+        // Kondisi B: Pengguna Lama (Login) -> Update nama jika ada perubahan profil terbaru dari Google
+        if (googleName && googleName !== user.full_name) {
+          const updated = await userRepository.updateUserProfile(user.id, { fullName: googleName });
+          if (updated) user = updated;
+        }
       }
 
-      // 4. Generate JWT Token CarbonWise
+      // 3. Generasi Sesi & Hak Akses (JWT Token Handover)
       const payload = {
         id: user.id,
         email: user.email,
@@ -223,11 +236,14 @@ class AuthService {
         fullName: user.full_name,
         email: user.email,
         role: user.role,
-        schoolName: user.school_name,
-        classGrade: user.class_grade,
+        schoolName: user.school_name || '-',
+        classGrade: user.class_grade || '-',
+        authProvider: user.auth_provider || 'google'
       };
 
-      // 5. Redirect ke Frontend dengan query string token & user
+      // 4. Inisialisasi Data Fitur sudah didukung oleh backend (getUserAnalytics menangani data emisi kosong dengan aman tanpa error)
+
+      // 5. Redirection (Pengalihan Halaman langsung ke Login Frontend yang otomatis memicu navigasi ke Dashboard)
       const targetUrl = `${frontendUrl}/login?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(userData))}`;
       return res.redirect(targetUrl);
     } catch (err) {
