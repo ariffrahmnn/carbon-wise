@@ -38,7 +38,7 @@ function Home() {
             Cintai Alam,
           </span>
           <br />
-          <span ref={line2Ref} style={{ display: 'inline-block' }}>
+          <span ref={line2Ref} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
             Kurangi Jejak.
           </span>
         </h1>

@@ -2,7 +2,7 @@
 .admin-wrapper {
   min-height: 100vh;
   background-color: #FDFBF7;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   color: #2D1B1E;
   display: flex;
   flex-direction: column;

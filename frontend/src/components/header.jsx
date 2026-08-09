@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import '../styles/shared/header.css'
+import appIcon from '../assets/Icon.png'
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -66,7 +67,7 @@ function Header() {
       <div className="site-header__inner page-container">
         <a className="brand" href="/" onClick={() => handleNavClick('/')}>
           <span className="brand__icon" aria-hidden="true">
-            <span className="material-symbols-outlined">eco</span>
+            <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
           </span>
           <span className="brand__name">CarbonWise</span>
         </a>

@@ -197,7 +197,7 @@ const AdminDashboard = () => {
             <div>
               <h1 className="admin-title">Student records</h1>
               <p className="admin-subtitle">
-                Manage and monitor daily carbon tracking submissions across the Karawang district.
+                Effortlessly track, evaluate, and manage student carbon footprint submissions to support sustainability goals.
               </p>
             </div>
 

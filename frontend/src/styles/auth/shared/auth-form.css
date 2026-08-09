@@ -10,12 +10,19 @@
   font-family: var(--font-sans, sans-serif);
 }
 
+.login-main-container,
+.login-main-container * {
+  box-sizing: border-box;
+}
+
 .login-main-container {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
   padding: 40px 20px;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../../../assets/LoginRegister.jpg') center/cover no-repeat fixed;
 }
 
 .login-card-container {
@@ -26,6 +33,7 @@
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(36, 0, 0, 0.12);
+  box-sizing: border-box;
 }
 
 /* SISI KIRI: FORM */
@@ -35,6 +43,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .login-title {
@@ -116,6 +125,8 @@
   font-size: 14px;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .login-input-group input:focus {
@@ -146,6 +157,8 @@
   cursor: pointer;
   letter-spacing: 0.5px;
   transition: opacity 0.2s;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .login-submit-btn:hover {
@@ -203,13 +216,13 @@
 }
 
 .login-signup-outline-btn {
-  padding: 10px 32px;
+  padding: 8px 24px;
   border: 2px solid #ffffff;
   border-radius: 30px;
   background-color: transparent;
   color: #ffffff;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 11px;
   cursor: pointer;
   letter-spacing: 1px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);

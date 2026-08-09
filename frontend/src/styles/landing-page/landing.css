@@ -146,8 +146,27 @@ main {
 }
 
 .facts {
+  position: relative;
+  isolation: isolate;
   padding-top: clamp(72px, 10vw, 136px);
   padding-bottom: clamp(72px, 10vw, 136px);
+}
+
+.facts::before {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  z-index: -1;
+  width: 100vw;
+  background: linear-gradient(
+    180deg,
+    var(--color-background) 0%,
+    #fbf9f6 42%,
+    #f4ede5 64%,
+    #ebe0d2 84%,
+    #e4d6c6 100%
+  );
+  content: '';
+  transform: translateX(-50%);
 }
 
 .section-heading {
