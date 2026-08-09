@@ -340,10 +340,10 @@ const Travel = () => {
                     <button
                       key={km}
                       type="button"
-                      className={`quick-select-btn ${distance === String(km) ? 'active' : ''}`}
-                      onClick={() => setDistance(String(km))}
+                      className="quick-select-btn"
+                      onClick={() => setDistance(prev => String((parseFloat(prev) || 0) + km))}
                     >
-                      {km} km
+                      +{km} km
                     </button>
                   ))}
                 </div>

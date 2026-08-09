@@ -355,10 +355,10 @@ const FoodInput = () => {
                     <button
                       key={gram}
                       type="button"
-                      className={`quick-select-btn ${weightGrams === String(gram) ? 'active' : ''}`}
-                      onClick={() => setWeightGrams(String(gram))}
+                      className="quick-select-btn"
+                      onClick={() => setWeightGrams(prev => String((parseInt(prev) || 0) + gram))}
                     >
-                      {gram} gram
+                      +{gram} gram
                     </button>
                   ))}
                 </div>
