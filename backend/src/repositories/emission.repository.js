@@ -86,14 +86,14 @@ class EmissionRepository {
 
     const dailyQuery = `
       SELECT 
+        id AS batch_id,
         TO_CHAR(created_at, 'HH24:MI') AS formatted_time,
         TRIM(TO_CHAR(created_at, 'Day')) AS day_name,
         TO_CHAR(created_at, 'DD Mon YYYY') AS formatted_date,
         created_at AS time_exact,
-        SUM(total_batch_co2) AS total 
+        total_batch_co2 AS total 
       FROM calculation_batches 
       WHERE user_id = $1 AND DATE(created_at) = CURRENT_DATE 
-      GROUP BY created_at, formatted_time, day_name, formatted_date 
       ORDER BY created_at ASC
     `;
 
@@ -132,15 +132,42 @@ class EmissionRepository {
       GROUP BY i.item_name, c.name
     `;
 
-    const [dailyRes, weeklyRes, monthlyRes, breakdownRes] = await Promise.all([
+    const batchBreakdownQuery = `
+      SELECT 
+        l.batch_id,
+        i.item_name, 
+        c.name AS category_name, 
+        SUM(l.calculated_co2) AS total 
+      FROM emission_logs l 
+      JOIN emission_items i ON l.item_id = i.id 
+      JOIN emission_categories c ON l.category_id = c.id 
+      WHERE l.user_id = $1 AND DATE(l.logged_at) = CURRENT_DATE 
+      GROUP BY l.batch_id, i.item_name, c.name
+    `;
+
+    const [dailyRes, weeklyRes, monthlyRes, breakdownRes, batchBreakdownRes] = await Promise.all([
       pool.query(dailyQuery, [userId]),
       pool.query(weeklyQuery, [userId]),
       pool.query(monthlyQuery, [userId, month, year]),
-      pool.query(breakdownQuery, [userId])
+      pool.query(breakdownQuery, [userId]),
+      pool.query(batchBreakdownQuery, [userId])
     ]);
 
+    const batchMap = new Map();
+    batchBreakdownRes.rows.forEach(row => {
+      if (!batchMap.has(row.batch_id)) {
+        batchMap.set(row.batch_id, []);
+      }
+      batchMap.get(row.batch_id).push(row);
+    });
+
+    const dailyWithBreakdown = dailyRes.rows.map(batch => ({
+      ...batch,
+      breakdown: batchMap.get(batch.batch_id) || []
+    }));
+
     return {
-      daily: dailyRes.rows,
+      daily: dailyWithBreakdown,
       weekly: weeklyRes.rows,
       monthly: monthlyRes.rows,
       todayBreakdown: breakdownRes.rows

@@ -86,6 +86,7 @@ const Analytics = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBatchBreakdown, setSelectedBatchBreakdown] = useState(null);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isResettingData, setIsResettingData] = useState(false);
   const [user, setUser] = useState(null);
@@ -170,8 +171,13 @@ const Analytics = () => {
     }
   };
 
-  // Callback klik dot pada grafik harian
-  const handleDotClick = useCallback(() => {
+  // Callback klik dot pada grafik harian (menampilkan breakdown khusus batch jam tersebut)
+  const handleDotClick = useCallback((itemData) => {
+    if (itemData && itemData.breakdown && itemData.breakdown.length > 0) {
+      setSelectedBatchBreakdown(itemData.breakdown);
+    } else {
+      setSelectedBatchBreakdown(null);
+    }
     setIsModalOpen(true);
   }, []);
 
@@ -350,7 +356,12 @@ const Analytics = () => {
                   </h4>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                     {dailyList.map((item, idx) => (
-                      <div key={idx} style={{ background: '#ffffff', padding: '8px 14px', borderRadius: '8px', border: '1px solid #E0E0E0', fontSize: '0.88rem' }}>
+                      <div 
+                        key={idx} 
+                        onClick={() => handleDotClick(item)}
+                        style={{ background: '#ffffff', padding: '8px 14px', borderRadius: '8px', border: '1px solid #E0E0E0', fontSize: '0.88rem', cursor: 'pointer' }}
+                        title="Klik untuk melihat Pie Chart komposisi jam ini"
+                      >
                         <span style={{ fontWeight: 'bold', color: '#4a0e17' }}>Pukul {item.formatted_time}:</span> {parseFloat(item.total).toFixed(2)} kg CO₂
                       </div>
                     ))}
@@ -497,8 +508,8 @@ const Analytics = () => {
       {/* Modal Pie Chart dengan Tombol Cetak PDF */}
       <DailyPieModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        data={todayBreakdownList} 
+        onClose={() => { setIsModalOpen(false); setSelectedBatchBreakdown(null); }} 
+        data={selectedBatchBreakdown && selectedBatchBreakdown.length > 0 ? selectedBatchBreakdown : todayBreakdownList} 
         onExportPDF={handleExportPDF}
       />
 
