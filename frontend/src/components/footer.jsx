@@ -50,6 +50,7 @@ function Footer() {
             <h2>Legal</h2>
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
+            <a href="/credits">Media Credits</a>
           </nav>
         </div>
 
