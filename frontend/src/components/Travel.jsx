@@ -331,6 +331,25 @@ const Travel = () => {
               )}
             </div>
 
+            {/* Tombol Template Jarak Cepat */}
+            {selectedVehicle && (
+              <div className="quick-select-group">
+                <span className="quick-select-label">Jarak cepat:</span>
+                <div className="quick-select-buttons">
+                  {[1, 3, 5].map((km) => (
+                    <button
+                      key={km}
+                      type="button"
+                      className={`quick-select-btn ${distance === String(km) ? 'active' : ''}`}
+                      onClick={() => setDistance(String(km))}
+                    >
+                      {km} km
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Form Input Jarak */}
             {selectedVehicle && (
               <div className="distance-input-card">

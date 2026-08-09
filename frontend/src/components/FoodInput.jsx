@@ -346,6 +346,25 @@ const FoodInput = () => {
               )}
             </div>
 
+            {/* Tombol Template Porsi Cepat */}
+            {selectedFood && (
+              <div className="quick-select-group">
+                <span className="quick-select-label">Porsi cepat:</span>
+                <div className="quick-select-buttons">
+                  {[100, 300, 500].map((gram) => (
+                    <button
+                      key={gram}
+                      type="button"
+                      className={`quick-select-btn ${weightGrams === String(gram) ? 'active' : ''}`}
+                      onClick={() => setWeightGrams(String(gram))}
+                    >
+                      {gram} gram
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Form Input Berat (Gram) */}
             {selectedFood && (
               <div className="distance-input-card">

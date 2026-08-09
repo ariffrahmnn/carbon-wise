@@ -317,6 +317,55 @@
 }
 
 /* Responsif Mobile */
+/* Quick Select Template Buttons (Porsi Cepat / Jarak Cepat) */
+.quick-select-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.quick-select-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.quick-select-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.quick-select-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.quick-select-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+}
+
+.quick-select-btn.active {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+}
+
 @media (max-width: 768px) {
   .main-body {
     flex-direction: column;
@@ -372,5 +421,21 @@
     max-width: 400px;
     white-space: normal;
     justify-content: space-between;
+  }
+
+  .quick-select-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .quick-select-buttons {
+    width: 100%;
+  }
+
+  .quick-select-btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px 14px;
   }
 }
