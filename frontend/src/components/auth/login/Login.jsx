@@ -21,6 +21,27 @@ export default function Login() {
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   useEffect(() => {
+    // Tangkap token & user dari callback URL Google OAuth
+    const params = new URLSearchParams(window.location.search);
+    const oauthToken = params.get('token');
+    const oauthUser = params.get('user');
+    const oauthError = params.get('error');
+
+    if (oauthError) {
+      setErrorMsg(decodeURIComponent(oauthError));
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (oauthToken && oauthUser) {
+      try {
+        localStorage.setItem('token', oauthToken);
+        localStorage.setItem('user', oauthUser);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setShowSuccessModal(true);
+        return;
+      } catch (e) {
+        console.error('Failed to parse Google OAuth user:', e);
+      }
+    }
+
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     if (token) {

@@ -131,6 +131,110 @@ class AuthService {
 
     return { message: 'Link reset password telah dikirim ke email Anda!' };
   }
+
+  googleAuthRedirect(res) {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/api/v1/auth/google/callback';
+
+    if (!clientId || clientId === 'your_google_client_id_here') {
+      return res.status(400).send(`
+        <div style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+          <h2 style="color: #d32f2f;">Google Client ID belum diisi!</h2>
+          <p>Silakan buka file <code>backend/.env</code> dan isi <code>GOOGLE_CLIENT_ID</code> serta <code>GOOGLE_CLIENT_SECRET</code> dari Google Cloud Console.</p>
+          <a href="http://localhost:5173/login" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #4a0e17; color: white; text-decoration: none; border-radius: 6px;">Kembali ke Halaman Login</a>
+        </div>
+      `);
+    }
+
+    const scope = encodeURIComponent('openid profile email');
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&prompt=select_account`;
+
+    return res.redirect(googleAuthUrl);
+  }
+
+  async handleGoogleCallback(code, res) {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/api/v1/auth/google/callback';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    if (!code) {
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Kode otorisasi Google tidak ditemukan!')}`);
+    }
+
+    try {
+      // 1. Tukar authorization code dengan OAuth tokens dari Google API
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code'
+        })
+      });
+
+      const tokenData = await tokenResponse.json();
+
+      if (!tokenResponse.ok || !tokenData.access_token) {
+        throw new Error(tokenData.error_description || 'Gagal menukar kode otorisasi dengan Google token.');
+      }
+
+      // 2. Dapatkan informasi profil user dari Google
+      const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` }
+      });
+
+      const googleUser = await userInfoResponse.json();
+
+      if (!googleUser || !googleUser.email) {
+        throw new Error('Gagal mengambil informasi profil dari Google.');
+      }
+
+      // 3. Cari atau buat user baru di database PostgreSQL
+      let user = await userRepository.findByEmail(googleUser.email);
+      if (!user) {
+        const randomPasswordHash = await bcrypt.hash(`google_oauth_${googleUser.id}_${Date.now()}`, 10);
+        user = await userRepository.createUser({
+          fullName: googleUser.name || googleUser.email.split('@')[0],
+          email: googleUser.email,
+          passwordHash: randomPasswordHash,
+          schoolName: '-',
+          classGrade: '-',
+          role: 'USER'
+        });
+      }
+
+      // 4. Generate JWT Token CarbonWise
+      const payload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      };
+
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+      });
+
+      const userData = {
+        id: user.id,
+        fullName: user.full_name,
+        email: user.email,
+        role: user.role,
+        schoolName: user.school_name,
+        classGrade: user.class_grade,
+      };
+
+      // 5. Redirect ke Frontend dengan query string token & user
+      const targetUrl = `${frontendUrl}/login?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(userData))}`;
+      return res.redirect(targetUrl);
+    } catch (err) {
+      console.error('Error handling Google OAuth callback:', err);
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(err.message || 'Login Google gagal!')}`);
+    }
+  }
 }
 
 export default new AuthService();

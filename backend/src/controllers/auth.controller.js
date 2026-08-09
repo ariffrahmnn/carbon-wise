@@ -88,6 +88,15 @@ class AuthController {
         res.status(400).json({ success: false, message: error.message });
       }
   };
+
+  googleRedirect(req, res) {
+    return authService.googleAuthRedirect(res);
+  }
+
+  async googleCallback(req, res) {
+    const { code } = req.query;
+    return await authService.handleGoogleCallback(code, res);
+  }
 }
 
 export default new AuthController();
