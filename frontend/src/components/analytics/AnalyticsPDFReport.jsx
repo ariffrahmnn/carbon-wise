@@ -37,7 +37,7 @@ const AnalyticsPDFReport = ({
             1. Grafik & Rincian Emisi Harian (Hari Ini)
           </h3>
           <p style={{ fontSize: '13px', margin: '0 0 10px 0', color: '#555' }}>
-            Total Emisi Hari Ini: <strong style={{ color: '#4a0e17' }}>{totalTodayEmissions.toFixed(3)} kg CO₂</strong>
+            Total Emisi Hari Ini: <strong style={{ color: '#4a0e17' }}>{totalTodayEmissions.toFixed(2)} kg CO₂</strong>
           </p>
           
           {/* Visual Grafik Harian LineChart */}
@@ -67,7 +67,7 @@ const AnalyticsPDFReport = ({
                   <tr key={i} style={{ background: i % 2 === 0 ? '#ffffff' : '#fcfcfc' }}>
                     <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{item.item_name}</td>
                     <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{item.category_name}</td>
-                    <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{parseFloat(item.total).toFixed(3)}</td>
+                    <td style={{ padding: '6px 10px', border: '1px solid #ddd' }}>{parseFloat(item.total).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

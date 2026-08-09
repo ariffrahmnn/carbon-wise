@@ -211,7 +211,7 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
                       />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => `${parseFloat(value).toFixed(3)} kg CO₂`} />
+                  <Tooltip formatter={(value) => `${parseFloat(value).toFixed(2)} kg CO₂`} />
                   <Legend verticalAlign="bottom" height={36} />
                 </PieChart>
               </ResponsiveContainer>

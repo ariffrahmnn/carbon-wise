@@ -24,21 +24,25 @@ const MONTH_NAMES = [
 ];
 
 // Sub-komponen Custom Dot (Didefinisikan di luar komponen utama agar tidak re-create pada setiap render)
-const CustomDot = React.memo(({ cx, cy, index, dailyLength, onClickDot }) => {
+const CustomDot = React.memo(({ cx, cy, index, dailyLength, onClickDot, payload }) => {
   const isLast = index === dailyLength - 1;
   
-  if (isLast) {
-    return (
-      <svg x={cx - 10} y={cy - 10} width={20} height={20} onClick={onClickDot} style={{ cursor: 'pointer' }}>
-        <circle cx="10" cy="10" r="6" fill="#ff4d4f" stroke="#fff" strokeWidth="2" />
-        <circle cx="10" cy="10" r="14" fill="transparent" stroke="#ff4d4f" strokeWidth="1" strokeDasharray="3 3">
-          <animate attributeName="r" from="6" to="16" dur="1.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
-        </circle>
-      </svg>
-    );
-  }
-  return <circle cx={cx} cy={cy} r={4} fill="#4a0e17" stroke="#fff" strokeWidth={2} />;
+  return (
+    <g onClick={(e) => { e.stopPropagation(); onClickDot(payload, index); }} style={{ cursor: 'pointer' }}>
+      <circle cx={cx} cy={cy} r={14} fill="transparent" />
+      {isLast ? (
+        <svg x={cx - 10} y={cy - 10} width={20} height={20}>
+          <circle cx="10" cy="10" r="6" fill="#ff4d4f" stroke="#fff" strokeWidth="2" />
+          <circle cx="10" cy="10" r="14" fill="transparent" stroke="#ff4d4f" strokeWidth="1" strokeDasharray="3 3">
+            <animate attributeName="r" from="6" to="16" dur="1.5s" repeatCount="indefinite" />
+            <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+      ) : (
+        <circle cx={cx} cy={cy} r={5} fill="#4a0e17" stroke="#fff" strokeWidth={2} />
+      )}
+    </g>
+  );
 });
 
 // Sub-komponen Custom Tooltip (Didefinisikan di luar komponen utama)
@@ -60,7 +64,7 @@ const CustomDailyTooltip = React.memo(({ active, payload }) => {
           Pukul: <strong>{data.formatted_time}</strong>
         </p>
         <p style={{ margin: '4px 0 0 0', color: '#4a0e17', fontWeight: '600', fontSize: '0.95rem' }}>
-          Total Emisi: {parseFloat(data.total).toFixed(3)} kg CO₂
+          Total Emisi: {parseFloat(data.total).toFixed(2)} kg CO₂
         </p>
       </div>
     );
@@ -249,7 +253,7 @@ const Analytics = () => {
 
           <div className="calc-total-emissions-badge">
             <span>Total Emisi:</span>
-            <strong>{totalTodayEmissions > 0 ? `${totalTodayEmissions.toFixed(3)} kg CO₂` : '0.000 kg CO₂'}</strong>
+            <strong>{totalTodayEmissions > 0 ? `${totalTodayEmissions.toFixed(2)} kg CO₂` : '0.00 kg CO₂'}</strong>
           </div>
         </div>
 
@@ -307,7 +311,7 @@ const Analytics = () => {
             {/* 1. Daily Line Chart */}
             <div className="chart-card">
               <h3>Grafik Harian (Hari Ini)</h3>
-              <p className="chart-desc">Pergerakan emisi Anda per jam. Klik titik merah terakhir untuk detail komposisi emisi!</p>
+              <p className="chart-desc">Pergerakan emisi Anda per jam. Klik pada titik mana saja di grafik untuk melihat detail komposisi emisi!</p>
               <div className="chart-container">
                 {dailyList.length > 0 ? (
                   <ResponsiveContainer width="100%" height={320}>
@@ -329,7 +333,7 @@ const Analytics = () => {
                             onClickDot={handleDotClick} 
                           />
                         )} 
-                        activeDot={{ r: 8 }} 
+                        activeDot={{ r: 8, cursor: 'pointer', onClick: (e, payload) => handleDotClick(payload?.payload) }} 
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -347,7 +351,7 @@ const Analytics = () => {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                     {dailyList.map((item, idx) => (
                       <div key={idx} style={{ background: '#ffffff', padding: '8px 14px', borderRadius: '8px', border: '1px solid #E0E0E0', fontSize: '0.88rem' }}>
-                        <span style={{ fontWeight: 'bold', color: '#4a0e17' }}>Pukul {item.formatted_time}:</span> {parseFloat(item.total).toFixed(3)} kg CO₂
+                        <span style={{ fontWeight: 'bold', color: '#4a0e17' }}>Pukul {item.formatted_time}:</span> {parseFloat(item.total).toFixed(2)} kg CO₂
                       </div>
                     ))}
                   </div>

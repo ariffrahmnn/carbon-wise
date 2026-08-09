@@ -48,8 +48,6 @@ function Footer() {
 
           <nav className="site-footer__nav" aria-label="Legal">
             <h2>Legal</h2>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
             <a href="/credits">Media Credits</a>
           </nav>
         </div>

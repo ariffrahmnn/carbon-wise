@@ -406,7 +406,7 @@ const Travel = () => {
             {/* Estimasi Ringkasan Emisi */}
             <div className="travel-estimate-card">
               <span>Estimasi Emisi Perjalanan:</span>
-              <strong>{totalEstimate.toFixed(3)} kg CO₂</strong>
+              <strong>{totalEstimate.toFixed(2)} kg CO₂</strong>
             </div>
 
             {/* Tombol Simpan */}
@@ -421,11 +421,6 @@ const Travel = () => {
           </div>
         </main>
       </div>
-
-      {/* FOOTER SECTION */}
-      <footer className="main-footer">
-        <p>&copy; 2026 CarbonWise. All rights reserved.</p>
-      </footer>
 
       {/* OVERLAY ANIMASI MENYIMPAN & SUKSES */}
       <SaveStatusOverlay status={saveStatus} message={saveStatus === 'saving' ? 'Menyimpan Emisi Perjalanan...' : 'Berhasil Menyimpan Progress!'} />

@@ -295,14 +295,19 @@
   }
 
   .login-main-container {
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
-    padding: 24px 16px 40px;
+    padding: 24px 16px;
+    box-sizing: border-box;
     overflow-y: auto;
   }
 
   .login-card-container {
     flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
     overflow: visible;
   }
 

@@ -174,7 +174,7 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
                     <XAxis dataKey="formatted_time" stroke="#757575" style={{ fontSize: '11px' }} />
                     <YAxis stroke="#757575" style={{ fontSize: '11px' }} />
-                    <RechartsTooltip formatter={(val) => `${parseFloat(val).toFixed(3)} kg CO₂`} />
+                    <RechartsTooltip formatter={(val) => `${parseFloat(val).toFixed(2)} kg CO₂`} />
                     <Line type="monotone" dataKey="total" stroke="#4a0e17" strokeWidth={2.5} dot={{ r: 4, fill: '#4a0e17' }} />
                   </LineChart>
                 </ResponsiveContainer>

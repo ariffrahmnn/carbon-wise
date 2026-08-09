@@ -127,9 +127,9 @@ const AdminDashboard = () => {
       'SEKOLAH': s.school_name || '-',
       'KELAS': s.class_grade || '-',
       'EMAIL': s.email,
-      'PER HARI (kg CO2)': parseFloat(s.total_daily || 0).toFixed(3),
-      'PER MINGGU (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(3),
-      'PER BULAN (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(3)
+      'PER HARI (kg CO2)': parseFloat(s.total_daily || 0).toFixed(2),
+      'PER MINGGU (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(2),
+      'PER BULAN (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(2)
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -307,13 +307,13 @@ const AdminDashboard = () => {
                         <td className="col-class">{student.class_grade || '-'}</td>
                         <td className="col-email">{student.email}</td>
                         <td className="col-emission daily">
-                          {parseFloat(student.total_daily || 0).toFixed(1)} kg
+                          {parseFloat(student.total_daily || 0).toFixed(2)} kg
                         </td>
                         <td className="col-emission weekly">
-                          {parseFloat(student.total_weekly || 0).toFixed(1)} kg
+                          {parseFloat(student.total_weekly || 0).toFixed(2)} kg
                         </td>
                         <td className="col-emission monthly">
-                          {parseFloat(student.total_monthly || 0).toFixed(1)} kg
+                          {parseFloat(student.total_monthly || 0).toFixed(2)} kg
                         </td>
                         <td className="col-action">
                           <button 
