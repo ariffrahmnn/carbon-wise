@@ -28,7 +28,7 @@ const CustomDot = React.memo(({ cx, cy, index, dailyLength, onClickDot, payload 
   const isLast = index === dailyLength - 1;
   
   return (
-    <g onClick={(e) => { e.stopPropagation(); onClickDot(payload, index, dailyLength); }} style={{ cursor: 'pointer' }}>
+    <g onClick={(e) => { e.stopPropagation(); onClickDot(index); }} style={{ cursor: 'pointer' }}>
       <circle cx={cx} cy={cy} r={14} fill="transparent" />
       {isLast ? (
         <svg x={cx - 10} y={cy - 10} width={20} height={20}>
@@ -173,23 +173,25 @@ const Analytics = () => {
   };
 
   // Callback klik dot pada grafik harian
-  // Titik terakhir = total emisi hari ini (todayBreakdown), titik lainnya = breakdown batch jam tersebut
-  const handleDotClick = useCallback((itemData, index, totalLength) => {
-    const isLastDot = index === totalLength - 1;
+  // Mengakses dailyList[index] langsung agar data breakdown selalu akurat
+  const handleDotClick = useCallback((dotIndex) => {
+    const isLastDot = dotIndex === dailyList.length - 1;
+    const clickedBatch = dailyList[dotIndex];
+
     if (isLastDot) {
-      // Titik terakhir: tampilkan total breakdown hari ini
+      // Titik terakhir: rincian emisi hari ini (total gabungan)
       setSelectedBatchBreakdown(null);
       setSelectedBatchTime(null);
-    } else if (itemData && itemData.breakdown && itemData.breakdown.length > 0) {
-      // Titik sebelumnya: tampilkan breakdown khusus batch jam tersebut
-      setSelectedBatchBreakdown(itemData.breakdown);
-      setSelectedBatchTime(itemData.formatted_time || null);
+    } else if (clickedBatch && clickedBatch.breakdown && clickedBatch.breakdown.length > 0) {
+      // Titik lainnya: rincian emisi khusus batch jam tersebut
+      setSelectedBatchBreakdown(clickedBatch.breakdown);
+      setSelectedBatchTime(clickedBatch.formatted_time || null);
     } else {
       setSelectedBatchBreakdown(null);
-      setSelectedBatchTime(itemData?.formatted_time || null);
+      setSelectedBatchTime(clickedBatch?.formatted_time || null);
     }
     setIsModalOpen(true);
-  }, []);
+  }, [dailyList]);
 
   // Hitung total emisi gabungan dari data hari ini dengan useMemo
   const totalTodayEmissions = useMemo(() => {
@@ -349,7 +351,7 @@ const Analytics = () => {
                             onClickDot={handleDotClick} 
                           />
                         )} 
-                        activeDot={{ r: 8, cursor: 'pointer', onClick: (e, payload) => { const idx = dailyList.findIndex(d => d.batch_id === payload?.payload?.batch_id); handleDotClick(payload?.payload, idx >= 0 ? idx : 0, dailyList.length); } }} 
+                        activeDot={{ r: 8, cursor: 'pointer', onClick: (e, payload) => { const idx = dailyList.findIndex(d => d.batch_id === payload?.payload?.batch_id); handleDotClick(idx >= 0 ? idx : dailyList.length - 1); } }} 
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -368,7 +370,7 @@ const Analytics = () => {
                     {dailyList.map((item, idx) => (
                       <div 
                         key={idx} 
-                        onClick={() => handleDotClick(item, idx, dailyList.length)}
+                        onClick={() => handleDotClick(idx)}
                         style={{ background: '#ffffff', padding: '8px 14px', borderRadius: '8px', border: '1px solid #E0E0E0', fontSize: '0.88rem', cursor: 'pointer' }}
                         title="Klik untuk melihat Pie Chart komposisi jam ini"
                       >
