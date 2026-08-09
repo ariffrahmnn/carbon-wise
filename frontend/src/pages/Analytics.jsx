@@ -87,6 +87,7 @@ const Analytics = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBatchBreakdown, setSelectedBatchBreakdown] = useState(null);
+  const [selectedBatchTime, setSelectedBatchTime] = useState(null);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isResettingData, setIsResettingData] = useState(false);
   const [user, setUser] = useState(null);
@@ -178,11 +179,14 @@ const Analytics = () => {
     if (isLastDot) {
       // Titik terakhir: tampilkan total breakdown hari ini
       setSelectedBatchBreakdown(null);
+      setSelectedBatchTime(null);
     } else if (itemData && itemData.breakdown && itemData.breakdown.length > 0) {
       // Titik sebelumnya: tampilkan breakdown khusus batch jam tersebut
       setSelectedBatchBreakdown(itemData.breakdown);
+      setSelectedBatchTime(itemData.formatted_time || null);
     } else {
       setSelectedBatchBreakdown(null);
+      setSelectedBatchTime(itemData?.formatted_time || null);
     }
     setIsModalOpen(true);
   }, []);
@@ -514,8 +518,9 @@ const Analytics = () => {
       {/* Modal Pie Chart dengan Tombol Cetak PDF */}
       <DailyPieModal 
         isOpen={isModalOpen} 
-        onClose={() => { setIsModalOpen(false); setSelectedBatchBreakdown(null); }} 
+        onClose={() => { setIsModalOpen(false); setSelectedBatchBreakdown(null); setSelectedBatchTime(null); }} 
         data={selectedBatchBreakdown && selectedBatchBreakdown.length > 0 ? selectedBatchBreakdown : todayBreakdownList} 
+        batchTime={selectedBatchTime}
         onExportPDF={handleExportPDF}
       />
 

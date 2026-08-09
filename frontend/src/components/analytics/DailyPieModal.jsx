@@ -30,7 +30,7 @@ const getItemColor = (itemName, index) => {
   return FALLBACK_COLORS[index % FALLBACK_COLORS.length];
 };
 
-const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
+const DailyPieModal = ({ isOpen, onClose, data, onExportPDF, batchTime }) => {
   const overlayRef = useRef(null);
   const contentRef = useRef(null);
   const titleRef = useRef(null);
@@ -180,7 +180,7 @@ const DailyPieModal = ({ isOpen, onClose, data, onExportPDF }) => {
         </button>
 
         <h3 className="modal-title" ref={titleRef} style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1b4332', marginBottom: '16px' }}>
-          Rincian Emisi Hari Ini
+          {batchTime ? `Rincian Emisi Pukul ${batchTime}` : 'Rincian Emisi Hari Ini'}
         </h3>
         
         {chartData.length > 0 ? (
