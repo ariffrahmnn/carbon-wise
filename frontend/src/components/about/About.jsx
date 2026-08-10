@@ -25,7 +25,7 @@ function About() {
   const navigate = useNavigate();
   const syntaxContainerRef = useRef(null);
 
-  // Animasi GSAP Syntax Beterbangan di Latar Belakang nodeCode_
+  // Animasi GSAP Syntax Beterbangan di Latar Belakang hiFooCode Group
   useEffect(() => {
     if (!syntaxContainerRef.current) return;
 
@@ -149,7 +149,7 @@ function About() {
           <div className="section-title-wrap">
             <h2>Siapa di Balik Layar?</h2>
             <p className="team-intro">
-              Inisiatif ini digagas langsung oleh tim peneliti Pascasarjana FKIP Universitas Riau (UNRI) dan diwujudkan ke dalam platform digital bersama nodeCode_.
+              Inisiatif ini digagas langsung oleh tim peneliti Pascasarjana FKIP Universitas Riau (UNRI) dan diwujudkan ke dalam platform digital bersama hiFooCode Group.
             </p>
           </div>
 
@@ -202,7 +202,7 @@ function About() {
             </div>
           </div>
 
-          {/* IT DEVELOPER: nodeCode_ DENGAN ANIMASI SYNTAX GSAP BETERBANGAN */}
+          {/* IT DEVELOPER: hiFooCode Group DENGAN ANIMASI SYNTAX GSAP BETERBANGAN */}
           <div className="nodecode-box">
             {/* CONTAINER LATAR BELAKANG SYNTAX GSAP */}
             <div className="nodecode-syntax-layer" ref={syntaxContainerRef}>
@@ -217,7 +217,7 @@ function About() {
               <span className="nodecode-tag">DEVELOPMENT PARTNER</span>
               <h3>
                 <ShinyText
-                  text="nodeCode_"
+                  text="hiFooCode Group"
                   speed={2}
                   delay={0}
                   color="#b5b5b5"
@@ -230,7 +230,7 @@ function About() {
                 />
               </h3>
               <p>
-                Tim IT developer yang beranggotakan empat talenta kreatif berlatar belakang Teknik Informatika. nodeCode_ bertugas mewujudkan rancangan ide dari peneliti ke dalam arsitektur website kalkulator karbon yang interaktif dan <i>user-friendly</i> bagi siswa-siswi.
+                Tim IT developer yang beranggotakan empat talenta kreatif berlatar belakang Teknik Informatika. hiFooCode Group bertugas mewujudkan rancangan ide dari peneliti ke dalam arsitektur website kalkulator karbon yang interaktif dan <i>user-friendly</i> bagi siswa-siswi.
               </p>
             </div>
           </div>
