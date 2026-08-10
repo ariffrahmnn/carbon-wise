@@ -270,9 +270,9 @@ const FoodInput = () => {
         <div className="calc-header-left">
           <div className="calc-brand">
             <div className="calc-logo-icon">
-              <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
+              <img src={appIcon} alt="CarbonWiseCalc Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
-            <span className="calc-brand-title">CarbonWise</span>
+            <span className="calc-brand-title">CarbonWiseCalc</span>
           </div>
         </div>
 
