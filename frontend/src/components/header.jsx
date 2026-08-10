@@ -69,7 +69,7 @@ function Header() {
           <span className="brand__icon" aria-hidden="true">
             <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
           </span>
-          <span className="brand__name">CarbonWise</span>
+          <span className="brand__name">CarbonWiseCalc</span>
         </a>
 
         <button

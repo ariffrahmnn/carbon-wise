@@ -15,7 +15,7 @@ function Footer() {
               <span className="site-footer__logo-icon" aria-hidden="true">
                 <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
               </span>
-              <span className="site-footer__logo-text">CarbonWise</span>
+              <span className="site-footer__logo-text">CarbonWiseCalc</span>
             </a>
             <p className="site-footer__tagline">One step closer to a greener sky.</p>
 
@@ -48,7 +48,7 @@ function Footer() {
         </div>
 
         <div className="site-footer__bottom">
-          <p>&copy; 2026 CarbonWise - One step closer to a greener sky.</p>
+          <p>&copy; 2026 CarbonWiseCalc- One step closer to a greener sky.</p>
           <button type="button" onClick={scrollToTop}>
             <span>Back to Top</span>
             <span className="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
