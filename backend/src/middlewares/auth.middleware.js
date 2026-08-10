@@ -16,9 +16,15 @@ export const verifyToken = (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(403).json({
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Sesi Anda telah kedaluwarsa (lebih dari 24 jam). Silakan login kembali!',
+      });
+    }
+    return res.status(401).json({
       success: false,
-      message: 'Token tidak valid atau sudah kadaluwarsa!',
+      message: 'Token tidak valid atau sesi telah berakhir!',
     });
   }
 };

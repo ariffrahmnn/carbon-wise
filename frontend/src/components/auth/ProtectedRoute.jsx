@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { isTokenExpired, clearSession } from '../../utils/auth.js';
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
@@ -12,8 +13,9 @@ const ProtectedRoute = ({ children }) => {
     } catch (e) {}
   }
 
-  if (!token) {
-    // Jika tidak ada token, tendang user kembali ke halaman Login
+  if (!token || isTokenExpired(token)) {
+    // Jika tidak ada token atau sesi > 24 jam, hapus sesi & tendang user ke Login
+    clearSession();
     return <Navigate to="/login" replace />;
   }
 

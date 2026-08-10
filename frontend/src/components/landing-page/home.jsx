@@ -2,16 +2,17 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import landingPageVideo from '../../assets/Vid.mp4'
 import { animateHeroEntrance } from '../../animations/heroAnimation.js'
+import { isTokenExpired, clearSession } from '../../utils/auth.js';
 
-function Home() {
-  const navigate = useNavigate() // 2. Inisialisasi hook navigate
-
+export function Home() {
   const line1Ref = useRef(null)
   const line2Ref = useRef(null)
   const subtitleRef = useRef(null)
   const buttonRef = useRef(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
+    // 2. Menjalankan animasi staggered entrance
     animateHeroEntrance({
       line1Ref: line1Ref.current,
       line2Ref: line2Ref.current,
@@ -20,12 +21,13 @@ function Home() {
     })
   }, [])
 
-  // 3. Handler untuk navigasi (apabila sudah login langsung masuk ke dashboard /input)
+  // 3. Handler untuk navigasi (apabila sudah login & sesi aktif langsung masuk ke dashboard /input)
   const handleStart = () => {
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && !isTokenExpired(token)) {
       navigate('/input');
     } else {
+      clearSession();
       navigate('/login');
     }
   }

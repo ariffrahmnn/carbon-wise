@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import SuccessModalCard from '../shared/SuccessModalCard.jsx';
 import ForgotPasswordModal from './ForgotPasswordModal.jsx';
+import { isTokenExpired, clearSession } from '../../../utils/auth.js';
 import '../../../styles/auth/shared/auth-form.css';
 
 const fotoHutan = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop";
@@ -44,7 +45,11 @@ export default function Login() {
 
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    if (token) {
+
+    if (token && isTokenExpired(token)) {
+      clearSession();
+      setErrorMsg('Sesi Anda telah kedaluwarsa (lebih dari 24 jam). Silakan login kembali.');
+    } else if (token) {
       let user = null;
       try { user = JSON.parse(savedUser); } catch(e) {}
       if (user?.role?.toUpperCase() === 'ADMIN') {
