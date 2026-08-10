@@ -22,7 +22,7 @@ const AnalyticsPDFReport = ({
         {/* Header PDF */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #4a0e17', paddingBottom: '16px', marginBottom: '24px' }}>
           <div>
-            <h1 style={{ margin: 0, color: '#4a0e17', fontSize: '24px', fontWeight: 'bold' }}>CarbonWise - Laporan Analisis Emisi</h1>
+            <h1 style={{ margin: 0, color: '#4a0e17', fontSize: '24px', fontWeight: 'bold' }}>CarbonWiseCalc - Laporan Analisis Emisi</h1>
             <p style={{ margin: '4px 0 0 0', color: '#666', fontSize: '14px' }}>Laporan Resmi Grafik Jejak Karbon Harian, Mingguan, & Bulanan</p>
           </div>
           <div style={{ textAlign: 'right', fontSize: '13px', color: '#555' }}>
@@ -133,7 +133,7 @@ const AnalyticsPDFReport = ({
 
         {/* Footer Dokumen PDF */}
         <div style={{ marginTop: '30px', paddingTop: '14px', borderTop: '1px solid #eee', textAlign: 'center', fontSize: '11px', color: '#888' }}>
-          Laporan ini secara otomatis dibuat oleh sistem CarbonWise. Mari terus lestarikan bumi bersama-sama. 🌱
+          Laporan ini secara otomatis dibuat oleh sistem CarbonWiseCalc. Mari terus lestarikan bumi bersama-sama. 🌱
         </div>
       </div>
     </div>
