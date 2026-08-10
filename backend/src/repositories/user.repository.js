@@ -69,15 +69,29 @@ class UserRepository {
         authProvider = 'google'
       } = userData;
 
-      const sql = `
-        INSERT INTO users (full_name, email, password_hash, school_name, class_grade, role, auth_provider)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id, full_name, email, role, school_name, class_grade, auth_provider, created_at
-      `;
-
-      const values = [fullName, email, passwordHash, schoolName, classGrade, role, authProvider];
-      const { rows } = await query(sql, values);
-      return rows[0];
+      try {
+        const sql = `
+          INSERT INTO users (full_name, email, password_hash, school_name, class_grade, role, auth_provider)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          RETURNING id, full_name, email, role, school_name, class_grade, created_at
+        `;
+        const values = [fullName, email, passwordHash, schoolName, classGrade, role, authProvider];
+        const { rows } = await query(sql, values);
+        return rows[0];
+      } catch (err) {
+        if (err.code === '42703') {
+          // Fallback jika kolom auth_provider belum ada di database target
+          const sqlFallback = `
+            INSERT INTO users (full_name, email, password_hash, school_name, class_grade, role)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id, full_name, email, role, school_name, class_grade, created_at
+          `;
+          const valuesFallback = [fullName, email, passwordHash, schoolName, classGrade, role];
+          const { rows } = await query(sqlFallback, valuesFallback);
+          return rows[0];
+        }
+        throw err;
+      }
     } catch (error) {
       throw error;
     }
@@ -90,7 +104,7 @@ class UserRepository {
         UPDATE users 
         SET full_name = COALESCE($2, full_name), updated_at = NOW() 
         WHERE id = $1 
-        RETURNING id, full_name, email, role, school_name, class_grade, auth_provider
+        RETURNING id, full_name, email, role, school_name, class_grade
       `;
       const { rows } = await query(sql, [id, fullName]);
       return rows[0];

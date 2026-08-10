@@ -5,6 +5,7 @@ import AuthController from './src/routes/auth.routes.js';
 import emissionRoutes from './src/routes/emission.routes.js';
 import adminRoutes from './src/routes/admin.routes.js';
 import { autoSeedDefaultAdmin } from './src/utils/adminSeeder.js';
+import { ensureSchema } from './src/utils/dbMigration.js';
 
 dotenv.config();
 
@@ -43,5 +44,6 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+  await ensureSchema();
   await autoSeedDefaultAdmin();
 });
