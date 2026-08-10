@@ -1,4 +1,5 @@
 import Header from '../components/header.jsx'
+import Footer from '../components/footer.jsx'
 import '../styles/global/credits.css'
 
 import kemacetanImg from '../assets/kemacetan.jpg'
@@ -13,6 +14,9 @@ import loginRegisterImg from '../assets/LoginRegister.jpg'
 import homeVid1Img from '../assets/Footage1.png'
 import homeVid2Img from '../assets/Footage2.png'
 import homeVid3Img from '../assets/Footage3.png'
+
+import unsplashIcon from '../assets/unsplash.png'
+import pexelsIcon from '../assets/pexels.png'
 
 function Credits() {
   const authImages = [
@@ -49,19 +53,19 @@ function Credits() {
     { 
       src: homeVid3Img, 
       title: "Video Hutan Matahari", 
-      creator: "Kreator Pexels", 
-      link: "#",
+      creator: "Matthias Groeneveld", 
+      link: "https://www.pexels.com/id-id/video/kayu-cahaya-sinar-jalan-27065375/",
       isButton: true
     }
   ];
 
   const newsImages = [
-    { src: kemacetanImg, title: "Kemacetan & Emisi", creator: "Nama Kreator", link: "#" },
-    { src: kapalImg, title: "Emisi Kapal", creator: "Nama Kreator", link: "#" },
-    { src: internetImg, title: "Jejak Digital", creator: "Nama Kreator", link: "#" },
-    { src: sampahImg, title: "Masalah Sampah", creator: "Nama Kreator", link: "#" },
-    { src: mobilListrikImg, title: "Mobil Listrik", creator: "Nama Kreator", link: "#" },
-    { src: asalKarbonImg, title: "Asal Karbon", creator: "Nama Kreator", link: "#" }
+    { src: kemacetanImg, title: "Kemacetan & Emisi", creator: "Jonas Degener", link: "https://unsplash.com/id/foto/jalan-raya-yang-penuh-lalu-lintas-melintasi-sebuah-kota-pada-jam-emas-72CrKMqbwkM", isButton: true },
+    { src: kapalImg, title: "Emisi Kapal", creator: "Venti Views", link: "https://unsplash.com/id/foto/pemandangan-udara-perahu-biru-dan-putih-di-badan-air-di-siang-hari-FPKnAO-CF6M", isButton: true },
+    { src: internetImg, title: "Jejak Digital", creator: "Scott Rodgerson", link: "https://unsplash.com/photos/a-bunch-of-blue-wires-connected-to-each-other-PSpf_XgOM5w", isButton: true },
+    { src: sampahImg, title: "Masalah Sampah", creator: "Antoine Giret", link: "https://unsplash.com/photos/garbage-near-forest-7_TSzqJms4w", isButton: true },
+    { src: mobilListrikImg, title: "Mobil Listrik", creator: "Iyan Ryan", link: "https://unsplash.com/photos/a-man-working-on-a-car-engine-in-a-garage-nkdv9cqz9VE", isButton: true },
+    { src: asalKarbonImg, title: "Asal Karbon", creator: "Alex Simpson", link: "https://unsplash.com/photos/gray-and-red-factory-building-under-a-calm-blue-sky-9GwMIek9jnY", isButton: true }
   ];
 
   return (
@@ -79,7 +83,7 @@ function Credits() {
             <div className="credits__platform">
               <div className="credits__platform-header">
                 <h2>Unsplash</h2>
-                <span className="material-symbols-outlined" aria-hidden="true">photo_camera</span>
+                <img src={unsplashIcon} alt="Unsplash" className="credits__platform-icon credits__platform-icon--outlined" />
               </div>
               <p>Foto-foto indah dengan lisensi terbuka yang menghidupkan pengalaman pengguna di CarbonWise.</p>
               <ul>
@@ -92,7 +96,7 @@ function Credits() {
             <div className="credits__platform">
               <div className="credits__platform-header">
                 <h2>Pexels</h2>
-                <span className="material-symbols-outlined" aria-hidden="true">videocam</span>
+                <img src={pexelsIcon} alt="Pexels" className="credits__platform-icon" />
               </div>
               <p>Video dan gambar stok gratis yang dibagikan oleh kreator berbakat di seluruh dunia.</p>
               <ul>
@@ -173,6 +177,7 @@ function Credits() {
           </div>
         </section>
       </main>
+      <Footer />
     </div>
   )
 }

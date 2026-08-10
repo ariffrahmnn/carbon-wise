@@ -7,8 +7,8 @@ function Footer() {
   }
 
   return (
-    <footer className="site-footer">
-      <div className="site-footer__inner page-container">
+    <footer className="site-footer" style={{ paddingInline: '4vw' }}>
+      <div className="site-footer__inner">
         <div className="site-footer__grid">
           <div className="site-footer__brand">
             <a className="site-footer__logo" href="/" aria-label="CarbonWise home">
