@@ -101,8 +101,8 @@ class AuthService {
       process.env.JWT_RESET_SECRET || process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
-    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
-    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+   
+    const resetUrl = `http://192.168.1.29/reset-password?token=${resetToken}`;
 
     const mailOptions = {
       from: `"Carbon Wise Support" <${process.env.EMAIL_USER}>`,
