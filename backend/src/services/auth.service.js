@@ -101,7 +101,16 @@ class AuthService {
       process.env.JWT_RESET_SECRET || process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
-    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
+    const getCleanFrontendUrl = () => {
+      let url = process.env.FRONTEND_URL || 'http://192.168.1.29';
+      url = url.trim().replace(/\/+$/, '');
+      if (url.includes(':5173')) {
+        url = url.replace(':5173', '');
+      }
+      return url;
+    };
+
+    const frontendUrl = getCleanFrontendUrl();
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     const mailOptions = {

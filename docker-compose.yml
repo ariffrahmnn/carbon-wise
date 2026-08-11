@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # 1. Database PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: carbonwise_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-db_carbonwise}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Backend Node.js
+  backend:
+    build: ./backend
+    container_name: carbonwise_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - PORT=3000
+      - FRONTEND_URL=${FRONTEND_URL:-http://192.168.1.29}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:-http://192.168.1.29:3000/api/v1/auth/google/callback}
+    depends_on:
+      - postgres
+
+  # 3. Frontend React + Nginx
+  frontend:
+    build: ./frontend
+    container_name: carbonwise_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
