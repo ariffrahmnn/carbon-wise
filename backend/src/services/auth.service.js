@@ -98,11 +98,11 @@ class AuthService {
 
     const resetToken = jwt.sign(
       { id: user.id, email: user.email },
-      process.env.JWT_RESET_SECRET,
+      process.env.JWT_RESET_SECRET || process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
-
-    const resetUrl = `http://192.168.1.29/reset-password?token=${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     const mailOptions = {
       from: `"Carbon Wise Support" <${process.env.EMAIL_USER}>`,
@@ -135,13 +135,14 @@ class AuthService {
   googleAuthRedirect(res) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://192.168.1.29:3000/api/v1/auth/google/callback';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
 
     if (!clientId || clientId === 'your_google_client_id_here') {
       return res.status(400).send(`
         <div style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
           <h2 style="color: #d32f2f;">Google Client ID belum diisi!</h2>
           <p>Silakan buka file <code>backend/.env</code> dan isi <code>GOOGLE_CLIENT_ID</code> serta <code>GOOGLE_CLIENT_SECRET</code> dari Google Cloud Console.</p>
-          <a href="http://192.168.1.29:5173/login" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #4a0e17; color: white; text-decoration: none; border-radius: 6px;">Kembali ke Halaman Login</a>
+          <a href="${frontendUrl}/login" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #4a0e17; color: white; text-decoration: none; border-radius: 6px;">Kembali ke Halaman Login</a>
         </div>
       `);
     }
@@ -156,7 +157,8 @@ class AuthService {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://192.168.1.29:3000/api/v1/auth/google/callback';
-    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29:5173';
+    
+    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
 
     if (!code) {
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Kode otorisasi Google tidak ditemukan!')}`);
@@ -241,9 +243,7 @@ class AuthService {
         authProvider: user.auth_provider || 'google'
       };
 
-      // 4. Inisialisasi Data Fitur sudah didukung oleh backend (getUserAnalytics menangani data emisi kosong dengan aman tanpa error)
-
-      // 5. Redirection (Pengalihan Halaman langsung ke Login Frontend yang otomatis memicu navigasi ke Dashboard)
+      // 5. Redirection ke Login Frontend
       const targetUrl = `${frontendUrl}/login?token=${encodeURIComponent(token)}&user=${encodeURIComponent(JSON.stringify(userData))}`;
       return res.redirect(targetUrl);
     } catch (err) {
