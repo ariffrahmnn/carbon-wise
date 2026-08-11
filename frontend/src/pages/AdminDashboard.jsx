@@ -41,7 +41,8 @@ const AdminDashboard = () => {
     adminUser = JSON.parse(savedUser);
   } catch (e) {}
 
-  const adminName = adminUser?.fullName || adminUser?.full_name || adminUser?.name || 'Admin User';
+  let adminNameRaw = adminUser?.fullName || adminUser?.full_name || adminUser?.name || 'Admin User';
+  const adminName = adminNameRaw === 'Peneliti CarbonWise' ? 'Peneliti CarbonWiseCalc' : adminNameRaw;
   const adminInitial = adminName.charAt(0).toUpperCase();
 
   // 1. Debounce Effect: Menunda pengubahan debouncedSearch hingga 400ms setelah user berhenti mengetik
@@ -136,7 +137,7 @@ const AdminDashboard = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekor_Siswa');
 
-    XLSX.writeFile(workbook, `Rekor_Emisi_Siswa_CarbonWise_Hal_${currentPage}.xlsx`);
+    XLSX.writeFile(workbook, `Rekor_Emisi_Siswa_CarbonWiseCalc_Hal_${currentPage}.xlsx`);
   };
 
   const handleOpenStudentModal = (student) => {
