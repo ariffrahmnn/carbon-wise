@@ -12,23 +12,10 @@ dotenv.config();
 
 const app = express();
 
-// Middleware Global
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://192.168.1.29:5173',
-  'http://192.168.1.29:3000',
-  'http://localhost:5173',
-  'http://127.0.0.1:5173'
-];
-
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Origin tidak diizinkan oleh CORS')); // Tolak origin tidak dikenal
-  },
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Security Headers & Device Permissions Policy (Membatasi hardware yang tidak digunakan)
