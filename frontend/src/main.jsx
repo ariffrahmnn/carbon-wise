@@ -14,6 +14,7 @@ const Travel = lazy(() => import('./components/Travel.jsx'))
 const FoodInput = lazy(() => import('./components/FoodInput.jsx'))
 const Analytics = lazy(() => import('./pages/Analytics.jsx'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'))
+const HowToUse = lazy(() => import('./pages/HowToUse.jsx'))
 
 // Auth Components
 const Login = lazy(() => import('./components/auth/login/Login.jsx'))
@@ -165,6 +166,7 @@ const AppRoutes = () => (
         <Route path="/about" element={<About />} />
         <Route path="/references" element={<References />} />
         <Route path="/credits" element={<Credits />} />
+        <Route path="/how-to-use" element={<HowToUse />} />
 
         {/* Halaman News */}
         <Route path="/news1" element={<LayoutWrapper><News1 /></LayoutWrapper>} />

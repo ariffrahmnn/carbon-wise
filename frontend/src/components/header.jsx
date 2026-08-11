@@ -72,53 +72,75 @@ function Header() {
           <span className="brand__name">CarbonWiseCalc</span>
         </a>
 
-        <button
-          className="menu-toggle"
-          type="button"
-          aria-expanded={isMenuOpen}
-          aria-controls="site-navigation"
-          aria-label={isMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
-          onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
-        >
-          <span className="material-symbols-outlined" aria-hidden="true">
-            {isMenuOpen ? 'close' : 'menu'}
-          </span>
-        </button>
+        <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <nav
+            id="site-navigation"
+            className={`site-navigation${isMenuOpen ? ' site-navigation--open' : ''}`}
+            aria-label="Navigasi utama"
+          >
+            <a
+              href="/"
+              className={currentPath === '/' || currentPath === '' ? 'active' : ''}
+              onClick={() => handleNavClick('/')}
+            >
+              Home
+            </a>
+            <a
+              href="/#edukasi"
+              className={currentPath.includes('#edukasi') ? 'active' : ''}
+              onClick={() => handleNavClick('/#edukasi')}
+            >
+              Edukasi
+            </a>
+            <a
+              href="/#news"
+              className={currentPath.includes('news') ? 'active' : ''}
+              onClick={() => handleNavClick('/#news')}
+            >
+              News
+            </a>
+            <a
+              href="/about"
+              className={currentPath.includes('/about') ? 'active' : ''}
+              onClick={() => handleNavClick('/about')}
+            >
+              About
+            </a>
+          </nav>
 
-        <nav
-          id="site-navigation"
-          className={`site-navigation${isMenuOpen ? ' site-navigation--open' : ''}`}
-          aria-label="Navigasi utama"
-        >
           <a
-            href="/"
-            className={currentPath === '/' || currentPath === '' ? 'active' : ''}
-            onClick={() => handleNavClick('/')}
+            href="/how-to-use"
+            title="how to use"
+            onClick={() => handleNavClick('/how-to-use')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: isSolidHeader ? '#ffffff' : 'var(--color-primary, #4e0000)',
+              transition: 'color 200ms ease',
+              cursor: 'pointer'
+            }}
           >
-            Home
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" strokeDasharray="4 4"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <path d="M12 17h.01"></path>
+            </svg>
           </a>
-          <a
-            href="/#edukasi"
-            className={currentPath.includes('#edukasi') ? 'active' : ''}
-            onClick={() => handleNavClick('/#edukasi')}
+
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-expanded={isMenuOpen}
+            aria-controls="site-navigation"
+            aria-label={isMenuOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+            onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
           >
-            Edukasi
-          </a>
-          <a
-            href="/#news"
-            className={currentPath.includes('news') ? 'active' : ''}
-            onClick={() => handleNavClick('/#news')}
-          >
-            News
-          </a>
-          <a
-            href="/about"
-            className={currentPath.includes('/about') ? 'active' : ''}
-            onClick={() => handleNavClick('/about')}
-          >
-            About
-          </a>
-        </nav>
+            <span className="material-symbols-outlined" aria-hidden="true">
+              {isMenuOpen ? 'close' : 'menu'}
+            </span>
+          </button>
+        </div>
       </div>
     </header>
   )

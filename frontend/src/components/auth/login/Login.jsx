@@ -7,7 +7,7 @@ import ForgotPasswordModal from './ForgotPasswordModal.jsx';
 import { isTokenExpired, clearSession } from '../../../utils/auth.js';
 import '../../../styles/auth/shared/auth-form.css';
 
-const fotoHutan = "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop";
+import fotoHutan from '../../../assets/LoginRegisterCard.jpg';
 
 export default function Login() {
   const navigate = useNavigate();
