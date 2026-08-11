@@ -420,7 +420,7 @@ const Travel = () => {
                 {isLoading ? 'Menyimpan...' : 'Simpan'}
               </button>
 
-              <div style={{ textAlign: 'right', fontSize: '0.85rem', paddingRight: '4px', paddingBottom: '80px' }}>
+              <div className="icons8-attribution">
                 <span style={{ color: 'maroon' }}>
                   icons by: <a href="https://icons8.com/icons" target="_blank" rel="noopener noreferrer" style={{ color: 'maroon', textDecoration: 'underline' }}>icons8</a>
                 </span>

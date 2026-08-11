@@ -366,12 +366,15 @@
   box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
 }
 
-/* Icons8 Attribution (Flow layout below content) */
-.icons8-attribution {
-  margin-top: 10px;
-  padding-bottom: 20px;
-  text-align: right;
-  font-size: 0.85rem;
+/* Icons8 Attribution */
+@media (min-width: 769px) {
+  .icons8-attribution {
+    position: fixed;
+    bottom: 20px;
+    left: 25px;
+    font-size: 0.85rem;
+    z-index: 100;
+  }
 }
 
 @media (max-width: 768px) {
@@ -449,8 +452,10 @@
 
   .icons8-attribution {
     position: static;
-    text-align: center;
-    margin-top: 40px;
-    padding-bottom: 10px;
+    text-align: right;
+    padding-right: 4px;
+    padding-bottom: 80px;
+    margin-top: 16px;
+    font-size: 0.85rem;
   }
 }

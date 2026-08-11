@@ -521,7 +521,7 @@ const Analytics = () => {
               </div>
             </div>
 
-            <div style={{ gridColumn: '1 / -1', marginTop: '12px', paddingBottom: '24px', textAlign: 'right', fontSize: '0.85rem' }}>
+            <div className="icons8-attribution" style={{ gridColumn: '1 / -1' }}>
               <span style={{ color: 'maroon' }}>
                 icons by: <a href="https://icons8.com/icons" target="_blank" rel="noopener noreferrer" style={{ color: 'maroon', textDecoration: 'underline' }}>icons8</a>
               </span>
