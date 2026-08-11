@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import AuthController from './src/routes/auth.routes.js';
 import emissionRoutes from './src/routes/emission.routes.js';
@@ -10,6 +11,22 @@ import { ensureSchema } from './src/utils/dbMigration.js';
 dotenv.config();
 
 const app = express();
+
+// Security Headers & Device Permissions Policy (Membatasi hardware yang tidak digunakan)
+app.use(
+  helmet({
+    permissionsPolicy: {
+      features: {
+        camera: ["'none'"],
+        microphone: ["'none'"],
+        geolocation: ["'none'"],
+        payment: ["'none'"],
+        usb: ["'none'"],
+        fullscreen: ["'self'"],
+      },
+    },
+  })
+);
 
 // Middleware Global
 const allowedOrigins = [

@@ -41,3 +41,32 @@ export const verifyAdmin = (req, res, next) => {
     }
   });
 };
+
+// Middleware Proteksi IDOR: Memastikan parameter ID milik user itu sendiri atau diakses oleh ADMIN
+export const verifyUserOrAdminAccess = (req, res, next) => {
+  verifyToken(req, res, () => {
+    const requestedId = req.params.id;
+    const currentUser = req.user;
+
+    // 1. Validasi format UUID untuk mencegah manipulasi ID atau error database
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (requestedId && !uuidRegex.test(requestedId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Format ID pengguna tidak valid!',
+      });
+    }
+
+    const isAdmin = currentUser && currentUser.role?.toUpperCase() === 'ADMIN';
+    const isSelf = currentUser && currentUser.id === requestedId;
+
+    if (isAdmin || isSelf) {
+      next();
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: 'Akses ditolak! Anda tidak memiliki izin mengakses data pengguna lain.',
+      });
+    }
+  });
+};
