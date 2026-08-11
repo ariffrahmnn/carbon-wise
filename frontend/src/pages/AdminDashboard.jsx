@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
-import appIcon from '../assets/Icon.png';
+const appIcon = '/Icon.png';
 import * as XLSX from 'xlsx';
 
 import StudentAnalyticsModal from '../components/admin/StudentAnalyticsModal.jsx';

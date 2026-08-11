@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
-import appIcon from '../assets/Icon.png';
+const appIcon = '/Icon.png';
 import gsap from 'gsap';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer

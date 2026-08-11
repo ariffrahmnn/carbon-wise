@@ -12,22 +12,6 @@ dotenv.config();
 
 const app = express();
 
-// Security Headers & Device Permissions Policy (Membatasi hardware yang tidak digunakan)
-app.use(
-  helmet({
-    permissionsPolicy: {
-      features: {
-        camera: ["'none'"],
-        microphone: ["'none'"],
-        geolocation: ["'none'"],
-        payment: ["'none'"],
-        usb: ["'none'"],
-        fullscreen: ["'self'"],
-      },
-    },
-  })
-);
-
 // Middleware Global
 const allowedOrigins = [
   process.env.CLIENT_URL || 'http://localhost:5173',
@@ -45,6 +29,23 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// Security Headers & Device Permissions Policy (Membatasi hardware yang tidak digunakan)
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    permissionsPolicy: {
+      features: {
+        camera: ["'none'"],
+        microphone: ["'none'"],
+        geolocation: ["'none'"],
+        payment: ["'none'"],
+        usb: ["'none'"],
+        fullscreen: ["'self'"],
+      },
+    },
+  })
+);
 app.use(express.json());
 
 // Route Auth & Admin

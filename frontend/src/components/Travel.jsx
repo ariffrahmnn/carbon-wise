@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Car, Bike, Bus, Footprints, Trash2, Plus, PenTool, Navigation, BarChart3, LogOut, CheckCircle, AlertCircle, X } from 'lucide-react';
-import appIcon from '../assets/Icon.png';
+const appIcon = '/Icon.png';
 
-import busImg from '../assets/bus.jpg';
-import walkImg from '../assets/walk.jpg';
-import carImg from '../assets/car.jpg';
-import motorbikeImg from '../assets/motorbike.jpg';
+const busImg = '/bus.png';
+const walkImg = '/jalan.png';
+const carImg = '/mobil.png';
+const motorbikeImg = '/motor.png';
 
 import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';

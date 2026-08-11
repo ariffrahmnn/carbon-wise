@@ -1,5 +1,5 @@
 import '../styles/shared/footer.css'
-import appIcon from '../assets/Icon.png'
+const appIcon = '/Icon.png';
 
 function Footer() {
   const scrollToTop = () => {

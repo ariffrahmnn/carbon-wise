@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Utensils, Plus, Trash2, PenTool, Navigation, BarChart3, LogOut, CheckCircle, AlertCircle, X } from 'lucide-react';
-import appIcon from '../assets/Icon.png';
-import tofuImg from '../assets/tofu.jpg';
-import tempehImg from '../assets/tempeh.jpg';
-import beefImg from '../assets/beef.jpg';
-import chickenImg from '../assets/chicken.jpg';
-import fishImg from '../assets/fish.jpg';
-import eggImg from '../assets/egg.jpg';
-import riceImg from '../assets/rice.jpg';
-import vegetableImg from '../assets/vegetable.jpg';
+const appIcon = '/Icon.png';
+const tofuImg = '/tahu.png';
+const tempehImg = '/tempeh.png';
+const beefImg = '/daging.png';
+const chickenImg = '/ayam leg.png';
+const fishImg = '/ikan.png';
+const eggImg = '/telur.png';
+const riceImg = '/nasi.png';
+const vegetableImg = '/sayur.png';
 
 import '../styles/headerkalkulator.css';
 import '../styles/shared/footer.css';

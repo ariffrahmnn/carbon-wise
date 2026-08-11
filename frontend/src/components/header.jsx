@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import '../styles/shared/header.css'
-import appIcon from '../assets/Icon.png'
+const appIcon = '/Icon.png';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
