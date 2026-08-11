@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, User, School, GraduationCap, Mail, Calendar, Clock, BarChart3 } from 'lucide-react';
 import gsap from 'gsap';
+import { buildApiUrl } from '../../config/api.js';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';

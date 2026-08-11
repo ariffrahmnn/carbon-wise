@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { buildApiUrl } from '../config/api.js';
 const appIcon = '/Icon.png';
 import * as XLSX from 'xlsx';
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Utensils, Plus, Trash2, PenTool, Navigation, BarChart3, LogOut, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { buildApiUrl } from '../config/api.js';
 const appIcon = '/Icon.png';
 const tofuImg = '/tahu.png';
 const tempehImg = '/tempeh.png';

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
+import { buildApiUrl } from '../../../config/api.js';
 import '../../../styles/auth/login/forgot-password-modal.css';
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {

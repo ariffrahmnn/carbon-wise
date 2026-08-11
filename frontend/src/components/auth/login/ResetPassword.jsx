@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import SuccessModalCard from '../shared/SuccessModalCard.jsx';
+import { buildApiUrl } from '../../../config/api.js';
 import '../../../styles/auth/shared/auth-form.css';
 
 import fotoHutan from '../../../assets/LoginRegisterCard.jpg';

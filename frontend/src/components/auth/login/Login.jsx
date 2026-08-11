@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import SuccessModalCard from '../shared/SuccessModalCard.jsx';
 import ForgotPasswordModal from './ForgotPasswordModal.jsx';
+import { buildApiUrl } from '../../../config/api.js';
 import { isTokenExpired, clearSession } from '../../../utils/auth.js';
 import '../../../styles/auth/shared/auth-form.css';
 
