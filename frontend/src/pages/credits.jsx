@@ -9,6 +9,9 @@ import sampahImg from '../assets/sampah.jpg'
 import mobilListrikImg from '../assets/mobillistrik.jpg'
 import asalKarbonImg from '../assets/asalkarbon.jpg'
 import loginRegisterImg from '../assets/LoginRegister.jpg'
+import loginRegisterCardImg from '../assets/LoginRegisterCard.jpg'
+import aboutHeroImg from '../assets/AboutSrc1.jpg'
+import aboutCoreImg from '../assets/AboutSrc2.jpg'
 
 // Menggunakan gambar yang baru diupload
 import homeVid1Img from '../assets/Footage1.png'
@@ -28,10 +31,11 @@ function Credits() {
       isButton: true
     },
     { 
-      src: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=1000&auto=format&fit=crop", 
+      src: loginRegisterCardImg, 
       title: "Gambar Card Login & Register", 
-      creator: "Nama Kreator", 
-      link: "#"
+      creator: "Siarhei Nester", 
+      link: "https://www.pexels.com/id-id/foto/hutan-pola-pohon-dalam-17287252/",
+      isButton: true
     }
   ];
 
@@ -66,6 +70,23 @@ function Credits() {
     { src: sampahImg, title: "Masalah Sampah", creator: "Antoine Giret", link: "https://unsplash.com/photos/garbage-near-forest-7_TSzqJms4w", isButton: true },
     { src: mobilListrikImg, title: "Mobil Listrik", creator: "Iyan Ryan", link: "https://unsplash.com/photos/a-man-working-on-a-car-engine-in-a-garage-nkdv9cqz9VE", isButton: true },
     { src: asalKarbonImg, title: "Asal Karbon", creator: "Alex Simpson", link: "https://unsplash.com/photos/gray-and-red-factory-building-under-a-calm-blue-sky-9GwMIek9jnY", isButton: true }
+  ];
+
+  const aboutImages = [
+    { 
+      src: aboutHeroImg, 
+      title: "Latar Belakang About Page", 
+      creator: "Maël BALLAND", 
+      link: "https://www.pexels.com/id-id/foto/alam-tangan-bumi-tanah-4484344/",
+      isButton: true
+    },
+    {
+      src: aboutCoreImg,
+      title: "Latar Belakang Core Section",
+      creator: "Jordi Costa Tomé",
+      link: "https://www.pexels.com/id-id/foto/hutan-bersinar-dengan-vegetasi-subur-di-musim-semi-32167957/",
+      isButton: true
+    }
   ];
 
   return (
@@ -123,6 +144,29 @@ function Credits() {
                       </a>
                     ) : (
                       <p>Video oleh <a href={img.link} target="_blank" rel="noopener noreferrer">{img.creator}</a></p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="credits__gallery-section">
+            <h2 className="credits__gallery-title">Aset Gambar Tentang Kami (About)</h2>
+            <div className="credits__gallery">
+              {aboutImages.map((img, index) => (
+                <div key={index} className="credits__gallery-card">
+                  <div className="credits__gallery-image">
+                    <img src={img.src} alt={img.title} loading="lazy" />
+                  </div>
+                  <div className="credits__gallery-info">
+                    <h3>{img.title}</h3>
+                    {img.isButton ? (
+                      <a href={img.link} target="_blank" rel="noopener noreferrer" className="credits__gallery-btn">
+                        Foto oleh {img.creator}
+                      </a>
+                    ) : (
+                      <p>Foto oleh <a href={img.link} target="_blank" rel="noopener noreferrer">{img.creator}</a></p>
                     )}
                   </div>
                 </div>
