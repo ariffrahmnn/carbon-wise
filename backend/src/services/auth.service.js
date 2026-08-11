@@ -90,7 +90,7 @@ class AuthService {
     }
   }
   
-  async forgotPassword(email) {
+  async forgotPassword(email, req = null) {
     const user = await userRepository.findByEmail(email);
     if (!user) {
       throw new Error('Email tidak ditemukan!');
@@ -102,7 +102,8 @@ class AuthService {
       { expiresIn: '15m' }
     );
     const getCleanFrontendUrl = () => {
-      let url = process.env.FRONTEND_URL || 'http://192.168.1.29';
+      let reqOrigin = req?.headers?.origin || (req?.headers?.referer ? new URL(req.headers.referer).origin : null);
+      let url = process.env.FRONTEND_URL || reqOrigin || 'http://192.168.1.29';
       url = url.trim().replace(/\/+$/, '');
       if (url.includes(':5173')) {
         url = url.replace(':5173', '');
