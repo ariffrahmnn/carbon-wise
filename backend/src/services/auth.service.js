@@ -102,7 +102,7 @@ class AuthService {
       { expiresIn: '15m' }
     );
 
-    const resetUrl = `http://192.168.1.29:5173/reset-password?token=${resetToken}`;
+    const resetUrl = `http://192.168.1.29/reset-password?token=${resetToken}`;
 
     const mailOptions = {
       from: `"Carbon Wise Support" <${process.env.EMAIL_USER}>`,
