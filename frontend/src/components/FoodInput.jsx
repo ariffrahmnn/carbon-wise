@@ -425,14 +425,22 @@ const FoodInput = () => {
             </div>
 
             {/* Tombol Simpan */}
-            <button 
-              type="button" 
-              className="btn-submit-all" 
-              onClick={handleSaveData}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '16px' }}>
+              <button 
+                type="button" 
+                className="btn-submit-all" 
+                onClick={handleSaveData}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Menyimpan...' : 'Simpan'}
+              </button>
+
+              <div className="icons8-attribution">
+                <span style={{ color: 'maroon' }}>
+                  icons by: <a href="https://icons8.com/icons" target="_blank" rel="noopener noreferrer" style={{ color: 'maroon', textDecoration: 'underline' }}>icons8</a>
+                </span>
+              </div>
+            </div>
           </div>
         </main>
       </div>

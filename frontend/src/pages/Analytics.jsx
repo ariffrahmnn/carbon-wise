@@ -266,7 +266,7 @@ const Analytics = () => {
             <div className="calc-logo-icon">
               <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
-            <span className="calc-brand-title">CarbonWise</span>
+            <span className="calc-brand-title">CarbonWiseCalc</span>
           </div>
 
           <div className="calc-total-emissions-badge">
@@ -519,6 +519,12 @@ const Analytics = () => {
                   Reset Semua Data
                 </button>
               </div>
+            </div>
+
+            <div className="icons8-attribution" style={{ gridColumn: '1 / -1' }}>
+              <span style={{ color: 'maroon' }}>
+                icons by: <a href="https://icons8.com/icons" target="_blank" rel="noopener noreferrer" style={{ color: 'maroon', textDecoration: 'underline' }}>icons8</a>
+              </span>
             </div>
           </div>
         </main>
