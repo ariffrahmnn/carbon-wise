@@ -257,7 +257,7 @@ const Travel = () => {
             <div className="calc-logo-icon">
               <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
-            <span className="calc-brand-title">CarbonWise</span>
+            <span className="calc-brand-title">CarbonWiseCalc</span>
           </div>
         </div>
 
@@ -410,14 +410,22 @@ const Travel = () => {
             </div>
 
             {/* Tombol Simpan */}
-            <button 
-              type="button" 
-              className="btn-submit-all" 
-              onClick={handleSaveData}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '16px' }}>
+              <button 
+                type="button" 
+                className="btn-submit-all" 
+                onClick={handleSaveData}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Menyimpan...' : 'Simpan'}
+              </button>
+
+              <div style={{ textAlign: 'right', fontSize: '0.85rem', paddingRight: '4px', paddingBottom: '80px' }}>
+                <span style={{ color: 'maroon' }}>
+                  icons by: <a href="https://icons8.com/icons" target="_blank" rel="noopener noreferrer" style={{ color: 'maroon', textDecoration: 'underline' }}>icons8</a>
+                </span>
+              </div>
+            </div>
           </div>
         </main>
       </div>

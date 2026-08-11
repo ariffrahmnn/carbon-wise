@@ -366,6 +366,14 @@
   box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
 }
 
+/* Icons8 Attribution (Flow layout below content) */
+.icons8-attribution {
+  margin-top: 10px;
+  padding-bottom: 20px;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 768px) {
   .main-body {
     flex-direction: column;
@@ -437,5 +445,12 @@
     flex: 1;
     text-align: center;
     padding: 10px 14px;
+  }
+
+  .icons8-attribution {
+    position: static;
+    text-align: center;
+    margin-top: 40px;
+    padding-bottom: 10px;
   }
 }
