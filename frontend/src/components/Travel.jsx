@@ -80,7 +80,7 @@ const Travel = () => {
       try {
         const token = localStorage.getItem('token');
 
-        const response = await fetch('http://localhost:3000/api/v1/emissions/master-items', {
+        const response = await fetch(buildApiUrl('/api/v1/emissions/master-items'), {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ const Travel = () => {
 
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:3000/api/v1/emissions/calculate', {
+      const response = await fetch(buildApiUrl('/api/v1/emissions/calculate'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

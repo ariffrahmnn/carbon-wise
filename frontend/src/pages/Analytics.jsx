@@ -106,7 +106,7 @@ const Analytics = () => {
   const fetchAnalyticsData = useCallback(async (m = selectedMonth, y = selectedYear) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/v1/emissions/analytics?month=${m}&year=${y}`, {
+      const response = await fetch(buildApiUrl(`/api/v1/emissions/analytics?month=${m}&year=${y}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
@@ -153,7 +153,7 @@ const Analytics = () => {
     setIsResettingData(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/v1/emissions/reset', {
+      const response = await fetch(buildApiUrl('/api/v1/emissions/reset'), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

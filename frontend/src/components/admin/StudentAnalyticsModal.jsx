@@ -55,7 +55,7 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/v1/admin/students/${studentId}/analytics`, {
+      const response = await fetch(buildApiUrl(`/api/v1/admin/students/${studentId}/analytics`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();

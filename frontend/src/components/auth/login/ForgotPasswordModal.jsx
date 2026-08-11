@@ -55,7 +55,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
 
     try {
       // Panggilan API backend
-      const response = await fetch('http://localhost:3000/api/v1/auth/forgot-password', {
+      const response = await fetch(buildApiUrl('/api/v1/auth/forgot-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

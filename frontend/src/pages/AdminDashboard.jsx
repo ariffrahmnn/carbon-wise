@@ -67,7 +67,7 @@ const AdminDashboard = () => {
   const fetchDistinctSchools = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/v1/admin/schools', {
+      const response = await fetch(buildApiUrl('/api/v1/admin/schools'), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
         limit: 10
       });
 
-      const response = await fetch(`http://localhost:3000/api/v1/admin/students?${queryParams.toString()}`, {
+      const response = await fetch(buildApiUrl(`/api/v1/admin/students?${queryParams.toString()}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();

@@ -70,7 +70,7 @@ export default function ResetPassword() {
 
     try {
       // Panggilan API backend placeholder (bebas disesuaikan oleh teman Anda)
-      await fetch('http://localhost:3000/api/v1/auth/reset-password', {
+      await fetch(buildApiUrl('/api/v1/auth/reset-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
