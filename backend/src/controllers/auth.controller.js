@@ -89,6 +89,22 @@ class AuthController {
       }
   };
 
+  async resetPassword(req, res) {
+    try {
+      const { token, password } = req.body;
+      const result = await authService.resetPassword(token, password);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error) {
+      return res.status(error.statusCode || 400).json({
+        success: false,
+        message: error.message || 'Gagal memperbarui kata sandi.',
+      });
+    }
+  }
+
   googleRedirect(req, res) {
     return authService.googleAuthRedirect(res);
   }

@@ -127,6 +127,21 @@ class UserRepository {
       throw error;
     }
   }
+
+  async updateUserPassword(id, passwordHash) {
+    try {
+      const sql = `
+        UPDATE users
+        SET password_hash = $2, updated_at = NOW()
+        WHERE id = $1
+        RETURNING id, full_name, email, role
+      `;
+      const { rows } = await query(sql, [id, passwordHash]);
+      return rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default new UserRepository();

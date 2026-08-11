@@ -10,6 +10,7 @@ router.post('/register', authLimiter, (req, res) => authController.register(req,
 // Endpoint: POST /api/v1/auth/login
 router.post('/login', authLimiter, (req, res) => authController.login(req, res));
 router.post('/forgot-password', (req, res) => authController.forgotPassword(req, res));
+router.post('/reset-password', (req, res) => authController.resetPassword(req, res));
 
 // Endpoint Google OAuth 2.0
 router.get('/google', (req, res) => authController.googleRedirect(req, res));
