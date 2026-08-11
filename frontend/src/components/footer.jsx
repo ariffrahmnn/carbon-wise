@@ -48,7 +48,11 @@ function Footer() {
         </div>
 
         <div className="site-footer__bottom">
-          <p>&copy; 2026 CarbonWiseCalc- One step closer to a greener sky.</p>
+          <p>
+            &copy; 2026 CarbonWiseCalc- One step closer to a greener sky.
+            <span style={{ margin: '0 8px' }}>|</span>
+            icons by: <a href="https://icons8.com/icons" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>icons8</a>
+          </p>
           <button type="button" onClick={scrollToTop}>
             <span>Back to Top</span>
             <span className="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
