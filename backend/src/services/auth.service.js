@@ -103,7 +103,7 @@ class AuthService {
     );
     const getCleanFrontendUrl = () => {
       let reqOrigin = req?.headers?.origin || (req?.headers?.referer ? new URL(req.headers.referer).origin : null);
-      let url = process.env.FRONTEND_URL || reqOrigin || 'http://192.168.1.29';
+      let url = process.env.FRONTEND_URL || reqOrigin || 'https://carbonwisecalc.com';
       url = url.trim().replace(/\/+$/, '');
       if (url.includes(':5173')) {
         url = url.replace(':5173', '');
@@ -144,8 +144,8 @@ class AuthService {
 
   googleAuthRedirect(res) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://192.168.1.29:3000/api/v1/auth/google/callback';
-    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
+    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'https://carbonwisecalc.com/api/v1/auth/google/callback';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://carbonwisecalc.com';
 
     if (!clientId || clientId === 'your_google_client_id_here') {
       return res.status(400).send(`
@@ -166,9 +166,9 @@ class AuthService {
   async handleGoogleCallback(code, res) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'http://192.168.1.29:3000/api/v1/auth/google/callback';
+    const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'https://carbonwisecalc.com/api/v1/auth/google/callback';
     
-    const frontendUrl = process.env.FRONTEND_URL || 'http://192.168.1.29';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://carbonwisecalc.com';
 
     if (!code) {
       return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Kode otorisasi Google tidak ditemukan!')}`);

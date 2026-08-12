@@ -13,19 +13,18 @@ dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
+  process.env.CLIENT_URL || 'https://carbonwisecalc.com',
+  'https://carbonwisecalc.com',
+  'https://www.carbonwisecalc.com',
+  'http://localhost:5173',
   'http://localhost:3000',
-  'http://127.0.0.1:5173',
-  'http://192.168.1.29',
-  'http://192.168.1.29:3000',
-  'http://192.168.1.29.nip.io',
-  'http://192.168.1.29.nip.io:3000'
+  'http://127.0.0.1:5173'
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl) or matching allowedOrigins / .nip.io
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.nip.io')) {
+    // Allow requests with no origin (like mobile apps or curl) or matching allowedOrigins / .carbonwisecalc.com
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.carbonwisecalc.com')) {
       return callback(null, true);
     }
     return callback(new Error('Origin tidak diizinkan oleh CORS')); // Tolak origin tidak dikenal
