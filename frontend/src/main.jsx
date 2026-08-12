@@ -64,7 +64,7 @@ const PageLoader = () => (
         animation: 'spin 0.8s linear infinite'
       }} />
       <span style={{ color: '#4a0e17', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em' }}>
-        Memuat Halaman CarbonWise...
+        Memuat Halaman CarbonWiseCalc...
       </span>
     </div>
     <style>{`
