@@ -159,7 +159,7 @@ const AdminDashboard = () => {
             <div className="admin-brand-icon">
               <img src={appIcon} alt="CarbonWise Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
             </div>
-            <span className="admin-brand-title">CarbonWise</span>
+            <span className="admin-brand-title">CarbonWiseCalc</span>
           </div>
 
           {/* PROFIL ADMIN & LOGOUT DIDEKATKAN DI SISI KANAN */}
