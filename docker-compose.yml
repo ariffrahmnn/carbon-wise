@@ -7,6 +7,7 @@ services:
     container_name: carbonwise_postgres
     restart: always
     environment:
+      TZ: Asia/Jakarta
       POSTGRES_USER: ${POSTGRES_USER:-arifrahmanmuda}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-4r1fsuk4d4d44y4m100gr}
       POSTGRES_DB: ${POSTGRES_DB:-db_carbonwise}
@@ -25,6 +26,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
+      - TZ=Asia/Jakarta
       - PORT=3000
       - DATABASE_URL=postgres://${POSTGRES_USER:-arifrahmanmuda}:${POSTGRES_PASSWORD:-4r1fsuk4d4d44y4m100gr}@postgres:5432/${POSTGRES_DB:-db_carbonwise}
       - FRONTEND_URL=${FRONTEND_URL:-https://carbonwisecalc.com}
