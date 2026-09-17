@@ -56,20 +56,20 @@ class AdminRepository {
       LEFT JOIN (
         SELECT user_id, SUM(total_batch_co2) AS total_daily
         FROM calculation_batches
-        WHERE DATE(created_at) = CURRENT_DATE
+        WHERE DATE(created_at AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE
         GROUP BY user_id
       ) daily ON u.id = daily.user_id
       LEFT JOIN (
         SELECT user_id, SUM(total_batch_co2) AS total_weekly
         FROM calculation_batches
-        WHERE created_at >= CURRENT_DATE - INTERVAL '6 days'
+        WHERE (created_at AT TIME ZONE 'Asia/Jakarta')::DATE >= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '6 days'
         GROUP BY user_id
       ) weekly ON u.id = weekly.user_id
       LEFT JOIN (
         SELECT user_id, SUM(total_batch_co2) AS total_monthly
         FROM calculation_batches
-        WHERE EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE)
-          AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
+        WHERE EXTRACT(MONTH FROM (created_at AT TIME ZONE 'Asia/Jakarta')) = EXTRACT(MONTH FROM (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'))
+          AND EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Asia/Jakarta')) = EXTRACT(YEAR FROM (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'))
         GROUP BY user_id
       ) monthly ON u.id = monthly.user_id
       ${whereClause}
@@ -121,35 +121,35 @@ class AdminRepository {
 
     const dailyQuery = `
       SELECT 
-        TO_CHAR(created_at, 'HH24:MI') AS formatted_time,
-        TRIM(TO_CHAR(created_at, 'Day')) AS day_name,
-        TO_CHAR(created_at, 'DD Mon YYYY') AS formatted_date,
+        TO_CHAR(created_at AT TIME ZONE 'Asia/Jakarta', 'HH24:MI') AS formatted_time,
+        TRIM(TO_CHAR(created_at AT TIME ZONE 'Asia/Jakarta', 'Day')) AS day_name,
+        TO_CHAR(created_at AT TIME ZONE 'Asia/Jakarta', 'DD Mon YYYY') AS formatted_date,
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
-      WHERE user_id = $1 AND DATE(created_at) = CURRENT_DATE 
+      WHERE user_id = $1 AND DATE(created_at AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE 
       GROUP BY created_at, formatted_time, day_name, formatted_date 
       ORDER BY created_at ASC
     `;
 
     const weeklyQuery = `
       SELECT 
-        TRIM(TO_CHAR(created_at, 'Day')) AS day_name, 
-        DATE(created_at) AS date, 
+        TRIM(TO_CHAR(created_at AT TIME ZONE 'Asia/Jakarta', 'Day')) AS day_name, 
+        DATE(created_at AT TIME ZONE 'Asia/Jakarta') AS date, 
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
-      WHERE user_id = $1 AND created_at >= CURRENT_DATE - INTERVAL '6 days' 
+      WHERE user_id = $1 AND (created_at AT TIME ZONE 'Asia/Jakarta')::DATE >= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '6 days' 
       GROUP BY date, day_name 
       ORDER BY date ASC
     `;
 
     const monthlyQuery = `
       SELECT 
-        'Week ' || CEIL(EXTRACT(DAY FROM created_at) / 7.0) AS week, 
+        'Week ' || CEIL(EXTRACT(DAY FROM (created_at AT TIME ZONE 'Asia/Jakarta')) / 7.0) AS week, 
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
       WHERE user_id = $1 
-        AND EXTRACT(MONTH FROM created_at) = $2 
-        AND EXTRACT(YEAR FROM created_at) = $3 
+        AND EXTRACT(MONTH FROM (created_at AT TIME ZONE 'Asia/Jakarta')) = $2 
+        AND EXTRACT(YEAR FROM (created_at AT TIME ZONE 'Asia/Jakarta')) = $3 
       GROUP BY week 
       ORDER BY week ASC
     `;
