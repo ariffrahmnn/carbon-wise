@@ -141,6 +141,43 @@ class AuthService {
     return { message: 'Link reset password telah dikirim ke email Anda!' };
   }
 
+  async resetPassword(token, password) {
+    if (!token) {
+      const error = new Error('Token reset tidak ditemukan.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!password || password.length < 6) {
+      const error = new Error('Kata sandi baru minimal 6 karakter.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_RESET_SECRET || process.env.JWT_SECRET);
+    } catch (err) {
+      const error = new Error('Link reset password sudah kedaluwarsa atau tidak valid.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const user = await userRepository.findByEmail(decoded.email);
+    if (!user) {
+      const error = new Error('Pengguna tidak ditemukan.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const saltRounds = 10;
+    const newPasswordHash = await bcrypt.hash(password, saltRounds);
+
+    await userRepository.updateUserPassword(user.id, newPasswordHash);
+
+    return { message: 'Kata sandi berhasil diperbarui! Silakan masuk dengan kata sandi baru Anda.' };
+  }
+
   googleAuthRedirect(res) {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const redirectUri = process.env.GOOGLE_CALLBACK_URL || 'https://carbonwisecalc.com/api/v1/auth/google/callback';
