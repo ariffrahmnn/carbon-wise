@@ -32,8 +32,8 @@ export const calculateEmission = async (req, res) => {
 export const getAnalytics = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { month, year } = req.query;
-    const analyticsData = await emissionService.getUserAnalytics(userId, month, year);
+    const { month, year, weekOffset, dayOffset } = req.query;
+    const analyticsData = await emissionService.getUserAnalytics(userId, month, year, weekOffset, dayOffset);
 
     res.status(200).json({
       success: true,

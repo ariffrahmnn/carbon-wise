@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2 } from 'lucide-react';
+import { BarChart3, Navigation, LogOut, PenTool, Sparkles, Heart, CheckCircle2, Trash2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { buildApiUrl } from '../config/api.js';
 const appIcon = '/Icon.png';
 import gsap from 'gsap';
@@ -24,7 +24,7 @@ const MONTH_NAMES = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
-// Sub-komponen Custom Dot (Didefinisikan di luar komponen utama agar tidak re-create pada setiap render)
+// Sub-komponen Custom Dot
 const CustomDot = React.memo(({ cx, cy, index, dailyLength, onClickDot, payload }) => {
   const isLast = index === dailyLength - 1;
   
@@ -46,7 +46,7 @@ const CustomDot = React.memo(({ cx, cy, index, dailyLength, onClickDot, payload 
   );
 });
 
-// Sub-komponen Custom Tooltip (Didefinisikan di luar komponen utama)
+// Sub-komponen Custom Tooltip Harian
 const CustomDailyTooltip = React.memo(({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -73,6 +73,32 @@ const CustomDailyTooltip = React.memo(({ active, payload }) => {
   return null;
 });
 
+// Sub-komponen Custom Tooltip Mingguan (Hari + Tanggal + Bulan + Tahun)
+const CustomWeeklyTooltip = React.memo(({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const dayName = data.day_name || '';
+    const formattedDate = data.formatted_date || data.date || '';
+    return (
+      <div style={{
+        background: '#ffffff',
+        padding: '10px 14px',
+        border: '1px solid #E0E0E0',
+        borderRadius: '10px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+      }}>
+        <p style={{ margin: 0, fontWeight: 'bold', color: '#4a0e17', fontSize: '0.95rem' }}>
+          📅 {dayName} {formattedDate ? `(${formattedDate})` : ''}
+        </p>
+        <p style={{ margin: '4px 0 0 0', color: '#555', fontSize: '0.9rem' }}>
+          Total Emisi: <strong style={{ color: '#4a0e17' }}>{parseFloat(data.total).toFixed(2)} kg CO₂</strong>
+        </p>
+      </div>
+    );
+  }
+  return null;
+});
+
 const Analytics = () => {
   const navigate = useNavigate();
   const containerRef = useRef(null);
@@ -86,6 +112,8 @@ const Analytics = () => {
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [dayOffset, setDayOffset] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBatchBreakdown, setSelectedBatchBreakdown] = useState(null);
   const [selectedBatchTime, setSelectedBatchTime] = useState(null);
@@ -104,10 +132,10 @@ const Analytics = () => {
     }
   }, []);
 
-  const fetchAnalyticsData = useCallback(async (m = selectedMonth, y = selectedYear) => {
+  const fetchAnalyticsData = useCallback(async (m = selectedMonth, y = selectedYear, w = weekOffset, d = dayOffset) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(buildApiUrl(`/api/v1/emissions/analytics?month=${m}&year=${y}`), {
+      const response = await fetch(buildApiUrl(`/api/v1/emissions/analytics?month=${m}&year=${y}&weekOffset=${w}&dayOffset=${d}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
@@ -119,7 +147,6 @@ const Analytics = () => {
           todayBreakdown: result.data.todayBreakdown || []
         });
         
-        // GSAP Animation: Animasi elemen naik perlahan
         gsap.fromTo(
           '.chart-card',
           { y: 40, opacity: 0 },
@@ -129,11 +156,11 @@ const Analytics = () => {
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
     }
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, weekOffset, dayOffset]);
 
   useEffect(() => {
-    fetchAnalyticsData(selectedMonth, selectedYear);
-  }, [selectedMonth, selectedYear, fetchAnalyticsData]);
+    fetchAnalyticsData(selectedMonth, selectedYear, weekOffset, dayOffset);
+  }, [selectedMonth, selectedYear, weekOffset, dayOffset, fetchAnalyticsData]);
 
   const userName = user?.fullName || user?.name || user?.username || 'User';
   const userInitial = userName ? userName.charAt(0).toUpperCase() : 'U';
@@ -323,14 +350,91 @@ const Analytics = () => {
             Kembali ke Beranda
           </button>
 
-          <h1 className="page-title" style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px' }}>Analisis Karbon</h1>
-          <p className="page-subtitle" style={{ color: '#666', marginBottom: '30px' }}>Pantau jejak emisi harian, mingguan, dan bulanan Anda di sini.</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h1 className="page-title" style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px' }}>Analisis Karbon</h1>
+              <p className="page-subtitle" style={{ color: '#666', margin: 0 }}>Pantau jejak emisi harian, mingguan, dan bulanan Anda di sini.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleExportPDF}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                backgroundColor: '#4a0e17',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '12px',
+                fontWeight: 'bold',
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(74, 14, 23, 0.25)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>download</span>
+              Unduh Laporan PDF
+            </button>
+          </div>
           
           <div className="charts-grid">
             {/* 1. Daily Line Chart */}
             <div className="chart-card">
-              <h3>Grafik Harian (Hari Ini)</h3>
-              <p className="chart-desc">Pergerakan emisi Anda per jam. Klik pada titik mana saja di grafik untuk melihat detail komposisi emisi!</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '8px' }}>
+                <div>
+                  <h3 style={{ margin: 0, color: '#4a0e17' }}>
+                    Grafik Harian {dailyList.length > 0 && dailyList[0].formatted_date ? `(${dailyList[0].day_name}, ${dailyList[0].formatted_date})` : dayOffset === 0 ? '(Hari Ini)' : `(H-${dayOffset})`}
+                  </h3>
+                  <p className="chart-desc" style={{ margin: '4px 0 0 0' }}>Pergerakan emisi Anda per jam. Klik pada titik mana saja di grafik untuk melihat detail komposisi emisi!</p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setDayOffset(prev => prev + 1)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #4a0e17',
+                      background: '#ffffff',
+                      color: '#4a0e17',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.85rem'
+                    }}
+                    title="Lihat 1 hari sebelumnya"
+                  >
+                    <ChevronLeft size={16} /> Hari Sebelumnya
+                  </button>
+                  {dayOffset > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setDayOffset(prev => Math.max(0, prev - 1))}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #4a0e17',
+                        background: '#4a0e17',
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                      title="Lihat hari yang lebih baru"
+                    >
+                      Hari Berikutnya <ChevronRight size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="chart-container">
                 {dailyList.length > 0 ? (
                   <ResponsiveContainer width="100%" height={320}>
@@ -392,8 +496,60 @@ const Analytics = () => {
 
             {/* 2. Weekly Bar Chart & Friendly Compliment */}
             <div className="chart-card">
-              <h3>Grafik Mingguan (7 Hari Terakhir)</h3>
-              <p className="chart-desc">Rekap total emisi harian Anda dalam satu minggu ke belakang.</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '8px' }}>
+                <div>
+                  <h3 style={{ margin: 0, color: '#4a0e17' }}>
+                    Grafik Mingguan {weeklyList.length > 0 && weeklyList[0].formatted_date && weeklyList[weeklyList.length - 1].formatted_date ? `(${weeklyList[0].formatted_date} - ${weeklyList[weeklyList.length - 1].formatted_date})` : '(7 Hari Terakhir)'}
+                  </h3>
+                  <p className="chart-desc" style={{ margin: '4px 0 0 0' }}>Rekap total emisi harian Anda dalam satu minggu ke belakang.</p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setWeekOffset(prev => prev + 1)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #4a0e17',
+                      background: '#ffffff',
+                      color: '#4a0e17',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.85rem'
+                    }}
+                    title="Lihat 1 minggu sebelumnya"
+                  >
+                    <ChevronLeft size={16} /> Minggu Sebelumnya
+                  </button>
+                  {weekOffset > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setWeekOffset(prev => Math.max(0, prev - 1))}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #4a0e17',
+                        background: '#4a0e17',
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                      title="Lihat minggu yang lebih baru"
+                    >
+                      Minggu Berikutnya <ChevronRight size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="chart-container">
                 {weeklyList.length > 0 ? (
                   <ResponsiveContainer width="100%" height={320}>
@@ -401,7 +557,7 @@ const Analytics = () => {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
                       <XAxis dataKey="day_name" stroke="#757575" />
                       <YAxis stroke="#757575" />
-                      <RechartsTooltip formatter={(value) => `${parseFloat(value).toFixed(2)} kg CO₂`} />
+                      <RechartsTooltip content={<CustomWeeklyTooltip />} />
                       <Bar dataKey="total" fill="#4a0e17" maxBarSize={45} radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>

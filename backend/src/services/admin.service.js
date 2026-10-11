@@ -9,8 +9,8 @@ class AdminService {
     return await adminRepository.getDistinctSchools();
   }
 
-  async getStudentAnalytics(userId, month, year) {
-    return await adminRepository.getStudentAnalytics(userId, month, year);
+  async getStudentAnalytics(userId, month, year, weekOffset, dayOffset) {
+    return await adminRepository.getStudentAnalytics(userId, month, year, weekOffset, dayOffset);
   }
 }
 

@@ -34,6 +34,7 @@ const AdminDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Data profil Admin dari localStorage
   const savedUser = localStorage.getItem('user');
@@ -116,29 +117,53 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
-  // Fitur Export ke Excel (SheetJS XLSX)
-  const handleExportExcel = () => {
-    if (students.length === 0) {
-      alert('Tidak ada data rekor siswa untuk diekspor!');
-      return;
+  // Fitur Export ke Excel Seluruh Data (SheetJS XLSX)
+  const handleExportExcel = async () => {
+    if (isExporting) return;
+    try {
+      setIsExporting(true);
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams({
+        search: debouncedSearch,
+        school: selectedSchool,
+        page: 1,
+        limit: 99999
+      });
+
+      const response = await fetch(buildApiUrl(`/api/v1/admin/students?${queryParams.toString()}`), {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const result = await response.json();
+
+      const exportData = result.data || [];
+
+      if (exportData.length === 0) {
+        alert('Tidak ada data rekor siswa untuk diekspor!');
+        return;
+      }
+
+      const excelData = exportData.map((s, idx) => ({
+        'NO': idx + 1,
+        'NAMA LENGKAP': s.full_name,
+        'SEKOLAH': s.school_name || '-',
+        'KELAS': s.class_grade || '-',
+        'EMAIL': s.email,
+        'PER HARI (kg CO2)': parseFloat(s.total_daily || 0).toFixed(2),
+        'PER MINGGU (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(2),
+        'PER BULAN (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(2)
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekor_Siswa');
+
+      XLSX.writeFile(workbook, `Rekor_Emisi_Siswa_CarbonWiseCalc_Semua_Data.xlsx`);
+    } catch (err) {
+      console.error('Failed to export student records to Excel:', err);
+      alert('Gagal mengunduh file Excel.');
+    } finally {
+      setIsExporting(false);
     }
-
-    const excelData = students.map((s, idx) => ({
-      'NO': idx + 1 + (currentPage - 1) * pagination.limit,
-      'NAMA LENGKAP': s.full_name,
-      'SEKOLAH': s.school_name || '-',
-      'KELAS': s.class_grade || '-',
-      'EMAIL': s.email,
-      'PER HARI (kg CO2)': parseFloat(s.total_daily || 0).toFixed(2),
-      'PER MINGGU (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(2),
-      'PER BULAN (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(2)
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekor_Siswa');
-
-    XLSX.writeFile(workbook, `Rekor_Emisi_Siswa_CarbonWiseCalc_Hal_${currentPage}.xlsx`);
   };
 
   const handleOpenStudentModal = (student) => {
@@ -263,9 +288,11 @@ const AdminDashboard = () => {
                 type="button" 
                 className="admin-export-btn"
                 onClick={handleExportExcel}
+                disabled={isExporting}
+                style={{ opacity: isExporting ? 0.7 : 1, cursor: isExporting ? 'wait' : 'pointer' }}
               >
                 <FileSpreadsheet size={16} />
-                <span>Import Excel</span>
+                <span>{isExporting ? 'Mengekspor...' : 'Ekspor Excel'}</span>
               </button>
             </div>
           </div>

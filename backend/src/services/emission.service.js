@@ -64,8 +64,8 @@ class EmissionService {
       }))
     };
   }
-  async getUserAnalytics(userId, targetMonth, targetYear) {
-    return await emissionRepository.getUserAnalytics(userId, targetMonth, targetYear);
+  async getUserAnalytics(userId, targetMonth, targetYear, weekOffset, dayOffset) {
+    return await emissionRepository.getUserAnalytics(userId, targetMonth, targetYear, weekOffset, dayOffset);
   }
 
   async resetUserEmissions(userId) {

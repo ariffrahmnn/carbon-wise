@@ -4,3 +4,5 @@
 .DS_Store
 schema.sql
 seed.sql
+generate_seed.js
+clean_seed.js

@@ -38,8 +38,8 @@ export const getDistinctSchools = async (req, res) => {
 export const getStudentAnalytics = async (req, res) => {
   try {
     const { id } = req.params;
-    const { month, year } = req.query;
-    const analytics = await adminService.getStudentAnalytics(id, month, year);
+    const { month, year, weekOffset, dayOffset } = req.query;
+    const analytics = await adminService.getStudentAnalytics(id, month, year, weekOffset, dayOffset);
 
     res.status(200).json({
       success: true,

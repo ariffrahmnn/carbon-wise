@@ -67,19 +67,32 @@ export default function ResetPassword() {
       return;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+      setErrorMsg('Token reset tidak ditemukan. Silakan gunakan link yang dikirimkan melalui email.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Panggilan API backend placeholder (bebas disesuaikan oleh teman Anda)
-      await fetch(buildApiUrl('/api/v1/auth/reset-password'), {
+      const response = await fetch(buildApiUrl('/api/v1/auth/reset-password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      }).catch(() => {});
+        body: JSON.stringify({ token, password })
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Gagal memperbarui kata sandi.');
+      }
 
       setShowSuccessModal(true);
     } catch (err) {
-      setErrorMsg('Gagal memperbarui kata sandi. Silakan coba lagi.');
+      setErrorMsg(err.message || 'Gagal memperbarui kata sandi. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }

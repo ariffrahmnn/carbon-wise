@@ -109,10 +109,13 @@ class AdminRepository {
   }
 
   // Mengambil data analitik grafik harian, mingguan, dan bulanan siswa tertentu untuk modal admin
-  async getStudentAnalytics(userId, targetMonth, targetYear) {
+  async getStudentAnalytics(userId, targetMonth, targetYear, weekOffset = 0, dayOffset = 0) {
     const now = new Date();
     const month = targetMonth ? parseInt(targetMonth) : now.getMonth() + 1;
     const year = targetYear ? parseInt(targetYear) : now.getFullYear();
+    const offset = parseInt(weekOffset) || 0;
+    const offsetDays = offset * 7;
+    const dOffset = parseInt(dayOffset) || 0;
 
     // Ambil detail profil siswa
     const userQuery = `SELECT id, full_name, email, school_name, class_grade FROM users WHERE id = $1`;
@@ -126,7 +129,8 @@ class AdminRepository {
         TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'DD Mon YYYY') AS formatted_date,
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
-      WHERE user_id = $1 AND DATE((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE 
+      WHERE user_id = $1 
+        AND DATE((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${dOffset} days' 
       GROUP BY created_at, formatted_time, day_name, formatted_date 
       ORDER BY created_at ASC
     `;
@@ -135,10 +139,13 @@ class AdminRepository {
       SELECT 
         TRIM(TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'Day')) AS day_name, 
         DATE((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') AS date, 
+        TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'DD Mon YYYY') AS formatted_date,
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
-      WHERE user_id = $1 AND ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')::DATE >= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '6 days' 
-      GROUP BY date, day_name 
+      WHERE user_id = $1 
+        AND ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')::DATE >= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${offsetDays + 6} days'
+        AND ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')::DATE <= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${offsetDays} days'
+      GROUP BY date, day_name, formatted_date 
       ORDER BY date ASC
     `;
 

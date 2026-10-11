@@ -1,10 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, User, School, GraduationCap, Mail, Calendar, Clock, BarChart3 } from 'lucide-react';
+import { X, User, School, GraduationCap, Mail, Calendar, Clock, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
 import { buildApiUrl } from '../../config/api.js';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
+
+// Sub-komponen Custom Tooltip Mingguan untuk Admin
+const CustomWeeklyTooltip = React.memo(({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const dayName = data.day_name || '';
+    const formattedDate = data.formatted_date || data.date || '';
+    return (
+      <div style={{
+        background: '#ffffff',
+        padding: '10px 14px',
+        border: '1px solid #E0E0E0',
+        borderRadius: '10px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)'
+      }}>
+        <p style={{ margin: 0, fontWeight: 'bold', color: '#4a0e17', fontSize: '0.92rem' }}>
+          📅 {dayName} {formattedDate ? `(${formattedDate})` : ''}
+        </p>
+        <p style={{ margin: '4px 0 0 0', color: '#555', fontSize: '0.88rem' }}>
+          Total Emisi: <strong style={{ color: '#4a0e17' }}>{parseFloat(data.total).toFixed(2)} kg CO₂</strong>
+        </p>
+      </div>
+    );
+  }
+  return null;
+});
 
 const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -13,12 +39,16 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
     monthly: []
   });
   const [loading, setLoading] = useState(false);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [dayOffset, setDayOffset] = useState(0);
 
   const overlayRef = useRef(null);
   const contentRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
+      setWeekOffset(0);
+      setDayOffset(0);
       const ctx = gsap.context(() => {
         gsap.fromTo(
           overlayRef.current,
@@ -48,15 +78,15 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
 
   useEffect(() => {
     if (isOpen && studentProfile?.id) {
-      fetchStudentAnalytics(studentProfile.id);
+      fetchStudentAnalytics(studentProfile.id, weekOffset, dayOffset);
     }
-  }, [isOpen, studentProfile]);
+  }, [isOpen, studentProfile, weekOffset, dayOffset]);
 
-  const fetchStudentAnalytics = async (studentId) => {
+  const fetchStudentAnalytics = async (studentId, wOffset = 0, dOffset = 0) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(buildApiUrl(`/api/v1/admin/students/${studentId}/analytics`), {
+      const response = await fetch(buildApiUrl(`/api/v1/admin/students/${studentId}/analytics?weekOffset=${wOffset}&dayOffset=${dOffset}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
@@ -75,6 +105,8 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
   };
 
   if (!isOpen || !studentProfile) return null;
+
+  const weeklyList = analyticsData.weekly || [];
 
   return (
     <div 
@@ -163,12 +195,63 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {/* 1. Daily Line Chart */}
             <div style={{ background: '#fafafa', padding: '20px', borderRadius: '14px', border: '1px solid #eee' }}>
-              <h4 style={{ margin: '0 0 6px 0', color: '#4a0e17', fontSize: '1.05rem' }}>
-                1. Grafik Emisi Harian (Hari Ini)
-              </h4>
-              <p style={{ margin: '0 0 14px 0', fontSize: '0.85rem', color: '#666' }}>
-                Tren pergerakan emisi CO₂ per jam input siswa di hari ini.
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', color: '#4a0e17', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Clock size={18} /> 
+                    1. Grafik Emisi Harian {analyticsData.daily.length > 0 && analyticsData.daily[0].formatted_date ? `(${analyticsData.daily[0].day_name}, ${analyticsData.daily[0].formatted_date})` : dayOffset === 0 ? '(Hari Ini)' : `(H-${dayOffset})`}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+                    Tren pergerakan emisi CO₂ per jam input siswa di hari ini.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setDayOffset(prev => prev + 1)}
+                    style={{
+                      padding: '5px 10px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #4a0e17',
+                      background: '#ffffff',
+                      color: '#4a0e17',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.8rem'
+                    }}
+                    title="Lihat 1 hari sebelumnya"
+                  >
+                    <ChevronLeft size={15} /> Hari Sebelumnya
+                  </button>
+                  {dayOffset > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setDayOffset(prev => Math.max(0, prev - 1))}
+                      style={{
+                        padding: '5px 10px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #4a0e17',
+                        background: '#4a0e17',
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.8rem'
+                      }}
+                      title="Lihat hari yang lebih baru"
+                    >
+                      Hari Berikutnya <ChevronRight size={15} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {analyticsData.daily.length > 0 ? (
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={analyticsData.daily} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
@@ -180,30 +263,81 @@ const StudentAnalyticsModal = ({ isOpen, onClose, studentProfile }) => {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <p style={{ textAlign: 'center', padding: '20px', color: '#999', fontSize: '0.88rem' }}>Siswa ini belum memiliki masukan emisi di hari ini.</p>
+                <p style={{ textAlign: 'center', padding: '20px', color: '#999', fontSize: '0.88rem' }}>Siswa ini belum memiliki masukan emisi pada tanggal ini.</p>
               )}
             </div>
 
-            {/* 2. Weekly Bar Chart */}
+            {/* 2. Weekly Bar Chart dengan Navigasi Panah & Rentang Tanggal */}
             <div style={{ background: '#fafafa', padding: '20px', borderRadius: '14px', border: '1px solid #eee' }}>
-              <h4 style={{ margin: '0 0 6px 0', color: '#4a0e17', fontSize: '1.05rem' }}>
-                2. Grafik Emisi Mingguan (7 Hari Terakhir)
-              </h4>
-              <p style={{ margin: '0 0 14px 0', fontSize: '0.85rem', color: '#666' }}>
-                Rekapitulasi total emisi per hari dalam 7 hari terakhir.
-              </p>
-              {analyticsData.weekly.length > 0 ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', color: '#4a0e17', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Calendar size={18} /> 
+                    2. Grafik Emisi Mingguan {weeklyList.length > 0 && weeklyList[0].formatted_date && weeklyList[weeklyList.length - 1].formatted_date ? `(${weeklyList[0].formatted_date} - ${weeklyList[weeklyList.length - 1].formatted_date})` : '(7 Hari Terakhir)'}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+                    Rekapitulasi total emisi per hari dalam rentang 1 minggu.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setWeekOffset(prev => prev + 1)}
+                    style={{
+                      padding: '5px 10px',
+                      borderRadius: '8px',
+                      border: '1.5px solid #4a0e17',
+                      background: '#ffffff',
+                      color: '#4a0e17',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.8rem'
+                    }}
+                    title="Lihat 1 minggu sebelumnya"
+                  >
+                    <ChevronLeft size={15} /> Minggu Sebelumnya
+                  </button>
+                  {weekOffset > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setWeekOffset(prev => Math.max(0, prev - 1))}
+                      style={{
+                        padding: '5px 10px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #4a0e17',
+                        background: '#4a0e17',
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.8rem'
+                      }}
+                      title="Lihat minggu yang lebih baru"
+                    >
+                      Minggu Berikutnya <ChevronRight size={15} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {weeklyList.length > 0 ? (
                 <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={analyticsData.weekly} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+                  <BarChart data={weeklyList} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
                     <XAxis dataKey="day_name" stroke="#757575" style={{ fontSize: '11px' }} />
                     <YAxis stroke="#757575" style={{ fontSize: '11px' }} />
-                    <RechartsTooltip formatter={(val) => `${parseFloat(val).toFixed(2)} kg CO₂`} />
+                    <RechartsTooltip content={<CustomWeeklyTooltip />} />
                     <Bar dataKey="total" fill="#4a0e17" maxBarSize={40} radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p style={{ textAlign: 'center', padding: '20px', color: '#999', fontSize: '0.88rem' }}>Data emisi mingguan masih kosong.</p>
+                <p style={{ textAlign: 'center', padding: '20px', color: '#999', fontSize: '0.88rem' }}>Data emisi minggu ini kosong.</p>
               )}
             </div>
 
