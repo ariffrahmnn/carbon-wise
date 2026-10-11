@@ -90,39 +90,39 @@ class EmissionRepository {
     const dailyQuery = `
       SELECT 
         id AS batch_id,
-        TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'HH24:MI') AS formatted_time,
-        TRIM(TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'Day')) AS day_name,
-        TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'DD Mon YYYY') AS formatted_date,
+        TO_CHAR(created_at, 'HH24:MI') AS formatted_time,
+        TRIM(TO_CHAR(created_at, 'Day')) AS day_name,
+        TO_CHAR(created_at, 'DD Mon YYYY') AS formatted_date,
         created_at AS time_exact,
         total_batch_co2 AS total 
       FROM calculation_batches 
       WHERE user_id = $1 
-        AND DATE((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${dOffset} days' 
+        AND DATE(created_at) = CURRENT_DATE - INTERVAL '${dOffset} days' 
       ORDER BY created_at ASC
     `;
 
     const weeklyQuery = `
       SELECT 
-        TRIM(TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'Day')) AS day_name, 
-        DATE((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') AS date, 
-        TO_CHAR((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta', 'DD Mon YYYY') AS formatted_date,
+        TRIM(TO_CHAR(created_at, 'Day')) AS day_name, 
+        DATE(created_at) AS date, 
+        TO_CHAR(created_at, 'DD Mon YYYY') AS formatted_date,
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
       WHERE user_id = $1 
-        AND ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')::DATE >= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${offsetDays + 6} days'
-        AND ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')::DATE <= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${offsetDays} days'
+        AND DATE(created_at) >= CURRENT_DATE - INTERVAL '${offsetDays + 6} days'
+        AND DATE(created_at) <= CURRENT_DATE - INTERVAL '${offsetDays} days'
       GROUP BY date, day_name, formatted_date 
       ORDER BY date ASC
     `;
 
     const monthlyQuery = `
       SELECT 
-        'Week ' || CEIL(EXTRACT(DAY FROM ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')) / 7.0) AS week, 
+        'Week ' || CEIL(EXTRACT(DAY FROM created_at) / 7.0) AS week, 
         SUM(total_batch_co2) AS total 
       FROM calculation_batches 
       WHERE user_id = $1 
-        AND EXTRACT(MONTH FROM ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')) = $2 
-        AND EXTRACT(YEAR FROM ((created_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta')) = $3 
+        AND EXTRACT(MONTH FROM created_at) = $2 
+        AND EXTRACT(YEAR FROM created_at) = $3 
       GROUP BY week 
       ORDER BY week ASC
     `;
@@ -136,7 +136,7 @@ class EmissionRepository {
       JOIN emission_items i ON l.item_id = i.id 
       JOIN emission_categories c ON l.category_id = c.id 
       WHERE l.user_id = $1 
-        AND DATE((l.logged_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${dOffset} days'
+        AND DATE(l.logged_at) = CURRENT_DATE - INTERVAL '${dOffset} days'
       GROUP BY i.item_name, c.name
     `;
 
@@ -150,7 +150,7 @@ class EmissionRepository {
       JOIN emission_items i ON l.item_id = i.id 
       JOIN emission_categories c ON l.category_id = c.id 
       WHERE l.user_id = $1 
-        AND DATE((l.logged_at AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Jakarta') = (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')::DATE - INTERVAL '${dOffset} days'
+        AND DATE(l.logged_at) = CURRENT_DATE - INTERVAL '${dOffset} days'
       GROUP BY l.batch_id, i.item_name, c.name
     `;
 
