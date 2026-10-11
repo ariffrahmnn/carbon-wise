@@ -102,13 +102,12 @@ class AuthService {
       { expiresIn: '15m' }
     );
     const getCleanFrontendUrl = () => {
-      let reqOrigin = req?.headers?.origin || (req?.headers?.referer ? new URL(req.headers.referer).origin : null);
-      let url = process.env.FRONTEND_URL || reqOrigin || 'https://carbonwisecalc.com';
-      url = url.trim().replace(/\/+$/, '');
-      if (url.includes(':5173')) {
-        url = url.replace(':5173', '');
+      const reqOrigin = req?.headers?.origin || (req?.headers?.referer ? new URL(req.headers.referer).origin : null);
+      if (reqOrigin) {
+        return reqOrigin.replace(/\/+$/, '');
       }
-      return url;
+      let url = process.env.FRONTEND_URL || 'https://carbonwisecalc.com';
+      return url.trim().replace(/\/+$/, '');
     };
 
     const frontendUrl = getCleanFrontendUrl();
