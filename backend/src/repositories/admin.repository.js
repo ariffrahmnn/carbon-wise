@@ -43,13 +43,25 @@ class AdminRepository {
 
     // Period filter condition for calculation_batches
     let periodWhere = '';
+    let w1Case = `CASE WHEN EXTRACT(DAY FROM created_at) BETWEEN 1 AND 7 THEN total_batch_co2 ELSE 0 END`;
+    let w2Case = `CASE WHEN EXTRACT(DAY FROM created_at) BETWEEN 8 AND 14 THEN total_batch_co2 ELSE 0 END`;
+
     if (month && year) {
       periodWhere = `WHERE EXTRACT(MONTH FROM created_at) = $${paramIndex} AND EXTRACT(YEAR FROM created_at) = $${paramIndex + 1}`;
       queryParams.push(parseInt(month), parseInt(year));
       paramIndex += 2;
+
+      if (parseInt(month) === 9 && parseInt(year) === 2026) {
+        w1Case = `CASE WHEN DATE(created_at) BETWEEN '2026-09-15' AND '2026-09-21' THEN total_batch_co2 ELSE 0 END`;
+        w2Case = `CASE WHEN DATE(created_at) BETWEEN '2026-09-22' AND '2026-09-28' THEN total_batch_co2 ELSE 0 END`;
+      }
+    } else {
+      // Default / All time fallback - compute for client period
+      w1Case = `CASE WHEN DATE(created_at) BETWEEN '2026-09-15' AND '2026-09-21' THEN total_batch_co2 ELSE 0 END`;
+      w2Case = `CASE WHEN DATE(created_at) BETWEEN '2026-09-22' AND '2026-09-28' THEN total_batch_co2 ELSE 0 END`;
     }
 
-    // Query Utama Rekor Siswa + Total Emisi Periode, Rata-rata Harian, dan All-Time
+    // Query Utama Rekor Siswa + Total Emisi Periode, Minggu 1, Minggu 2, Rata-rata Harian, dan All-Time
     const mainQuery = `
       SELECT 
         u.id,
@@ -58,6 +70,8 @@ class AdminRepository {
         u.school_name,
         u.class_grade,
         COALESCE(period.total_period, 0) AS total_period,
+        COALESCE(period.minggu_1, 0) AS minggu_1,
+        COALESCE(period.minggu_2, 0) AS minggu_2,
         COALESCE(period.days_count, 0) AS days_count,
         COALESCE(period.avg_daily, 0) AS avg_daily,
         COALESCE(all_time.total_all_time, 0) AS total_all_time,
@@ -69,6 +83,8 @@ class AdminRepository {
         SELECT 
           user_id, 
           ROUND(SUM(total_batch_co2), 2) AS total_period,
+          ROUND(SUM(${w1Case}), 2) AS minggu_1,
+          ROUND(SUM(${w2Case}), 2) AS minggu_2,
           COUNT(DISTINCT DATE(created_at)) AS days_count,
           ROUND(SUM(total_batch_co2) / NULLIF(COUNT(DISTINCT DATE(created_at)), 0), 2) AS avg_daily
         FROM calculation_batches
@@ -167,11 +183,16 @@ class AdminRepository {
         DATE(b.created_at) AS date,
         TO_CHAR(b.created_at, 'DD Mon YYYY') AS formatted_date,
         TRIM(TO_CHAR(b.created_at, 'Day')) AS day_name,
+        CASE 
+          WHEN DATE(b.created_at) BETWEEN '2026-09-15' AND '2026-09-21' THEN 'Minggu 1 (15 - 21 Sep)'
+          WHEN DATE(b.created_at) BETWEEN '2026-09-22' AND '2026-09-28' THEN 'Minggu 2 (22 - 28 Sep)'
+          ELSE 'Minggu ' || CEIL(EXTRACT(DAY FROM b.created_at) / 7.0)
+        END AS week_name,
         ROUND(SUM(b.total_batch_co2), 2) AS daily_co2
       FROM calculation_batches b
       JOIN users u ON b.user_id = u.id
       ${whereClause}
-      GROUP BY u.id, u.full_name, u.school_name, u.class_grade, u.email, DATE(b.created_at), formatted_date, day_name
+      GROUP BY u.id, u.full_name, u.school_name, u.class_grade, u.email, DATE(b.created_at), formatted_date, day_name, week_name
       ORDER BY u.full_name ASC, date ASC
     `;
 

@@ -68,12 +68,31 @@ const AdminDashboard = () => {
 
   const getPeriodLabel = () => {
     switch (selectedPeriod) {
-      case '9-2026': return 'September 2026';
+      case '9-2026': return 'September 2026 (15 - 28 Sep)';
       case '10-2026': return 'Oktober 2026';
       case '8-2026': return 'Agustus 2026';
       case 'all': return 'Semua Waktu';
       default: return selectedPeriod;
     }
+  };
+
+  const getWeekLabels = () => {
+    if (selectedPeriod === '9-2026' || selectedPeriod === 'all') {
+      return {
+        w1: 'Minggu 1 (15 - 21 Sep)',
+        w2: 'Minggu 2 (22 - 28 Sep)'
+      };
+    }
+    if (selectedPeriod === '10-2026') {
+      return {
+        w1: 'Minggu 1 (1 - 7 Okt)',
+        w2: 'Minggu 2 (8 - 14 Okt)'
+      };
+    }
+    return {
+      w1: 'Minggu 1',
+      w2: 'Minggu 2'
+    };
   };
 
   // 3. Fetch data rekor siswa saat debouncedSearch, selectedSchool, selectedPeriod, atau currentPage berubah
@@ -183,10 +202,11 @@ const AdminDashboard = () => {
       const resultDetails = await resDetails.json();
       const detailsData = resultDetails.data || [];
 
-      // Sheet 1: Rekapitulasi Siswa
+      // Sheet 1: Rekapitulasi Siswa (Termasuk Minggu 1 & Minggu 2)
+      const weekLabels = getWeekLabels();
       const periodColName = selectedPeriod === 'all' 
-        ? 'TOTAL EMISI (kg CO2)' 
-        : `EMISI ${getPeriodLabel().toUpperCase()} (kg CO2)`;
+        ? 'TOTAL PERIODE (kg CO2)' 
+        : `TOTAL ${getPeriodLabel().toUpperCase()} (kg CO2)`;
 
       const excelDataSheet1 = exportData.map((s, idx) => ({
         'NO': idx + 1,
@@ -194,6 +214,8 @@ const AdminDashboard = () => {
         'SEKOLAH': s.school_name || '-',
         'KELAS': s.class_grade || '-',
         'EMAIL': s.email,
+        [`${weekLabels.w1} (kg CO2)`]: parseFloat(s.minggu_1 || 0).toFixed(2),
+        [`${weekLabels.w2} (kg CO2)`]: parseFloat(s.minggu_2 || 0).toFixed(2),
         [periodColName]: parseFloat(s.total_period || 0).toFixed(2),
         'RATA-RATA HARIAN (kg CO2)': parseFloat(s.avg_daily || 0).toFixed(2),
         'HARI AKTIF MENGISI': parseInt(s.days_count || 0),
@@ -207,6 +229,7 @@ const AdminDashboard = () => {
         'SEKOLAH': d.school_name || '-',
         'KELAS': d.class_grade || '-',
         'EMAIL': d.email,
+        'MINGGU': d.week_name || '-',
         'TANGGAL': d.formatted_date || (d.date ? String(d.date).split('T')[0] : '-'),
         'HARI': d.day_name || '-',
         'EMISI HARIAN (kg CO2)': parseFloat(d.daily_co2 || 0).toFixed(2)
@@ -425,12 +448,14 @@ const AdminDashboard = () => {
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '60px' }}>NO</th>
+                    <th style={{ width: '50px' }}>NO</th>
                     <th>NAMA LENGKAP</th>
                     <th>SEKOLAH</th>
                     <th>KELAS</th>
                     <th>EMAIL</th>
-                    <th>EMISI PERIODE</th>
+                    <th style={{ color: '#b45309' }}>{getWeekLabels().w1.toUpperCase()}</th>
+                    <th style={{ color: '#0284c7' }}>{getWeekLabels().w2.toUpperCase()}</th>
+                    <th>TOTAL PERIODE</th>
                     <th>RATA-RATA HARIAN</th>
                     <th>TOTAL ALL-TIME</th>
                     <th style={{ width: '70px', textAlign: 'center' }}>DETAIL</th>
@@ -439,13 +464,13 @@ const AdminDashboard = () => {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td colSpan="9" className="admin-table-empty">
+                      <td colSpan="11" className="admin-table-empty">
                         Memuat data rekor siswa...
                       </td>
                     </tr>
                   ) : students.length === 0 ? (
                     <tr>
-                      <td colSpan="9" className="admin-table-empty">
+                      <td colSpan="11" className="admin-table-empty">
                         Tidak ada data siswa ditemukan.
                       </td>
                     </tr>
@@ -457,6 +482,12 @@ const AdminDashboard = () => {
                         <td className="col-school">{student.school_name || '-'}</td>
                         <td className="col-class">{student.class_grade || '-'}</td>
                         <td className="col-email">{student.email}</td>
+                        <td className="col-emission" style={{ color: '#b45309', fontWeight: 'bold' }}>
+                          {parseFloat(student.minggu_1 || 0).toFixed(2)} kg
+                        </td>
+                        <td className="col-emission" style={{ color: '#0284c7', fontWeight: 'bold' }}>
+                          {parseFloat(student.minggu_2 || 0).toFixed(2)} kg
+                        </td>
                         <td className="col-emission daily" style={{ fontWeight: 'bold' }}>
                           {parseFloat(student.total_period || 0).toFixed(2)} kg
                         </td>
