@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import './styles/global/index.css'
 
+// Penanganan otomatis saat file chunk versi lama di browser sudah diganti oleh versi build baru di server
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault();
+  window.location.reload();
+});
+
 // Page Dasar (Loaded Eagerly)
 import LandingPage from './pages/LandingPage.jsx'
 
