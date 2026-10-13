@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Calendar, FileSpreadsheet, LogOut, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import { buildApiUrl } from '../config/api.js';
 const appIcon = '/Icon.png';
 import * as XLSX from 'xlsx';
@@ -16,6 +16,10 @@ const AdminDashboard = () => {
   const [schoolsList, setSchoolsList] = useState([]);
   const [selectedSchool, setSelectedSchool] = useState('');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+
+  // Filter Periode Waktu Dinamis (Default: September 2026 - Proyek Jejak Karbonku)
+  const [selectedPeriod, setSelectedPeriod] = useState('9-2026');
+  const [showPeriodDropdown, setShowPeriodDropdown] = useState(false);
 
   // Search input state dengan TEKNIK DEBOUNCE (400ms)
   const [searchInput, setSearchInput] = useState('');
@@ -62,10 +66,20 @@ const AdminDashboard = () => {
     fetchDistinctSchools();
   }, []);
 
-  // 3. Fetch data rekor siswa saat debouncedSearch, selectedSchool, atau currentPage berubah
+  const getPeriodLabel = () => {
+    switch (selectedPeriod) {
+      case '9-2026': return 'September 2026';
+      case '10-2026': return 'Oktober 2026';
+      case '8-2026': return 'Agustus 2026';
+      case 'all': return 'Semua Waktu';
+      default: return selectedPeriod;
+    }
+  };
+
+  // 3. Fetch data rekor siswa saat debouncedSearch, selectedSchool, selectedPeriod, atau currentPage berubah
   useEffect(() => {
     fetchStudentRecords();
-  }, [debouncedSearch, selectedSchool, currentPage]);
+  }, [debouncedSearch, selectedSchool, selectedPeriod, currentPage]);
 
   const fetchDistinctSchools = async () => {
     try {
@@ -86,9 +100,19 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
+      let month = '';
+      let year = '';
+      if (selectedPeriod && selectedPeriod !== 'all') {
+        const [m, y] = selectedPeriod.split('-');
+        month = m;
+        year = y;
+      }
+
       const queryParams = new URLSearchParams({
         search: debouncedSearch,
         school: selectedSchool,
+        month,
+        year,
         page: currentPage,
         limit: 10
       });
@@ -117,47 +141,89 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
-  // Fitur Export ke Excel Seluruh Data (SheetJS XLSX)
+  // Fitur Export ke Excel 2 Sheet: Rekap Siswa & Rincian Harian (SheetJS XLSX)
   const handleExportExcel = async () => {
     if (isExporting) return;
     try {
       setIsExporting(true);
       const token = localStorage.getItem('token');
+      let month = '';
+      let year = '';
+      if (selectedPeriod && selectedPeriod !== 'all') {
+        const [m, y] = selectedPeriod.split('-');
+        month = m;
+        year = y;
+      }
+
       const queryParams = new URLSearchParams({
         search: debouncedSearch,
         school: selectedSchool,
+        month,
+        year,
         page: 1,
         limit: 99999
       });
 
-      const response = await fetch(buildApiUrl(`/api/v1/admin/students?${queryParams.toString()}`), {
+      // 1. Ambil data rekap seluruh siswa untuk Sheet 1
+      const resStudents = await fetch(buildApiUrl(`/api/v1/admin/students?${queryParams.toString()}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      const result = await response.json();
-
-      const exportData = result.data || [];
+      const resultStudents = await resStudents.json();
+      const exportData = resultStudents.data || [];
 
       if (exportData.length === 0) {
         alert('Tidak ada data rekor siswa untuk diekspor!');
         return;
       }
 
-      const excelData = exportData.map((s, idx) => ({
+      // 2. Ambil data rincian emisi harian siswa untuk Sheet 2
+      const resDetails = await fetch(buildApiUrl(`/api/v1/admin/students/export-details?${queryParams.toString()}`), {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const resultDetails = await resDetails.json();
+      const detailsData = resultDetails.data || [];
+
+      // Sheet 1: Rekapitulasi Siswa
+      const periodColName = selectedPeriod === 'all' 
+        ? 'TOTAL EMISI (kg CO2)' 
+        : `EMISI ${getPeriodLabel().toUpperCase()} (kg CO2)`;
+
+      const excelDataSheet1 = exportData.map((s, idx) => ({
         'NO': idx + 1,
         'NAMA LENGKAP': s.full_name,
         'SEKOLAH': s.school_name || '-',
         'KELAS': s.class_grade || '-',
         'EMAIL': s.email,
-        'PER HARI (kg CO2)': parseFloat(s.total_daily || 0).toFixed(2),
-        'PER MINGGU (kg CO2)': parseFloat(s.total_weekly || 0).toFixed(2),
-        'PER BULAN (kg CO2)': parseFloat(s.total_monthly || 0).toFixed(2)
+        [periodColName]: parseFloat(s.total_period || 0).toFixed(2),
+        'RATA-RATA HARIAN (kg CO2)': parseFloat(s.avg_daily || 0).toFixed(2),
+        'HARI AKTIF MENGISI': parseInt(s.days_count || 0),
+        'TOTAL KESELURUHAN (All-Time kg CO2)': parseFloat(s.total_all_time || 0).toFixed(2)
       }));
 
-      const worksheet = XLSX.utils.json_to_sheet(excelData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekor_Siswa');
+      // Sheet 2: Rincian Emisi Per Hari
+      const excelDataSheet2 = detailsData.map((d, idx) => ({
+        'NO': idx + 1,
+        'NAMA SISWA': d.full_name,
+        'SEKOLAH': d.school_name || '-',
+        'KELAS': d.class_grade || '-',
+        'EMAIL': d.email,
+        'TANGGAL': d.formatted_date || (d.date ? String(d.date).split('T')[0] : '-'),
+        'HARI': d.day_name || '-',
+        'EMISI HARIAN (kg CO2)': parseFloat(d.daily_co2 || 0).toFixed(2)
+      }));
 
-      XLSX.writeFile(workbook, `Rekor_Emisi_Siswa_CarbonWiseCalc_Semua_Data.xlsx`);
+      const workbook = XLSX.utils.book_new();
+      const worksheet1 = XLSX.utils.json_to_sheet(excelDataSheet1);
+      const worksheet2 = XLSX.utils.json_to_sheet(excelDataSheet2);
+
+      XLSX.utils.book_append_sheet(workbook, worksheet1, 'Rekap_Siswa');
+      XLSX.utils.book_append_sheet(workbook, worksheet2, 'Rincian_Harian');
+
+      const periodFileSuffix = selectedPeriod === 'all' 
+        ? 'Semua_Waktu' 
+        : getPeriodLabel().replace(/\s+/g, '_');
+
+      XLSX.writeFile(workbook, `Rekor_Emisi_Siswa_CarbonWise_${periodFileSuffix}.xlsx`);
     } catch (err) {
       console.error('Failed to export student records to Excel:', err);
       alert('Gagal mengunduh file Excel.');
@@ -231,59 +297,115 @@ const AdminDashboard = () => {
 
             <div className="admin-action-group">
               {/* TOMBOL FILTER SEKOLAH UNIK */}
-              <button 
-                type="button" 
-                className="admin-filter-btn"
-                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-              >
-                <Filter size={16} />
-                <span>Filter {selectedSchool ? `(${selectedSchool})` : ''}</span>
-              </button>
+              <div style={{ position: 'relative' }}>
+                <button 
+                  type="button" 
+                  className="admin-filter-btn"
+                  onClick={() => {
+                    setShowFilterDropdown(!showFilterDropdown);
+                    setShowPeriodDropdown(false);
+                  }}
+                >
+                  <Filter size={16} />
+                  <span>Filter {selectedSchool ? `(${selectedSchool})` : ''}</span>
+                </button>
 
-              {/* DROPDOWN FILTER SEKOLAH DEDUPLIKASI */}
-              {showFilterDropdown && (
-                <div className="admin-filter-dropdown">
-                  <strong style={{ display: 'block', marginBottom: '8px', fontSize: '0.82rem', color: '#4a0e17' }}>
-                    Pilih Sekolah:
-                  </strong>
-                  <select 
-                    value={selectedSchool}
-                    onChange={(e) => {
-                      setSelectedSchool(e.target.value);
-                      setCurrentPage(1);
-                      setShowFilterDropdown(false);
-                    }}
-                    className="admin-filter-select"
-                  >
-                    <option value="">-- Semua Sekolah --</option>
-                    {schoolsList.map((sch, i) => {
-                      const schoolName = (typeof sch === 'string' ? sch : (sch?.school_name || '')).trim();
-                      const count = typeof sch === 'object' && sch?.student_count ? ` (${sch.student_count} siswa)` : '';
-                      if (!schoolName) return null;
-                      return (
-                        <option key={i} value={schoolName}>
-                          {schoolName}{count}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {selectedSchool && (
-                    <button 
-                      type="button" 
-                      className="admin-reset-filter-btn"
-                      onClick={() => {
-                        setSelectedSchool('');
+                {/* DROPDOWN FILTER SEKOLAH DEDUPLIKASI */}
+                {showFilterDropdown && (
+                  <div className="admin-filter-dropdown">
+                    <strong style={{ display: 'block', marginBottom: '8px', fontSize: '0.82rem', color: '#4a0e17' }}>
+                      Pilih Sekolah:
+                    </strong>
+                    <select 
+                      value={selectedSchool}
+                      onChange={(e) => {
+                        setSelectedSchool(e.target.value);
                         setCurrentPage(1);
                         setShowFilterDropdown(false);
                       }}
+                      className="admin-filter-select"
                     >
-                      Reset Filter
-                    </button>
-                  )}
-                </div>
-              )}
+                      <option value="">-- Semua Sekolah --</option>
+                      {schoolsList.map((sch, i) => {
+                        const schoolName = (typeof sch === 'string' ? sch : (sch?.school_name || '')).trim();
+                        const count = typeof sch === 'object' && sch?.student_count ? ` (${sch.student_count} siswa)` : '';
+                        if (!schoolName) return null;
+                        return (
+                          <option key={i} value={schoolName}>
+                            {schoolName}{count}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    {selectedSchool && (
+                      <button 
+                        type="button" 
+                        className="admin-reset-filter-btn"
+                        onClick={() => {
+                          setSelectedSchool('');
+                          setCurrentPage(1);
+                          setShowFilterDropdown(false);
+                        }}
+                      >
+                        Reset Filter
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
 
-              {/* TOMBOL EXPORT KE EXCEL */}
+              {/* TOMBOL FILTER PERIODE WAKTU */}
+              <div style={{ position: 'relative' }}>
+                <button 
+                  type="button" 
+                  className="admin-filter-btn"
+                  onClick={() => {
+                    setShowPeriodDropdown(!showPeriodDropdown);
+                    setShowFilterDropdown(false);
+                  }}
+                >
+                  <Calendar size={16} />
+                  <span>Periode: {getPeriodLabel()}</span>
+                </button>
+
+                {/* DROPDOWN FILTER PERIODE */}
+                {showPeriodDropdown && (
+                  <div className="admin-filter-dropdown" style={{ minWidth: '250px' }}>
+                    <strong style={{ display: 'block', marginBottom: '8px', fontSize: '0.82rem', color: '#4a0e17' }}>
+                      Pilih Periode Emisi:
+                    </strong>
+                    <select 
+                      value={selectedPeriod}
+                      onChange={(e) => {
+                        setSelectedPeriod(e.target.value);
+                        setCurrentPage(1);
+                        setShowPeriodDropdown(false);
+                      }}
+                      className="admin-filter-select"
+                    >
+                      <option value="9-2026">September 2026 (Jejak Karbonku)</option>
+                      <option value="10-2026">Oktober 2026 (Bulan Ini)</option>
+                      <option value="all">Semua Waktu (All Time)</option>
+                      <option value="8-2026">Agustus 2026</option>
+                    </select>
+                    {selectedPeriod !== '9-2026' && (
+                      <button 
+                        type="button" 
+                        className="admin-reset-filter-btn"
+                        onClick={() => {
+                          setSelectedPeriod('9-2026');
+                          setCurrentPage(1);
+                          setShowPeriodDropdown(false);
+                        }}
+                      >
+                        Kembali ke September 2026
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* TOMBOL EXPORT KE EXCEL 2 SHEET */}
               <button 
                 type="button" 
                 className="admin-export-btn"
@@ -292,7 +414,7 @@ const AdminDashboard = () => {
                 style={{ opacity: isExporting ? 0.7 : 1, cursor: isExporting ? 'wait' : 'pointer' }}
               >
                 <FileSpreadsheet size={16} />
-                <span>{isExporting ? 'Mengekspor...' : 'Ekspor Excel'}</span>
+                <span>{isExporting ? 'Mengekspor 2 Sheet...' : 'Ekspor Excel'}</span>
               </button>
             </div>
           </div>
@@ -308,9 +430,9 @@ const AdminDashboard = () => {
                     <th>SEKOLAH</th>
                     <th>KELAS</th>
                     <th>EMAIL</th>
-                    <th>PER HARI</th>
-                    <th>PER MINGGU</th>
-                    <th>PER BULAN</th>
+                    <th>EMISI PERIODE</th>
+                    <th>RATA-RATA HARIAN</th>
+                    <th>TOTAL ALL-TIME</th>
                     <th style={{ width: '70px', textAlign: 'center' }}>DETAIL</th>
                   </tr>
                 </thead>
@@ -335,14 +457,14 @@ const AdminDashboard = () => {
                         <td className="col-school">{student.school_name || '-'}</td>
                         <td className="col-class">{student.class_grade || '-'}</td>
                         <td className="col-email">{student.email}</td>
-                        <td className="col-emission daily">
-                          {parseFloat(student.total_daily || 0).toFixed(2)} kg
+                        <td className="col-emission daily" style={{ fontWeight: 'bold' }}>
+                          {parseFloat(student.total_period || 0).toFixed(2)} kg
                         </td>
                         <td className="col-emission weekly">
-                          {parseFloat(student.total_weekly || 0).toFixed(2)} kg
+                          {parseFloat(student.avg_daily || 0).toFixed(2)} kg
                         </td>
                         <td className="col-emission monthly">
-                          {parseFloat(student.total_monthly || 0).toFixed(2)} kg
+                          {parseFloat(student.total_all_time || 0).toFixed(2)} kg
                         </td>
                         <td className="col-action">
                           <button 

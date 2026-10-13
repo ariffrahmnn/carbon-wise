@@ -1,8 +1,8 @@
 import pool from '../configs/db.js';
 
 class AdminRepository {
-  // Mengambil daftar rekor siswa dengan fitur pencarian ILIKE, filter sekolah unik, dan agregasi emisi
-  async getAllStudentRecords({ search = '', school = '', classGrade = '', page = 1, limit = 10 }) {
+  // Mengambil daftar rekor siswa dengan fitur pencarian ILIKE, filter sekolah unik, filter periode waktu dinamis, dan agregasi emisi
+  async getAllStudentRecords({ search = '', school = '', classGrade = '', month = '', year = '', page = 1, limit = 10 }) {
     const offset = (page - 1) * limit;
     const cleanSearch = search.trim();
     const cleanSchool = school.trim();
@@ -41,7 +41,15 @@ class AdminRepository {
     const countRes = await pool.query(countQuery, queryParams);
     const totalRecords = parseInt(countRes.rows[0].total || 0);
 
-    // Query Utama Rekor Siswa + Total Emisi Harian, Mingguan, Bulanan
+    // Period filter condition for calculation_batches
+    let periodWhere = '';
+    if (month && year) {
+      periodWhere = `WHERE EXTRACT(MONTH FROM created_at) = $${paramIndex} AND EXTRACT(YEAR FROM created_at) = $${paramIndex + 1}`;
+      queryParams.push(parseInt(month), parseInt(year));
+      paramIndex += 2;
+    }
+
+    // Query Utama Rekor Siswa + Total Emisi Periode, Rata-rata Harian, dan All-Time
     const mainQuery = `
       SELECT 
         u.id,
@@ -49,10 +57,29 @@ class AdminRepository {
         u.email,
         u.school_name,
         u.class_grade,
+        COALESCE(period.total_period, 0) AS total_period,
+        COALESCE(period.days_count, 0) AS days_count,
+        COALESCE(period.avg_daily, 0) AS avg_daily,
+        COALESCE(all_time.total_all_time, 0) AS total_all_time,
         COALESCE(daily.total_daily, 0) AS total_daily,
         COALESCE(weekly.total_weekly, 0) AS total_weekly,
         COALESCE(monthly.total_monthly, 0) AS total_monthly
       FROM users u
+      LEFT JOIN (
+        SELECT 
+          user_id, 
+          ROUND(SUM(total_batch_co2), 2) AS total_period,
+          COUNT(DISTINCT DATE(created_at)) AS days_count,
+          ROUND(SUM(total_batch_co2) / NULLIF(COUNT(DISTINCT DATE(created_at)), 0), 2) AS avg_daily
+        FROM calculation_batches
+        ${periodWhere}
+        GROUP BY user_id
+      ) period ON u.id = period.user_id
+      LEFT JOIN (
+        SELECT user_id, ROUND(SUM(total_batch_co2), 2) AS total_all_time
+        FROM calculation_batches
+        GROUP BY user_id
+      ) all_time ON u.id = all_time.user_id
       LEFT JOIN (
         SELECT user_id, SUM(total_batch_co2) AS total_daily
         FROM calculation_batches
@@ -89,6 +116,67 @@ class AdminRepository {
         limit: parseInt(limit)
       }
     };
+  }
+
+  // Mengambil rincian emisi harian per siswa untuk diekspor ke Sheet 2 Excel
+  async getStudentExportDetails({ search = '', school = '', classGrade = '', month = '', year = '' }) {
+    const cleanSearch = search.trim();
+    const cleanSchool = school.trim();
+    const cleanClass = classGrade.trim();
+
+    let whereConditions = [`u.role::text NOT ILIKE 'admin'`];
+    let queryParams = [];
+    let paramIndex = 1;
+
+    if (cleanSearch) {
+      whereConditions.push(`(u.full_name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex} OR u.school_name ILIKE $${paramIndex})`);
+      queryParams.push(`%${cleanSearch}%`);
+      paramIndex++;
+    }
+
+    if (cleanSchool) {
+      whereConditions.push(`TRIM(u.school_name) ILIKE $${paramIndex}`);
+      queryParams.push(cleanSchool);
+      paramIndex++;
+    }
+
+    if (cleanClass) {
+      whereConditions.push(`TRIM(u.class_grade) ILIKE $${paramIndex}`);
+      queryParams.push(`%${cleanClass}%`);
+      paramIndex++;
+    }
+
+    if (month && year) {
+      whereConditions.push(`EXTRACT(MONTH FROM b.created_at) = $${paramIndex}`);
+      queryParams.push(parseInt(month));
+      paramIndex++;
+      whereConditions.push(`EXTRACT(YEAR FROM b.created_at) = $${paramIndex}`);
+      queryParams.push(parseInt(year));
+      paramIndex++;
+    }
+
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    const query = `
+      SELECT 
+        u.id AS user_id,
+        u.full_name,
+        u.school_name,
+        u.class_grade,
+        u.email,
+        DATE(b.created_at) AS date,
+        TO_CHAR(b.created_at, 'DD Mon YYYY') AS formatted_date,
+        TRIM(TO_CHAR(b.created_at, 'Day')) AS day_name,
+        ROUND(SUM(b.total_batch_co2), 2) AS daily_co2
+      FROM calculation_batches b
+      JOIN users u ON b.user_id = u.id
+      ${whereClause}
+      GROUP BY u.id, u.full_name, u.school_name, u.class_grade, u.email, DATE(b.created_at), formatted_date, day_name
+      ORDER BY u.full_name ASC, date ASC
+    `;
+
+    const result = await pool.query(query, queryParams);
+    return result.rows;
   }
 
   // Mengambil daftar nama sekolah unik (Deduplikasi & TRIM + Hitung Jumlah Siswa)

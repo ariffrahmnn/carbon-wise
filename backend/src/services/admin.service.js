@@ -5,6 +5,10 @@ class AdminService {
     return await adminRepository.getAllStudentRecords(params);
   }
 
+  async getStudentExportDetails(params) {
+    return await adminRepository.getStudentExportDetails(params);
+  }
+
   async getDistinctSchools() {
     return await adminRepository.getDistinctSchools();
   }

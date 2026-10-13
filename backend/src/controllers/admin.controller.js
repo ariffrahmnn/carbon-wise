@@ -2,11 +2,13 @@ import adminService from '../services/admin.service.js';
 
 export const getStudentRecords = async (req, res) => {
   try {
-    const { search, school, classGrade, page, limit } = req.query;
+    const { search, school, classGrade, month, year, page, limit } = req.query;
     const result = await adminService.getStudentRecords({
       search: search || '',
       school: school || '',
       classGrade: classGrade || '',
+      month: month || '',
+      year: year || '',
       page: page ? parseInt(page) : 1,
       limit: limit ? parseInt(limit) : 10
     });
@@ -16,6 +18,27 @@ export const getStudentRecords = async (req, res) => {
       message: 'Berhasil mengambil rekor siswa!',
       data: result.students,
       pagination: result.pagination
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getStudentExportDetails = async (req, res) => {
+  try {
+    const { search, school, classGrade, month, year } = req.query;
+    const details = await adminService.getStudentExportDetails({
+      search: search || '',
+      school: school || '',
+      classGrade: classGrade || '',
+      month: month || '',
+      year: year || ''
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Berhasil mengambil rincian ekspor siswa!',
+      data: details
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
