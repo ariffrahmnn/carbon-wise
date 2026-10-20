@@ -12,6 +12,9 @@ dotenv.config();
 
 const app = express();
 
+// Percayai reverse proxy Nginx agar rate-limiter & IP client terbaca akurat
+app.set('trust proxy', 1);
+
 const allowedOrigins = [
   process.env.CLIENT_URL || 'https://carbonwisecalc.com',
   'https://carbonwisecalc.com',
